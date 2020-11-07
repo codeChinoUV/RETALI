@@ -1,16 +1,26 @@
-body{
-    margin: 0;
-    padding: 0;
+@import "../../../bootstrap-4/css/bootstrap.css";
+
+.color-primario{
+    background-color: var(--primary);
+    border-color: var(--primary);
 }
 
-img{
-    display: block;
-    width: 50%;
-    resize: vertical;
-    height: 50%;
+html, body{
     margin: 0;
     padding: 0;
+    height: 100%;
+}
+
+#imagen{
+    display: block;
     float: left;
+    width: 50%;
+    height: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    background-image: url("../imagenes/inicioSesion.jpeg");
+    background-size:100% 150%;
 }
 
 h1{
@@ -22,7 +32,7 @@ h1{
     width: 50%;
     display: block;
     float: right;
-    padding: 3%;
+    padding: 7% 12.5%;
 }
 
 #btnIniciarSesion{
@@ -31,6 +41,19 @@ h1{
     justify-content: center;
 }
 
+.form-group{
+    margin-top: 7%;
+}
+
 button{
     margin: auto;
+}
+
+.center{
+  text-align: center;
+}
+
+hr{
+    width: 100%;
+    border-color: #1b1e21;
 }

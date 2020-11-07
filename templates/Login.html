@@ -8,10 +8,11 @@
     <link rel="stylesheet" type="text/css" href="{% static 'usuarios/inicioSesion/estilos/inicioSesion.css' %}">
 </head>
 <body>
-    <img class="img-fluid" src="{% static 'usuarios/inicioSesion/imagenes/inicioSesion.jpeg' %}" alt="Imagen estudiando" />
+<div id="imagen"></div>
     <div id="formularioInicioSesion">
         <h1>RETALI</h1>
         <form method="POST">
+            {% csrf_token %}
             <div class="form-group">
                 <label for="username">Nombre de usuario</label>
                 <input type="text" class="form-control" id="username" name="username" placeholder="Ingresa tu nombre de usuario">
@@ -21,10 +22,13 @@
                 <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña">
             </div>
             <div id="btnIniciarSesion">
-                <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+                <button type="submit" class="btn btn-primary color-primario">Iniciar sesión</button>
             </div>
         </form>
-    </div>
+        <div class="who-we-are">
+            <hr>
+            <hr>
+        </div>
 
     <script src="{% static 'bootstrap-4/js/bootstrap.js' %}"></script>
 </body>
