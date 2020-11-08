@@ -127,3 +127,4 @@ STATICFILES_DIRS = (
 )
 
 STATIC_URL = '/static/'
+AUTH_USER_MODEL = 'usuarios.Usuario'
