@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 
-
-# Create your views here.
 
 def iniciarSesion(request):
     if request.method == 'POST':
@@ -12,6 +11,9 @@ def iniciarSesion(request):
         if user is not None:
             login(request, user)
             return redirect('paginaInicio')
+        else:
+            messages.error(request, 'El correo electronico o la contraseña son incorrectos')
+            return redirect('login')
     else:
         if request.user.is_authenticated:
             return redirect('paginaInicio')
