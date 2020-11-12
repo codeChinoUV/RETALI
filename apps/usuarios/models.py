@@ -28,3 +28,4 @@ class Persona(models.Model):
     numero_telefonico = models.CharField(max_length=13)
     foto_de_perfil = models.ImageField(upload_to='personas')
     usuario = models.OneToOneField(Usuario, on_delete=models.RESTRICT, primary_key=True)
+

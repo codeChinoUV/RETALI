@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -21,14 +22,20 @@ def iniciarSesion(request):
             return render(request, 'Login.html')
 
 
+@login_required
 def paginaInicio(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
+    if request.user.persona.es_maestro:
+        return render(request, 'PaginaInicioMaestro.html')
     else:
-        return render(request, 'PaginaInicio.html')
+        return render(request, 'PaginaInicioAlumno.html')
 
 
 def cerrarSesion(request):
     if request.user.is_authenticated:
         logout(request)
     return redirect('login')
+
+
+def registro(request):
+    if request.method == 'GET':
+        return render(request, 'RegistroUsuario.html')
