@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RETALI</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-4/css/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'estilos/paginaPrincipal.css' %}">
+</head>
+<body>
+    {% block navbar %}
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'imagenes/Logo.png' %}" alt="">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-1 ml-auto" >
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'cerrarSesion' %}">Cerrar sesión</a>
+                    </li>
+            </ul>
+            </div>
+        </nav>
+    {% endblock %}
+   <h2>¡Bienvenido {{ user.persona.nombre }}!</h2>
+    <div id="tarjetas">
+        <div class="tarjeta" id="clases">
+            <img src="{% static 'imagenes/libro.png' %}" alt="libro"/>
+            <div class="contenido-tarjeta">
+                <h3>Clase</h3>
+                <p>Clases inscrito: {{ '0' }}</p>
+                <p>Clases pendiente de aceptación: {{ '1' }}</p>
+            </div>
+        </div>
+        <div class="tarjeta" id="tareas">
+            <img src="{% static 'imagenes/portapapeles.png' %}" alt="checklist"/>
+            <div class="contenido-tarjeta">
+                <h3>Tareas</h3>
+                <p>Tareas que se cierran hoy: {{ '1' }}</p>
+                <p>Tareas que se cierran esta semana: {{ '3' }}</p>
+            </div>
+        </div>
+        <div class="tarjeta" id="avisos">
+            <img src="{% static 'imagenes/altoparlante.png' %}" alt="altavoz"/>
+            <div class="contenido-tarjeta">
+                <h3>Anuncios</h3>
+                <p>Anuncios sin leer: {{ '0' }}</p>
+            </div>
+        </div>
+        <div class="tarjeta" id="foros">
+            <img src="{% static 'imagenes/charlando.png' %}" alt="conversacion"/>
+            <div class="contenido-tarjeta">
+                <h3>Foros</h3>
+                <p>Foros abiertos: {{ '1' }}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

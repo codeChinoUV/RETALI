@@ -1,0 +1,70 @@
+@import "../bootstrap-4/css/bootstrap.css";
+
+html, body{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Roboto, serif;
+}
+
+nav a img{
+    width: 50%;
+    margin: 0;
+}
+
+.navbar a{
+    color: white;
+}
+
+.navbar{
+    padding: 0;
+}
+
+h2{
+    text-align: center;
+    margin: 2% 0 0 0;
+}
+
+#clases{
+    background-color: var(--secondary);
+}
+
+#tareas{
+    background-color: var(--primary);
+}
+
+#avisos{
+    background-color: #dc3545;
+}
+
+#foros{
+    background-color: #1e7e34;
+}
+
+.tarjeta{
+    margin: 5% 10% 0 10%;
+    width: 30%;
+    display: block;
+    float: left;
+    height: 20%;
+    color: white;
+    border-radius: 5%;
+}
+
+.tarjeta img{
+    display: block;
+    float: left;
+    width: 30%;
+    height: 100%;
+    padding: 1.5%;
+}
+
+.tarjeta h3{
+    text-align: center;
+}
+
+.tarjeta div{
+    display: block;
+    float: right;
+    width: 70%;
+}
