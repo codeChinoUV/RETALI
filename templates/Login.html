@@ -4,8 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block nombrePagina %}RETALI - Inicia sesión{% endblock %}</title>
+    {% block estilos %}
     <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-4/css/bootstrap.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'usuarios/inicioSesion/estilos/inicioSesion.css' %}">
+    {% endblock %}
 </head>
 <body>
 {% block body %}
