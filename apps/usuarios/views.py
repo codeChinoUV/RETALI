@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
+from apps.usuarios.models import Persona
+
 
 def iniciarSesion(request):
     if request.method == 'POST':
@@ -24,7 +26,7 @@ def iniciarSesion(request):
 
 @login_required
 def paginaInicio(request):
-    if request.user.persona.es_maestro:
+    if request.user.es_maestro:
         return render(request, 'PaginaInicioMaestro.html')
     else:
         return render(request, 'PaginaInicioAlumno.html')
