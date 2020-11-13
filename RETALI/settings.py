@@ -131,4 +131,4 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
-LOGIN_URL = ''
+LOGIN_URL = 'login/'
