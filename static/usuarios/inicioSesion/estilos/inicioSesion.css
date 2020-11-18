@@ -62,7 +62,7 @@ button:hover{
     height: 100%;
     display: block;
     float: right;
-    padding: 2% 12.5% 0% 12.5%;
+    padding: 2% 12.5% 0 12.5%;
 }
 
 #logo{
@@ -78,7 +78,7 @@ button:hover{
 
 #btnIniciarSesion button{
     width: 100%;
-    margin: 0% 15%;
+    margin: 0 15%;
 }
 
 .form-group{
@@ -122,5 +122,5 @@ button{
 p{
     text-align: center;
     margin-top: 7.5%;
-    margin-bottom: 0%;
+    margin-bottom: 0;
 }

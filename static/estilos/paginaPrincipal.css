@@ -5,6 +5,9 @@ html, body{
     padding: 0;
     height: 100%;
     font-family: Roboto, serif;
+    background-image: url("../imagenes/fondo.jpg");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
 }
 
 nav a img{
@@ -67,4 +70,38 @@ h2{
     display: block;
     float: right;
     width: 70%;
+}
+
+#mensaje-inicio-maestro{
+    background: rgba(0, 0, 0, 0.75);
+    margin: 4% 15%;
+    border-radius: 2rem;
+    padding: 2%;
+    color: white;
+}
+
+#mensaje-inicio-maestro h2{
+    text-align: center;
+}
+
+#mensaje-inicio-maestro p{
+    margin: 3% 0 0 0;
+    font-size: 1.50rem;
+    text-align: center;
+}
+
+#boton-registro-clase{
+    margin: 2% 0 0 0;
+    display: flex;
+    justify-content: center;
+}
+
+.color-primario{
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.color-secundario{
+    background-color: var(--secondary);
+    border-color: var(--secondary);
 }
