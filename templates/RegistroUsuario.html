@@ -12,6 +12,7 @@
     <div id="registerForm">
         <h1>Registrate</h1>
         <form method="POST">
+            {% csrf_token %}
             <div class="form-group">
                 <label for="nombre">Nombre</label>
                 <input type="text"  class="form-control" name="nombre" id="nombre" placeholder="Ingresa tu nombre">
@@ -44,9 +45,9 @@
             </div>
             <div class="form-group">
                 <label for="tipoUsuario">¿Qué eres?</label>
-                <select class="form-control" id="tipoUsuario">
-                    <option>Maestro</option>
-                    <option>Alumno</option>
+                <select class="form-control" id="tipoUsuario" name="tipoUsuario">
+                    <option value="Maestro">Maestro</option>
+                    <option value="Alumno">Alumno</option>
                 </select>
             </div>
             <div class="form-group">
