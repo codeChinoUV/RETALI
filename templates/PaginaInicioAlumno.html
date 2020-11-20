@@ -6,6 +6,7 @@
     <title>{% block titulo %} RETALI - Alumno{% endblock %}</title>
     <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-4/css/bootstrap.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'estilos/paginaPrincipal.css' %}">
+    {% block estilos-adicionales %} {% endblock %}
 </head>
 <body>
     {% block navbar %}
@@ -60,5 +61,6 @@
             </div>
         </div>
     {% endblock %}
+    <script src="{% static 'bootstrap-4/js/bootstrap.js' %}"></script>
 </body>
 </html>
