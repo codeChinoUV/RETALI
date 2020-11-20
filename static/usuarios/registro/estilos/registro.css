@@ -7,11 +7,11 @@
     float: right;
     padding: 2% 12.5% 0% 12.5%;
 }
-#imagen{
+#imagenPortada{
     display: block;
     float: left;
     width: 50%;
-    height: 1000px;
+    height: 100%;
     max-height: 100%;
     margin: 0;
     padding: 0;
@@ -52,7 +52,7 @@ button:hover{
 button{
     margin: auto;
 }
-#btnInicioSesion button{
+#btnInicioSesion{
     width: 50%;
     margin: 10% 25%;
     text-align: center;

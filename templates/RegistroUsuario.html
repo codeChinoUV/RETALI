@@ -8,11 +8,19 @@
     <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-4/css/bootstrap.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'usuarios/registro/estilos/registro.css' %}">
 {% endblock %}
+{% block imagenPrincipal %}
+    <div id="imagenPortada"></div>
+    {% endblock %}
 {% block formulario %}
     <div id="registerForm">
         <h1>Registrate</h1>
         <form method="POST">
             {% csrf_token %}
+             {% for message in messages %}
+                  <div class="alert alert-warning">
+                        {{ message }}
+                  </div>
+            {% endfor %}
             <div class="form-group">
                 <label for="nombre">Nombre</label>
                 <input type="text"  class="form-control" name="nombre" id="nombre" placeholder="Ingresa tu nombre">
@@ -40,7 +48,7 @@
             <div class="form-group">
                 <label for="confirmarContraseña">Confirmar contraseña</label>
                 <div class="button-inside">
-                    <input type="password" class="form-control" id="confirmarContraseña" name="confirmarContraseña" placeholder="Ingresa nuevamente tu contraseña">
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmarContraseña" placeholder="Ingresa nuevamente tu contraseña">
                 </div>
             </div>
             <div class="form-group">
@@ -55,16 +63,16 @@
                 <input type="text" class="form-control" name="telefono" id="telefono" placeholder="Ingresa un número de telefono">
             </div>
             <div id="btnRegistro">
-                <button type="submit" class="btn btn-primary color-primario">Registrarse</button>
+                <button type="submit" class="btn btn-primary">Registrarse</button>
             </div>
             <div id="linea">
                 <hr id="linea-izquierda">
                 <span id="texto-entre-lineas"> O </span>
                 <hr id="linea-derecha">
             </div>
-            <p><a href="">¿Ya tienes una cuenta?</a></p>
+            <p>¿Ya tienes una cuenta?</p>
             <div id="btnInicioSesion">
-                <button type="submit" class="btn btn-primary color-primario">Iniciar sesión</button>
+                <a href="http://localhost:8000/login/" class="btn btn-secondary">Iniciar sesión</a>
             </div>
         </form>
     </div>

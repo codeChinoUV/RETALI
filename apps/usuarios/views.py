@@ -2,8 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
-
 from apps.clases.models import Inscripcion, Foro, Alumno, Maestro
+import re
 
 
 def iniciarSesion(request):
@@ -73,36 +73,78 @@ def cerrarSesion(request):
     return redirect('login')
 
 
-def paginaRegistro(request):
-    if request.method == 'GET':
-        return render(request, 'RegistroUsuario.html')
-
-
 def registrarUsuario(request):
     if request.method == 'POST':
         username = request.POST.get('correoElectronico')
         password = request.POST.get('password')
-        tipo_usuario = request.POST.get('tipoUsuario')
-        if tipo_usuario == 'Maestro':
-            es_maestro = True
-        else:
-            es_maestro = False
-        Usuario = get_user_model()
-        user = Usuario.objects.create_user(email=username, password=password, es_maestro=es_maestro)
+        confirmPassword = request.POST.get('confirmarContraseña')
         nombre = request.POST.get('nombre')
         apellidos = request.POST.get('apellidos')
         telefono = request.POST.get('telefono')
-        try:
-            if es_maestro:
-                maestro = Maestro(nombre=nombre, apellidos=apellidos, numero_telefonico=telefono, foto_de_perfil="",
-                                  usuario=user)
-                maestro.save()
+        tipoUsuario = request.POST.get('tipoUsuario')
+        es_maestro = validarTipoUsuario(tipoUsuario)
+        if validarCamposNoVacios(username, password, nombre, apellidos, telefono):
+            if esCorreoValido(username):
+                if validarContraseña(password, confirmPassword):
+                    Usuario = get_user_model()
+                    user = Usuario.objects.create_user(email=username, password=password, es_maestro=es_maestro)
+                    crearTipoUsuario(nombre, apellidos, telefono, user, es_maestro)
+                    return redirect('login')
+                else:
+                    messages.error(request, 'Las contraseñas no coinciden')
+                    return redirect('registro')
             else:
-                alumno = Alumno(nombre=nombre, apellidos=apellidos, numero_telefonico=telefono, foto_de_perfil="",
-                                usuario=user)
-                alumno.save()
-            return redirect('paginaInicio')
-        except:
-            messages.error(request, 'No se puedo guardar')
-
+                messages.error(request, 'El correo ingresado es inválido')
+                return redirect('registro')
+        else:
+            messages.error(request, 'Favor de ingresar información en todos los campos')
+            return redirect('registro')
     return render(request, 'RegistroUsuario.html')
+
+
+def validarContraseña(password, confirmPassword):
+    if password == confirmPassword:
+        return True
+    else:
+        return False
+
+
+def validarTipoUsuario(tipoUsuario):
+    if tipoUsuario == 'Maestro':
+        return True
+    else:
+        return False
+
+
+def crearTipoUsuario(nombre, apellidos, telefono, user, esMaestro):
+    if esMaestro:
+        maestro = Maestro(nombre=nombre, apellidos=apellidos, numero_telefonico=telefono, foto_de_perfil="",
+                          usuario=user)
+        maestro.save()
+    else:
+        alumno = Alumno(nombre=nombre, apellidos=apellidos, numero_telefonico=telefono, foto_de_perfil="",
+                        usuario=user)
+        alumno.save()
+
+
+def esCorreoValido(correo):
+    if re.match('^[(a-z0-9\_\-\.)]+@[(a-z0-9\_\-\.)]+\.[(a-z)]{2,15}$', correo):
+        return True
+    else:
+        return False
+
+
+def validarCamposNoVacios(username, password, nombre, apellidos, telefono):
+    if not username:
+        return False
+    elif not password:
+        return False
+    elif not nombre:
+        return False
+    elif not apellidos:
+        return False
+    elif not telefono:
+        return False
+    else:
+        return True
+
