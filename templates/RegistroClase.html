@@ -1,0 +1,38 @@
+{%  extends 'PaginaInicioAlumno.html' %}
+{% load static %}
+{% block titulo %} Registro Clase{% endblock %}
+{% block estilos-adicionales %}
+    <link rel="stylesheet" type="text/css" href="{% static 'clases/registro-clase/estilos/registro-clase.css' %}">
+{% endblock %}
+{% block cuerpo %}
+    <div id="formulario_registro_clase" class="formulario_registro">
+        <div id="imagen-seleccionada">
+        </div>
+        <div id="campos-formulario">
+            <h2>Registrar clase</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="nombre">{{ form.nombre.label }}</label>
+                    {{ form.nombre }}
+                </div>
+                <div class="form-group">
+                    <label for="escuela">{{ form.escuela.label }}</label>
+                    {{ form.escuela }}
+                </div>
+                <div class="form-group">
+                    <label for="foto">{{ form.foto.label }}</label>
+                    <div class="input-group mb-3">
+                        <div class="custom-file">
+                            {{ form.foto }}
+                            <label class="custom-file-label btn-" for="foto">Escoge un archivo</label>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-danger">Regresar</button>
+                <input type="submit" class="btn btn-primary" value="Registrar">
+            </form>
+        </div>
+    </div>
+    <script type="module" src="{% static 'clases/registro-clase/scripts/registro-clase.js' %}"></script>
+{% endblock %}
