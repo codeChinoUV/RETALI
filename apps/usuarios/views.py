@@ -86,7 +86,7 @@ def paginaRegistro(request):
 def registrarUsuario(request):
     if request.method == 'POST':
         username = request.POST.get('correoElectronico')
-        password = request.POST.get('contraseña')
+        password = request.POST.get('password')
         tipoUsuario = request.POST.get('tipoUsuario')
         if tipoUsuario == 'Maestro':
             es_maestro = True
@@ -99,17 +99,14 @@ def registrarUsuario(request):
         nombre = request.POST.get('nombre')
         apellidos = request.POST.get('apellidos')
         telefono = request.POST.get('telefono')
-        try:
-            if es_maestro:
-                maestro = Maestro(nombre=nombre, apellidos=apellidos, numero_telefonico=telefono, foto_de_perfil="",
-                                  usuario=user)
-                maestro.save()
-            else:
-                alumno = Alumno(nombre=nombre, apellidos=apellidos, numero_telefonico=telefono, foto_de_perfil="",
-                                usuario=user)
-                alumno.save()
-            return redirect('paginaInicio')
-        except:
-            messages.error(request, 'No se puedo guardar')
+        if es_maestro:
+            maestro = Maestro(nombre=nombre, apellidos=apellidos, numero_telefonico=telefono, foto_de_perfil="",
+                              usuario=user)
+            maestro.save()
+        else:
+            alumno = Alumno(nombre=nombre, apellidos=apellidos, numero_telefonico=telefono, foto_de_perfil="",
+                            usuario=user)
+            alumno.save()
+        return redirect('login')
 
     return render(request, 'RegistroUsuario.html')
