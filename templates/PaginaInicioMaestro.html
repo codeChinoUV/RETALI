@@ -12,16 +12,18 @@
         </div>
     {% else %}
         <div id="clases-del-maestro">
-            <h2>Bienvenido {{ user.persona.nombre }}</h2>
+            <h2>Bienvenido {{ user.persona.nombre }}, estas son tus clases:</h2>
             <div id="tarjetas-clases">
                 {% for clase in clases %}
                     <div class="clase">
                         {% if clase.foto  %}
                             <img src="{{ clase.foto.url }}">
                         {% endif %}
-                        <h3>{{ clase.nombre }}</h3>
-                        <p>{{ clase.escuela }}</p>
-                        <p>Codigo para unirse a clase: {{ clase.codigo }}</p>
+                        <div class="informacion-clase">
+                            <h3>{{ clase.nombre }}</h3>
+                            <p>{{ clase.escuela }}</p>
+                            <p>Codigo para unirse a clase: {{ clase.codigo }}</p>
+                        </div>
                     </div>
                 {% endfor %}
             </div>

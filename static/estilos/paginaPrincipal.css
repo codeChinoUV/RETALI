@@ -3,11 +3,10 @@
 html, body{
     margin: 0;
     padding: 0;
-    height: 100%;
     font-family: Roboto, serif;
-    background-image: url("../imagenes/fondo.jpg");
+    /*background-image: url("../imagenes/fondo.jpg");*/
+    object-fit: cover;
     background-repeat: no-repeat;
-    background-size: 100% 100%;
 }
 
 nav a img{
@@ -94,6 +93,38 @@ h2{
     margin: 2% 0 0 0;
     display: flex;
     justify-content: center;
+}
+
+#tarjetas-clases{
+    display: inline-block;
+    margin: 2% 10%;
+    color: white;
+    width: 80%;
+}
+
+.clase{
+    height: 180px;
+    padding: 10px;
+    margin: 5%;
+    background-color: rgba(0, 0, 0, 0.85);
+    border-radius: 2rem;
+}
+
+.clase img{
+    display: block;
+    float: left;
+    height: 160px;
+    width: 30%;
+    object-fit: cover;
+    margin-right: 2%;
+    border-radius: 2rem;
+}
+
+.informacion-clase{
+    display: block;
+    float: right;
+    width: 68%;
+    height: 170px;
 }
 
 .color-primario{

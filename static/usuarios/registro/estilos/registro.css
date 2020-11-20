@@ -9,13 +9,13 @@
 }
 #imagen{
     display: block;
-    float: 60%;
-    height: 100%;
+    float: left;
+    width: 50%;
+    height: 1000px;
     max-height: 100%;
     margin: 0;
     padding: 0;
     background-image: url("../imagenes/inicioSesion.jpeg");
-    background-size: 100% 100%;
 }
 
 h1{
