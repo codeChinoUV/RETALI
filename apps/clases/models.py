@@ -12,8 +12,8 @@ class Clase(models.Model):
     codigo = models.CharField(max_length=10, db_index=True)
     escuela = models.CharField(max_length=100, null=False)
     nombre = models.CharField(max_length=120, null=False)
-    numero_de_telefono = models.CharField(max_length=10)
     abierta = models.BooleanField(default=True)
+    foto = models.ImageField(upload_to='clases')
     maestro = models.ForeignKey(Maestro, on_delete=models.RESTRICT)
 
 

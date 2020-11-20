@@ -2,7 +2,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
-from apps.clases.models import Alumno, Maestro
 
 from apps.clases.models import Inscripcion, Foro, Alumno, Maestro
 
@@ -92,8 +91,6 @@ def registrarUsuario(request):
             es_maestro = True
         else:
             es_maestro = False
-        print(es_maestro)
-
         Usuario = get_user_model()
         user = Usuario.objects.create_user(email=username, password=password, es_maestro=es_maestro)
         nombre = request.POST.get('nombre')
