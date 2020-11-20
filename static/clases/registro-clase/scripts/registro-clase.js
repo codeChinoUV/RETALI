@@ -1,4 +1,4 @@
-import {validar_tamanio, validar_tamanio_campo} from "../../../scripts/validaciones.js";
+import { validar_tamanio_campo} from "../../../scripts/validaciones.js";
 
 function validarCampoNombre(){
     let tamanio_maximo = 120;

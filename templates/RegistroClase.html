@@ -6,8 +6,7 @@
 {% endblock %}
 {% block cuerpo %}
     <div id="formulario_registro_clase" class="formulario_registro">
-        <div id="imagen-seleccionada">
-        </div>
+        <img id="imagen-seleccionada" src="{% static 'clases/registro-clase/imagenes/AgregarImagen.png' %}">
         <div id="campos-formulario">
             <h2>Registrar clase</h2>
             <form method="POST">
@@ -30,7 +29,7 @@
                     </div>
                 </div>
                 <button class="btn btn-danger">Regresar</button>
-                <input type="submit" class="btn btn-primary" value="Registrar">
+                <input type="button" id="btn-registrar" class="btn btn-primary" value="Registrar">
             </form>
         </div>
     </div>
