@@ -3,4 +3,25 @@ function validar_tamanio(tamanio_minino, tamanio_maximo, texto){
     return cadena_sin_espacios_extra.length >=tamanio_minino && cadena_sin_espacios_extra.length <= tamanio_maximo;
 }
 
-export {validar_tamanio}
+function validar_tamanio_campo(tamanio_minimo, tamanio_maximo, id, mensajeNoValido){
+    let campo = document.body.querySelector("#" + id);
+    if( !validar_tamanio(tamanio_minimo, tamanio_maximo, campo.value)){
+        let advertenciasExistentes = document.querySelectorAll("#"+id+"-invalido-mensaje");
+        if(advertenciasExistentes.length === 0){
+            let advertencia = document.createElement('div');
+            advertencia.innerHTML= mensajeNoValido;
+            advertencia.setAttribute('id',  id +'-invalido-mensaje');
+            advertencia.setAttribute('class', 'invalid-feedback');
+            advertencia.style.display = "block";
+            campo.parentElement.appendChild(advertencia);
+        }
+    }else{
+        let mensajeNombreInvalido = document.querySelector("#"+ id + "-invalido-mensaje");
+        if(mensajeNombreInvalido != null){
+            campo.parentElement.removeChild(mensajeNombreInvalido);
+        }
+        campo.value = campo.value.trim();
+    }
+}
+
+export {validar_tamanio, validar_tamanio_campo}
