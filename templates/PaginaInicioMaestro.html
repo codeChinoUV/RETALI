@@ -10,5 +10,21 @@
                 <a href="{% url 'registrar_clase' %}" class="btn btn-secondary color-secundario">Crear clase</a>
             </div>
         </div>
+    {% else %}
+        <div id="clases-del-maestro">
+            <h2>Bienvenido {{ user.persona.nombre }}</h2>
+            <div id="tarjetas-clases">
+                {% for clase in clases %}
+                    <div class="clase">
+                        {% if clase.foto  %}
+                            <img src="{{ clase.foto.url }}">
+                        {% endif %}
+                        <h3>{{ clase.nombre }}</h3>
+                        <p>{{ clase.escuela }}</p>
+                        <p>Codigo para unirse a clase: {{ clase.codigo }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     {% endif %}
 {% endblock %}

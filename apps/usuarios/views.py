@@ -21,10 +21,6 @@ def iniciarSesion(request):
         if request.user.is_authenticated:
             return redirect('paginaInicio')
         else:
-            # User = get_user_model()
-            # user = User.objects.create_user(email="maestro@gmail.com", password="hola9011", es_maestro=True)
-            # maestro = Maestro(nombre="Jose Miguel", apellidos="Quiroz Benitez", numero_telefonico="2821125536", usuario=user)
-            # maestro.save()
             return render(request, 'Login.html')
 
 
@@ -32,7 +28,7 @@ def iniciarSesion(request):
 def paginaInicio(request):
     if request.user.es_maestro:
         datos = {
-            'clases': None,
+            'clases': [],
             'cantidad_clases': 0
         }
         if request.user.persona.maestro.clase_set.exists():
