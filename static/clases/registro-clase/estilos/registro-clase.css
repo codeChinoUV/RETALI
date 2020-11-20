@@ -1,7 +1,7 @@
 #formulario_registro_clase{
     display: flex;
     margin: 2% 15%;
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 0.85);
     border-radius: 2rem;
     padding: 2%;
     color: white;
@@ -10,8 +10,8 @@
 #imagen-seleccionada{
     display: block;
     float: left;
-    width: 25%;
-    background-size: cover;
+    width: 30%;
+    object-fit: cover;
     margin-right: 2%;
     border-radius: 2rem;
     margin-top: 5%;
@@ -32,4 +32,8 @@
 .btn-primary{
     display: block;
     float: right;
+}
+
+.invalid-feedback{
+    display: block;
 }
