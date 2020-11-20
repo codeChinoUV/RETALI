@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from apps.usuarios.views import iniciarSesion, paginaInicio, cerrarSesion, registro
+from apps.usuarios.views import iniciarSesion, paginaInicio, cerrarSesion, registrarUsuario
 from apps.clases.views import registrar_clase
 
 urlpatterns = [
@@ -23,6 +23,6 @@ urlpatterns = [
     path('login/', iniciarSesion, name='login'),
     path('', paginaInicio, name='paginaInicio'),
     path('logout/', cerrarSesion, name='cerrarSesion'),
-    path('registro/', registro, name='registro'),
+    path('registro/',registrarUsuario , name='registro'),
     path('registro_clase/', registrar_clase, name='registrar_clase')
 ]
