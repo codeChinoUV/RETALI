@@ -23,6 +23,6 @@ urlpatterns = [
     path('login/', iniciarSesion, name='login'),
     path('', paginaInicio, name='paginaInicio'),
     path('logout/', cerrarSesion, name='cerrarSesion'),
-    path('registro/',registrarUsuario , name='registro'),
+    path('registro/', registrarUsuario, name='registro'),
     path('registro_clase/', registrar_clase, name='registrar_clase')
 ]

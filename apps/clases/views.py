@@ -8,6 +8,8 @@ from .models import Clase
 
 @login_required
 def registrar_clase(request):
+    if not request.user.es_maestro:
+        return redirect('paginaInicio')
     if request.method == 'GET':
         form = ClaseForm()
         return render(request, 'RegistroClase.html', {'form': form})
