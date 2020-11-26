@@ -34,7 +34,7 @@ def paginaInicio(request):
         if request.user.persona.maestro.clase_set.exists():
             datos['clases'] = request.user.persona.maestro.clase_set.filter(abierta=True)
             datos['cantidad_clases'] = (datos['clases'])
-        return render(request, 'PaginaInicioMaestro.html', datos)
+        return render(request, 'usuarios/paginaInicio/PaginaInicioMaestro.html', datos)
     else:
         datos_de_las_clases_del_alumno = _obtener_informacion_de_las_clases_del_alumno(request.user.persona.alumno)
         return render(request, 'PaginaInicioAlumno.html', datos_de_las_clases_del_alumno)

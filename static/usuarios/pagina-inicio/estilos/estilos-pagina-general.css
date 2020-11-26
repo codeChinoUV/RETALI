@@ -1,0 +1,330 @@
+:root{
+    --width: 250px;
+    --padding: 10px;
+    --bgcolor: #202020;
+    --hovercolor: rgb(23,23,23);
+    --width-collapsed: 45px;
+}
+
+body{
+    background-color: #4B4B4B;
+    font-family: Roboto, sans-serif;
+    padding: 0;
+    margin: 0 0 0 var(--width-collapsed);
+}
+
+.body-expandido{
+    margin-left: var(--width);
+}
+
+#menu-lateral{
+    background-color: var(--bgcolor);
+    position: fixed;
+    color: white;
+    height: 100%;
+    max-height: 100%;
+    left: 0;
+    top: 0;
+    padding: 10px 0;
+}
+
+*{
+    box-sizing: border-box;
+}
+
+.logo{
+    cursor: pointer;
+}
+
+/*
+    Botones
+ */
+
+#btn-cerrar-sesion{
+    background-color: #B52A41;
+    border-radius: 16px;
+    border: none;
+    transition: all 0.3s ease 0s;
+}
+
+#btn-cerrar-sesion:hover{
+    background-color: #92041f;
+}
+
+/*
+    Header
+ */
+
+header{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: var(--bgcolor);
+    padding: 1%;
+}
+
+.div-logo{
+    width: 20%;
+    vertical-align: center;
+}
+
+.div-logo img{
+    width: 70%;
+}
+
+header li,
+header a,
+header button{
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 16px;
+    color: #edf0f1;
+}
+
+.nav-links{
+    list-style: none;
+}
+
+.nav-links li{
+    display: inline-block;
+    padding: 0 20px;
+}
+
+.nav-links li a{
+    transition: all 0.3s ease 0s;
+}
+
+.nav-links li a:hover{
+    color: var(--hovercolor);
+}
+
+nav{
+    margin-right: auto;
+}
+
+header a .titulo,
+header a .icono{
+    font-size: 14px;
+    vertical-align: middle;
+    overflow: hidden;
+    display: inline-block;
+}
+
+header div a{
+    margin-right: 10px;
+}
+
+header a .icono img{
+    width: 28px;
+}
+
+/*
+    Scrollbar
+ */
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+}
+
+/*
+    Menu lateral
+ */
+
+#menu-lateral a{
+    color: white;
+    text-decoration: none;
+}
+
+/*
+    Cabecera
+ */
+
+#menu-lateral #cabecera{
+    box-sizing: border-box;
+
+}
+
+#menu-lateral #cabecera #titulo{
+    box-sizing: border-box;
+    overflow: hidden;
+    display: block;
+    float: left;
+    width: 80%;
+}
+
+#menu-lateral #cabecera #titulo img{
+    width: 100%;
+}
+
+#menu-lateral #cabecera #titulo, #menu-lateral #cabecera #boton-menu{
+    vertical-align: middle;
+}
+
+#menu-lateral #cabecera #boton-menu{
+    display: block;
+    float: right;
+    cursor: pointer;
+    padding: 10px;
+    width: var(--width-collapsed);
+    box-sizing: border-box;
+}
+
+#menu-lateral #cabecera #boton-menu:hover{
+    background-color: var(--hovercolor);
+}
+
+#menu-lateral #cabecera #boton-menu .btn-hamburger{
+    background-color: white;
+    width: 100%;
+    height: 2px;
+    margin: 5px 0;
+}
+
+/*
+    Perfil
+ */
+
+#menu-lateral #perfil{
+    border-bottom: solid 2px white;
+    padding: var(--padding) 0;
+    text-align: center;
+}
+
+#menu-lateral #perfil #foto{
+    box-sizing: border-box;
+    padding: var(--padding);
+    margin: 0 auto;
+}
+
+#menu-lateral #perfil #foto img{
+    border-radius: 50%;
+    width: 60%;
+}
+
+#menu-lateral #perfil #foto, #menu-lateral #perfil #nombre{
+    font-size: 18px;
+    padding: var(--padding);
+    overflow: hidden;
+}
+
+/*
+    Elementos
+ */
+
+#menu-lateral.menu-expandido #elementos-menu{
+    height: 50%;
+}
+
+#menu-lateral.menu-contraido #elementos-menu{
+    overflow: hidden;
+    height: 80%;
+}
+
+#menu-lateral.menu-expandido #elementos-menu #clases{
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 75%;
+    margin-bottom: 20px
+}
+
+#menu-lateral.menu-contraido #elementos-menu #clases{
+    overflow: hidden;
+    height: 70%;
+    margin-bottom: 20px
+}
+
+#menu-lateral #elementos-menu .elemento{
+    width: var(--width);
+}
+
+#menu-lateral #elementos-menu .elemento .icono{
+    display: inline-block;
+}
+
+#menu-lateral #elementos-menu .elemento .icono,
+#menu-lateral #elementos-menu .elemento .titulo{
+    font-size: 14px;
+    vertical-align: middle;
+    overflow: hidden;
+    display: inline-block;
+}
+
+#menu-lateral #elementos-menu .elemento a{
+    display: block;
+}
+
+#menu-lateral #elementos-menu .elemento a:hover{
+    background-color: var(--hovercolor);
+}
+
+#menu-lateral #elementos-menu .elemento .icono{
+    box-sizing: border-box;
+    padding: var(--padding);
+    width: var(--width-collapsed);
+}
+
+#menu-lateral #elementos-menu .elemento .icono img{
+    width: 100%;
+}
+
+#menu-lateral #elementos-menu .elemento .titulo{
+    padding: var(--padding) 0;
+}
+
+#menu-lateral #elementos-menu .elemento.elemento-clase{
+    margin-left: 3px;
+}
+
+.menu-expandido{
+    width: var(--width);
+}
+
+.menu-expandido{
+    display: inline-block;
+    /*width: calc(100% - 50px);*/
+    margin-right: -5px;
+    padding: var(--padding);
+}
+
+.menu-expandido #cabecera #titulo span{
+    width: calc(var(--width) - var(--width-collapsed) - 5px);
+    overflow: hidden;
+    display: inline-block;
+}
+
+.menu-expandido #perfil #foto{
+    width: 200px;
+}
+
+.menu-expandido #perfil #nombre{
+    width: 100%;
+}
+
+.menu-contraido{
+    width: var(--width-collapsed);
+}
+
+.menu-contraido #cabecera #titulo{
+    width: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-contraido #perfil #nombre{
+    display: none;
+}
+
+.menu-contraido .elemento{
+    width: 100%;
+}

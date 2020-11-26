@@ -1,0 +1,95 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block nombre_pagina %}RETALI - Maestro{% endblock %}</title>
+    {% block estilos-generales %}
+        <link href="{% static 'usuarios/pagina-inicio/estilos/estilos-pagina-general.css' %}" rel="stylesheet">
+    {% endblock %}
+    {% block estilos-extra %}
+    {% endblock %}
+</head>
+<body class="body-expandido">
+{% block barra-superior %}
+    <header>
+        <nav>
+            <ul class="nav-links">
+                {% block links %}
+                {% endblock %}
+            </ul>
+        </nav>
+        <div>
+            <a href="#">
+                <div class="icono"><img src="{% static 'usuarios/pagina-inicio/imagenes/cuenta.png' %}" alt="Icono de cuenta"></div>
+                <div class="titulo">Modificar perfil</div>
+            </a>
+            <button id="btn-cerrar-sesion">
+                <a href="#">
+                    <div class="icono"><img src="{% static 'usuarios/pagina-inicio/imagenes/cerrar-sesion.png' %}" alt="Icono de salir"></div>
+                    <div class="titulo">Cerrar sesión</div>
+                </a>
+            </button>
+        </div>
+    </header>
+{% endblock %}
+{% block menu-lateral %}
+    <div id="menu-lateral" class="menu-expandido">
+        <div id="cabecera">
+            <div id="titulo"><img src="{% static 'imagenes/Logo.png' %}" alt="logo"></div>
+            <div id="boton-menu">
+                <div class="btn-hamburger"></div>
+                <div class="btn-hamburger"></div>
+                <div class="btn-hamburger"></div>
+            </div>
+        </div>
+        <div id="perfil">
+            <div id="foto">
+                {% if user.persona.maestro.foto_de_perfil %}
+                    <img src="{{ user.persona.maestro.foto_de_perfil.url }}" alt="foto de perfil">
+                {% else %}
+                    <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
+                {% endif %}
+            </div>
+            <div id="nombre">{{ user.persona.maestro.nombre }} {{ user.persona.maestro.apellidos }}</div>
+        </div>
+        <div id="elementos-menu">
+            <div class="elemento">
+                <a href="#">
+                    <div class="icono"><img src="{% static 'usuarios/pagina-inicio/imagenes/libros.png' %}" alt="Icono de libros"></div>
+                    <div class="titulo">Clases</div>
+                </a>
+            </div>
+            <div id="clases">
+                {% for clase in clases %}
+                    <div class="elemento elemento-clase">
+                        <a href="#">
+                            <div class="icono">
+                                {% if clase.foto %}
+                                    <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
+                                {% else %}
+                                    <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
+                                {% endif %}
+                            </div>
+                            <div class="titulo">{{ clase.nombre }}</div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block contenido %}
+{% endblock %}
+{% block scripts %}
+    {% block scripts-principales %}
+        <script src="{% static 'usuarios/pagina-inicio/scripts/pagina-inicio-barra-lateral.js'%}"></script>
+    {% endblock %}
+    {% block scripts-adicionales %}
+    {% endblock %}
+{% endblock %}
+</body>
+</html>
