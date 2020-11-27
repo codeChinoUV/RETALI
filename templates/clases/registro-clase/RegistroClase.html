@@ -1,10 +1,10 @@
-{%  extends 'PaginaInicioAlumno.html' %}
+{%  extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
 {% load static %}
-{% block titulo %} Registro Clase{% endblock %}
-{% block estilos-adicionales %}
+{% block titulo %} RETALI - Registro Clase{% endblock %}
+{% block estilos-extra %}
     <link rel="stylesheet" type="text/css" href="{% static 'clases/registro-clase/estilos/registro-clase.css' %}">
 {% endblock %}
-{% block cuerpo %}
+{% block contenido %}
     <div id="formulario_registro_clase" class="formulario_registro">
         <img id="imagen-seleccionada" src="{% static 'clases/registro-clase/imagenes/AgregarImagen.png' %}">
         <div id="campos-formulario">

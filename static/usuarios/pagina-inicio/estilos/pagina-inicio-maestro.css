@@ -1,0 +1,92 @@
+:root{
+    --height-tarjeta-clase: 150px;
+}
+
+#mensaje-inicio-maestro{
+    background: #1e1e1e;
+    margin: 4% 15%;
+    border-radius: 2rem;
+    padding: 2%;
+    color: white;
+}
+
+
+#tarjetas-clases{
+    display: inline-block;
+    margin: 0 10%;
+    color: white;
+    width: 80%;
+}
+
+.clase{
+    height: var(--height-tarjeta-clase);
+    padding: 10px;
+    margin: 5%;
+    background-color: #1e1e1e;
+    border-radius: 2rem;
+}
+
+.clase img{
+    display: block;
+    float: left;
+    height: calc(var(--height-tarjeta-clase) - 20px );
+    object-fit: cover;
+    margin-right: 2%;
+    border-radius: 2rem;
+}
+
+.informacion-clase{
+    display: block;
+    float: left;
+    width: 68%;
+    height: calc(var(--height-tarjeta-clase) - 20px);
+}
+
+.informacion-clase h3{
+    margin-top: 0;
+}
+
+.elementos-clase a{
+    color: transparent;
+}
+
+.elementos-clase a .titulo{
+    color: white;
+    text-decoration: none;
+}
+
+.elementos-clase a .titulo,
+.elementos-clase a .icono{
+    font-size: 14px;
+    vertical-align: middle;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.elementos-clase{
+    width: 10%;
+    display: block;
+    float: right;
+    height: calc(var(--height-tarjeta-clase) - 20px);
+}
+
+.elementos-clase a .icono img{
+    height: 36px;
+}
+
+#boton-registro-clase{
+    display: flex;
+    justify-content: flex-end;
+    margin-top: calc(var(--heigh-nav) + 20px);
+    margin-right: 1%;
+}
+
+div a.boton-primario{
+    text-decoration: none;
+    color: white;
+    background-color: var(--hovercolor);
+    border: none;
+    padding: 1%;
+    vertical-align: center;
+    border-radius: 1rem;
+}

@@ -8,9 +8,11 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block nombre_pagina %}RETALI - Maestro{% endblock %}</title>
     {% block estilos-generales %}
+        <link href="{% static 'bootstrap-4/css/bootstrap.css' %}" rel="stylesheet">
         <link href="{% static 'usuarios/pagina-inicio/estilos/estilos-pagina-general.css' %}" rel="stylesheet">
     {% endblock %}
     {% block estilos-extra %}
+        <link href="{% static 'usuarios/pagina-inicio/estilos/pagina-inicio-maestro.css' %}" rel="stylesheet">
     {% endblock %}
 </head>
 <body class="body-expandido">
@@ -19,6 +21,7 @@
         <nav>
             <ul class="nav-links">
                 {% block links %}
+                    <li class="link-actual"><a>Mis clases</a></li>
                 {% endblock %}
             </ul>
         </nav>
@@ -28,7 +31,7 @@
                 <div class="titulo">Modificar perfil</div>
             </a>
             <button id="btn-cerrar-sesion">
-                <a href="#">
+                <a href="{% url 'cerrarSesion' %}">
                     <div class="icono"><img src="{% static 'usuarios/pagina-inicio/imagenes/cerrar-sesion.png' %}" alt="Icono de salir"></div>
                     <div class="titulo">Cerrar sesión</div>
                 </a>
@@ -39,7 +42,11 @@
 {% block menu-lateral %}
     <div id="menu-lateral" class="menu-expandido">
         <div id="cabecera">
-            <div id="titulo"><img src="{% static 'imagenes/Logo.png' %}" alt="logo"></div>
+            <div id="titulo">
+                <a href="{% url 'paginaInicio' %}">
+                    <img src="{% static 'imagenes/Logo.png' %}" alt="logo">
+                </a>
+            </div>
             <div id="boton-menu">
                 <div class="btn-hamburger"></div>
                 <div class="btn-hamburger"></div>
@@ -83,6 +90,37 @@
     </div>
 {% endblock %}
 {% block contenido %}
+    {% if cantidad_clases == 0 %}
+        <div id="mensaje-inicio-maestro">
+            <p>Al parecer aun no tienes ninguna clase registrada, para empezar a crear actividades, crear foros y
+            enviar avisos, crea una nueva clase.</p>
+            <div id="boton-registro-clase">
+                <a href="{% url 'registrar_clase' %}" class="btn btn-secondary color-secundario">Crear clase</a>
+            </div>
+        </div>
+    {% else %}
+        <div id="boton-registro-clase">
+            <a href="{% url 'registrar_clase' %}" class="boton-primario">Crear clase</a>
+        </div>
+        <div id="clases-del-maestro">
+            <div id="tarjetas-clases">
+                {% for clase in clases %}
+                    <div class="clase">
+                        {% if clase.foto  %}
+                            <img src="{{ clase.foto.url }}" alt="Imagen de la clase">
+                        {% else %}
+                            <img src="{% static 'usuarios/pagina-inicio/imagenes/libro.png' %}" alt="Imagen de la clase">
+                        {% endif %}
+                        <div class="informacion-clase">
+                            <h3>{{ clase.nombre }}</h3>
+                            <p>{{ clase.escuela }}</p>
+                            <p>Codigo para unirse a clase: {{ clase.codigo }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
 {% block scripts %}
     {% block scripts-principales %}

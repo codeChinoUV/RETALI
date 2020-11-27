@@ -1,16 +1,17 @@
 :root{
     --width: 250px;
     --padding: 10px;
-    --bgcolor: #202020;
-    --hovercolor: rgb(23,23,23);
+    --heigh-nav: 70px;
+    --bgcolor: #1f1f1f;
+    --hovercolor: #F09A26;
     --width-collapsed: 45px;
 }
 
 body{
-    background-color: #4B4B4B;
+    background-color: #121212;
     font-family: Roboto, sans-serif;
     padding: 0;
-    margin: 0 0 0 var(--width-collapsed);
+    margin: var(--heigh-nav) 0 0 var(--width-collapsed);
 }
 
 .body-expandido{
@@ -56,11 +57,20 @@ body{
  */
 
 header{
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: calc(100% - var(--width-collapsed));
     display: flex;
     justify-content: flex-end;
     align-items: center;
     background-color: var(--bgcolor);
-    padding: 1%;
+    padding: 0.5%;
+    height: var(--heigh-nav);
+}
+
+.body-expandido header{
+    width: calc(100% - var(--width));
 }
 
 .div-logo{
@@ -87,7 +97,7 @@ header button{
 
 .nav-links li{
     display: inline-block;
-    padding: 0 20px;
+    padding: 22px 20px;
 }
 
 .nav-links li a{
@@ -96,6 +106,10 @@ header button{
 
 .nav-links li a:hover{
     color: var(--hovercolor);
+}
+
+.nav-links .link-actual{
+    border-bottom: 3px solid var(--hovercolor);
 }
 
 nav{

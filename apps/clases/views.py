@@ -17,7 +17,7 @@ def registrar_clase(request):
         return redirect('paginaInicio')
     if request.method == 'GET':
         form = ClaseForm()
-        return render(request, 'RegistroClase.html', {'form': form})
+        return render(request, 'clases/registro-clase/RegistroClase.html', {'form': form})
     elif request.method == "POST":
         form = ClaseForm(request.POST, request.FILES)
         if form.is_valid():
@@ -29,7 +29,7 @@ def registrar_clase(request):
             clase.save()
             return redirect('paginaInicio')
         else:
-            return render(request, 'RegistroClase.html', {'form': form})
+            return render(request, 'clases/registro-clase/RegistroClase.html', {'form': form})
 
 
 def _generar_codigo_alfebetico():
