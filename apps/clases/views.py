@@ -4,20 +4,26 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .forms import ClaseForm
 from .models import Clase
+from ..usuarios.views import obtener_informacion_de_clases_de_maestro
 
 
 @login_required
 def registrar_clase(request):
     """
-    Maneja las peticiones realizadas a la ruta 'registro_maestro/
+    Maneja las peticiones realizadas a la ruta 'registro_clase'
     :param request: Contiene la información de la petición
     :return: Un redirect a la pagina adecuada o un render de un Template
     """
     if not request.user.es_maestro:
         return redirect('paginaInicio')
+    clases_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
+    datos = {
+        'clases': clases_maestro['clases'],
+        'cantidad_clases': clases_maestro['cantidad_clases']
+    }
     if request.method == 'GET':
-        form = ClaseForm()
-        return render(request, 'clases/registro-clase/RegistroClase.html', {'form': form})
+        datos['form'] = ClaseForm()
+        return render(request, 'clases/registro-clase/RegistroClase.html', datos)
     elif request.method == "POST":
         form = ClaseForm(request.POST, request.FILES)
         if form.is_valid():
@@ -29,7 +35,8 @@ def registrar_clase(request):
             clase.save()
             return redirect('paginaInicio')
         else:
-            return render(request, 'clases/registro-clase/RegistroClase.html', {'form': form})
+            datos['form'] = form
+            return render(request, 'clases/registro-clase/RegistroClase.html', datos)
 
 
 def _generar_codigo_alfebetico():
