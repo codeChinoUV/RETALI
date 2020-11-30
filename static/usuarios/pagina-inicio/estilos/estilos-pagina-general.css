@@ -342,3 +342,18 @@ header a .icono img{
 .menu-contraido .elemento{
     width: 100%;
 }
+
+/*
+    Titulo seccion
+ */
+
+.titulo-seccion{
+    margin-top: calc(var(--heigh-nav) + 20px);
+    color: white;
+    text-align: center;
+}
+
+hr{
+    border-bottom: 2px solid var(--hovercolor);
+    margin: 0 5%;
+}

@@ -27,17 +27,27 @@ def iniciarSesion(request):
 @login_required
 def paginaInicio(request):
     if request.user.es_maestro:
-        datos = {
-            'clases': [],
-            'cantidad_clases': 0
-        }
-        if request.user.persona.maestro.clase_set.exists():
-            datos['clases'] = request.user.persona.maestro.clase_set.filter(abierta=True)
-            datos['cantidad_clases'] = (datos['clases'])
+        datos = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
         return render(request, 'usuarios/paginaInicio/PaginaInicioMaestro.html', datos)
     else:
         datos_de_las_clases_del_alumno = _obtener_informacion_de_las_clases_del_alumno(request.user.persona.alumno)
         return render(request, 'PaginaInicioAlumno.html', datos_de_las_clases_del_alumno)
+
+
+def obtener_informacion_de_clases_de_maestro(maestro):
+    """
+    Recupera la información de las clases del maestro
+    :param maestro: El maestro del cual se recuperaran las clases
+    :return: Un diccionario con las clases y la cantidad de clases
+    """
+    datos = {
+        'clases': [],
+        'cantidad_clases': 0
+    }
+    if maestro.clase_set.exists():
+        datos['clases'] = maestro.clase_set.filter(abierta=True)
+        datos['cantidad_clases'] = (datos['clases'])
+    return datos
 
 
 def _obtener_informacion_de_las_clases_del_alumno(alumno):
@@ -147,4 +157,3 @@ def validarCamposNoVacios(username, password, nombre, apellidos, telefono):
         return False
     else:
         return True
-

@@ -2,6 +2,10 @@
     --height-tarjeta-clase: 150px;
 }
 
+h2{
+    font-size: 1.5rem;
+}
+
 #mensaje-inicio-maestro{
     background: #1e1e1e;
     margin: 4% 15%;
@@ -30,6 +34,7 @@
     display: block;
     float: left;
     height: calc(var(--height-tarjeta-clase) - 20px );
+    width: calc(var(--height-tarjeta-clase) - 20px );
     object-fit: cover;
     margin-right: 2%;
     border-radius: 2rem;
@@ -74,11 +79,23 @@
     height: 36px;
 }
 
+/*
+    Boton registro clase
+ */
+
+#boton-registro-clase img,
+#boton-registro-clase div{
+    font-size: 14px;
+    vertical-align: middle;
+    overflow: hidden;
+    display: inline-block;
+}
+
+
 #boton-registro-clase{
+    margin: 2% 15% 0 15%;
     display: flex;
-    justify-content: flex-end;
-    margin-top: calc(var(--heigh-nav) + 20px);
-    margin-right: 1%;
+    justify-content: space-between;
 }
 
 div a.boton-primario{
@@ -89,4 +106,36 @@ div a.boton-primario{
     padding: 1%;
     vertical-align: center;
     border-radius: 1rem;
+}
+
+/*
+    Barra busqueda
+ */
+
+#barra-busqueda{
+    background-color: white;
+    border-radius: 40px;
+    padding: 0;
+}
+
+#barra-busqueda #busqueda-boton{
+    background-color: var(--hovercolor);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    float: left;
+}
+
+#busqueda-txt{
+    border: none;
+    background: none;
+    outline: none;
+    float: right;
+    margin: 5px 0 5px 0;
+    height: 25px;
+    line-height: 40px;
 }

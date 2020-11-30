@@ -1,15 +1,12 @@
 @import "../../../bootstrap-4/css/bootstrap.css";
 
-.color-primario{
-    background-color: var(--primary);
-    border-color: var(--primary);
-}
-
 html, body{
+    background-color: #121212;
     margin: 0;
     padding: 0;
     height: 100%;
     font-family: Roboto, serif;
+    color: white;
 }
 
 .form-group label{
@@ -123,4 +120,8 @@ p{
     text-align: center;
     margin-top: 7.5%;
     margin-bottom: 0;
+}
+
+button{
+    background-color: var(--hovercolor);
 }

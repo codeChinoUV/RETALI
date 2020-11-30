@@ -14,6 +14,8 @@
     {% block estilos-extra %}
         <link href="{% static 'usuarios/pagina-inicio/estilos/pagina-inicio-maestro.css' %}" rel="stylesheet">
     {% endblock %}
+    {% block recursos-adicionales %}
+    {% endblock %}
 </head>
 <body class="body-expandido">
 {% block barra-superior %}
@@ -21,7 +23,6 @@
         <nav>
             <ul class="nav-links">
                 {% block links %}
-                    <li class="link-actual"><a>Mis clases</a></li>
                 {% endblock %}
             </ul>
         </nav>
@@ -90,18 +91,26 @@
     </div>
 {% endblock %}
 {% block contenido %}
+    <h1 class="titulo-seccion">Mis clases</h1>
+    <hr>
+    <div id="boton-registro-clase">
+        <div id="barra-busqueda">
+            <a id="busqueda-boton" href="#">
+                <img src="{% static 'usuarios/pagina-inicio/imagenes/busqueda.svg' %}" alt="">
+            </a>
+            <input id="busqueda-txt" type="text" name="busqueda" placeholder="Ingresa para buscar">
+        </div>
+        <a href="{% url 'registrar_clase' %}" class="boton-primario">
+            <img src="{% static 'usuarios/pagina-inicio/imagenes/agregar-elemento.svg' %}" alt="icono agregar">
+            <div>Crear clase</div>
+        </a>
+    </div>
     {% if cantidad_clases == 0 %}
         <div id="mensaje-inicio-maestro">
             <p>Al parecer aun no tienes ninguna clase registrada, para empezar a crear actividades, crear foros y
             enviar avisos, crea una nueva clase.</p>
-            <div id="boton-registro-clase">
-                <a href="{% url 'registrar_clase' %}" class="btn btn-secondary color-secundario">Crear clase</a>
-            </div>
         </div>
     {% else %}
-        <div id="boton-registro-clase">
-            <a href="{% url 'registrar_clase' %}" class="boton-primario">Crear clase</a>
-        </div>
         <div id="clases-del-maestro">
             <div id="tarjetas-clases">
                 {% for clase in clases %}
@@ -112,7 +121,7 @@
                             <img src="{% static 'usuarios/pagina-inicio/imagenes/libro.png' %}" alt="Imagen de la clase">
                         {% endif %}
                         <div class="informacion-clase">
-                            <h3>{{ clase.nombre }}</h3>
+                            <h2>{{ clase.nombre }}</h2>
                             <p>{{ clase.escuela }}</p>
                             <p>Codigo para unirse a clase: {{ clase.codigo }}</p>
                         </div>
