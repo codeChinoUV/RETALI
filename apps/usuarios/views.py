@@ -2,8 +2,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
-from apps.clases.models import Inscripcion, Foro, Alumno, Maestro
+from apps.clases.models import Inscripcion, Alumno, Maestro
 import re
+
+from apps.foros.models import Foro
 
 
 def iniciarSesion(request):
