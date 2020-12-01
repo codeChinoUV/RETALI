@@ -1,0 +1,30 @@
+#mensaje-pagina-no-encontrada{
+    margin: calc(var(--heigh-nav) + 30px) 10% 0 10%;
+    background-color: var(--bgcolor);
+    text-align: center;
+    color: white;
+    padding: 5% 10%;
+    border-radius: 2rem;
+}
+
+#mensaje-pagina-no-encontrada  img{
+    height: 200px;
+    margin-bottom: 20px;
+}
+
+#mensaje-pagina-no-encontrada h1{
+    margin-bottom: 20px;
+}
+
+#mensaje-pagina-no-encontrada a{
+    text-decoration: none;
+    background-color: var(--hovercolor);
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+}
+
+#mensaje-pagina-no-encontrada a:hover{
+    text-decoration: none;
+    background-color: #d98319;
+}
