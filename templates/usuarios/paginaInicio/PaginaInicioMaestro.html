@@ -45,7 +45,7 @@
         <div id="cabecera">
             <div id="titulo">
                 <a href="{% url 'paginaInicio' %}">
-                    <img src="{% static 'imagenes/Logo.png' %}" alt="logo">
+                    <img src="{% static 'generales/imagenes/Logo.png' %}" alt="logo">
                 </a>
             </div>
             <div id="boton-menu">
@@ -66,7 +66,7 @@
         </div>
         <div id="elementos-menu">
             <div class="elemento">
-                <a href="#">
+                <a href="{% url 'paginaInicio' %}">
                     <div class="icono"><img src="{% static 'usuarios/pagina-inicio/imagenes/libros.png' %}" alt="Icono de libros"></div>
                     <div class="titulo">Clases</div>
                 </a>
@@ -74,7 +74,7 @@
             <div id="clases">
                 {% for clase in clases %}
                     <div class="elemento elemento-clase">
-                        <a href="#">
+                        <a href="{% url 'ver_materia' clase.codigo %}">
                             <div class="icono">
                                 {% if clase.foto %}
                                     <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">

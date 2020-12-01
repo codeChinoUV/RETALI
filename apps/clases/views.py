@@ -63,3 +63,21 @@ def _obtener_codigo_unico():
         if cantidad_de_clases_con_el_mismo_codigo == 0:
             break
     return codigo_generado
+
+
+@login_required()
+def informacion_clase(request, codigo_clase):
+    if not request.user.es_maestro:
+        return redirect('login')
+    else:
+        maestro = request.user.persona.maestro
+        clase_actual = maestro.clase_set.filter(abierta=True, codigo=codigo_clase).first()
+        clases_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
+        datos = {
+            'clases': clases_maestro['clases']
+        }
+        if clase_actual is not None:
+            datos['clase_actual'] = clase_actual
+            return render(request, 'clases/informacion-clase/InformacionClase.html', datos)
+        else:
+            return render(request, 'generales/NoEncontrada.html', datos)

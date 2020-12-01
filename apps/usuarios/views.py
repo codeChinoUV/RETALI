@@ -8,7 +8,7 @@ import re
 from apps.foros.models import Foro
 
 
-def iniciarSesion(request):
+def iniciar_sesion(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -27,7 +27,7 @@ def iniciarSesion(request):
 
 
 @login_required
-def paginaInicio(request):
+def pagina_inicio(request):
     if request.user.es_maestro:
         datos = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
         return render(request, 'usuarios/paginaInicio/PaginaInicioMaestro.html', datos)
@@ -79,13 +79,13 @@ def _obtener_informacion_de_las_clases_del_alumno(alumno):
     return datos
 
 
-def cerrarSesion(request):
+def cerrar_sesion(request):
     if request.user.is_authenticated:
         logout(request)
     return redirect('login')
 
 
-def registrarUsuario(request):
+def registrar_usuario(request):
     if request.method == 'POST':
         username = request.POST.get('correoElectronico')
         password = request.POST.get('password')
@@ -94,13 +94,13 @@ def registrarUsuario(request):
         apellidos = request.POST.get('apellidos')
         telefono = request.POST.get('telefono')
         tipoUsuario = request.POST.get('tipoUsuario')
-        es_maestro = validarTipoUsuario(tipoUsuario)
-        if validarCamposNoVacios(username, password, nombre, apellidos, telefono):
-            if esCorreoValido(username):
-                if validarContraseña(password, confirmPassword):
+        es_maestro = validar_tipo_usuario(tipoUsuario)
+        if validar_campos_no_vacios(username, password, nombre, apellidos, telefono):
+            if es_correo_valido(username):
+                if validar_contrasena(password, confirmPassword):
                     Usuario = get_user_model()
                     user = Usuario.objects.create_user(email=username, password=password, es_maestro=es_maestro)
-                    crearTipoUsuario(nombre, apellidos, telefono, user, es_maestro)
+                    crear_tipo_usuario(nombre, apellidos, telefono, user, es_maestro)
                     return redirect('login')
                 else:
                     messages.error(request, 'Las contraseñas no coinciden')
@@ -114,21 +114,21 @@ def registrarUsuario(request):
     return render(request, 'RegistroUsuario.html')
 
 
-def validarContraseña(password, confirmPassword):
+def validar_contrasena(password, confirmPassword):
     if password == confirmPassword:
         return True
     else:
         return False
 
 
-def validarTipoUsuario(tipoUsuario):
+def validar_tipo_usuario(tipoUsuario):
     if tipoUsuario == 'Maestro':
         return True
     else:
         return False
 
 
-def crearTipoUsuario(nombre, apellidos, telefono, user, esMaestro):
+def crear_tipo_usuario(nombre, apellidos, telefono, user, esMaestro):
     if esMaestro:
         maestro = Maestro(nombre=nombre, apellidos=apellidos, numero_telefonico=telefono, foto_de_perfil="",
                           usuario=user)
@@ -139,14 +139,14 @@ def crearTipoUsuario(nombre, apellidos, telefono, user, esMaestro):
         alumno.save()
 
 
-def esCorreoValido(correo):
+def es_correo_valido(correo):
     if re.match('^[(a-z0-9\_\-\.)]+@[(a-z0-9\_\-\.)]+\.[(a-z)]{2,15}$', correo):
         return True
     else:
         return False
 
 
-def validarCamposNoVacios(username, password, nombre, apellidos, telefono):
+def validar_campos_no_vacios(username, password, nombre, apellidos, telefono):
     if not username:
         return False
     elif not password:

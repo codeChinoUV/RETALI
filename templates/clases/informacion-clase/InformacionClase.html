@@ -1,0 +1,66 @@
+{% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
+{% load static %}
+{% block titulo %} RETALI -{% endblock %}
+{% block estilos-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static 'clases/informacion-clase/estilos/informacion-clase.css' %}">
+{% endblock %}
+{% block links %}
+    <li class="link-actual">
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Grupos</div>
+        </a>
+    </li>
+{% endblock %}
+{% block contenido %}
+    <h1>{{ clase_actual.nombre }}</h1>
+    <hr>
+    <div id="tarjeta-informacion-clase">
+        <img src="{{ clase_actual.foto.url }}">
+        <div>
+            <p>{{ clase_actual.escuela }}</p>
+            <p>Codigo de la clase: {{ clase_actual.codigo }}</p>
+        </div>
+    </div>
+    <div id="tarjeta-estadistica-clase">
+        <div class="tarjeta-estadistica">
+            <img src="{% static 'generales/imagenes/portapapeles.png' %}" alt="imagen actividades">
+            <div class="estadistica">
+                <p>Total de actividades: </p>
+                <p>Actividades abiertas: </p>
+            </div>
+        </div>
+        <div class="tarjeta-estadistica">
+            <img src="{% static 'generales/imagenes/charlando.png' %}" alt="imagen foros">
+            <div class="estadistica">
+                <p>Total de foros: </p>
+                <p>Foros activos: </p>
+            </div>
+        </div>
+        <div class="tarjeta-estadistica">
+            <img src="{% static 'generales/imagenes/graduado.png' %}" alt="imagen alumno">
+            <div class="estadistica">
+                <p>Alumnos aceptados: </p>
+                <p>Alumnos pendientes de aceptar: </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

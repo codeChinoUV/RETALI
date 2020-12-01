@@ -1,0 +1,63 @@
+h1{
+    margin: calc(var(--heigh-nav) + 20px) 10% 0 10%;
+    text-align: center;
+    color: white;
+}
+
+hr{
+    border: 2px solid var(--hovercolor);
+    margin-bottom: 20px;
+}
+
+/*
+    Taejeta informacion clase
+ */
+
+#tarjeta-informacion-clase, #tarjeta-estadistica-clase{
+    width: 45%;
+    display: block;
+    float: left;
+    background-color: var(--bgcolor);
+    padding: 1%;
+    margin: 2.5%;
+    border-radius: 1rem;
+}
+
+#tarjeta-informacion-clase img{
+    width: 30%;
+    height: 100px;
+    display: block;
+    float: left;
+    object-fit: cover;
+    margin-right: 2%;
+    border-radius: 1rem;
+}
+
+#tarjeta-informacion-clase div{
+    width: 65%;
+    color: white;
+    display: block;
+    float: right;
+}
+
+/*
+    Tarjeta estadisticas clase
+ */
+
+#tarjeta-estadistica-clase .tarjeta-estadistica{
+    display: inline-block;
+    width: 100%;
+    border-bottom: 2px solid var(--hovercolor);
+}
+
+#tarjeta-estadistica-clase .tarjeta-estadistica img{
+    margin: 10px 20px auto auto;
+    height: 48px;
+    width: 48px;
+    float: left;
+}
+
+#tarjeta-estadistica-clase .tarjeta-estadistica div {
+    float: left;
+    color: white;
+}
