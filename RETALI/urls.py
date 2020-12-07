@@ -24,5 +24,5 @@ from apps.clases.views import registrar_clase
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('usuario/', include('apps.usuarios.urls')),
-    path('clases/', include('apps.clases.urls'))
+    path('clases/', include('apps.clases.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
