@@ -1,6 +1,6 @@
 {% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
 {% load static %}
-{% block titulo %} RETALI -{% endblock %}
+{% block nombre_pagina %} Clase {{ clase_actual.nombre}} {% endblock %}
 {% block estilos-extra %}
     <link rel="stylesheet" type="text/css" href="{% static 'clases/informacion-clase/estilos/informacion-clase.css' %}">
 {% endblock %}
@@ -34,7 +34,7 @@
     <h1>{{ clase_actual.nombre }}</h1>
     <hr>
     <div id="tarjeta-informacion-clase">
-        <img src="{{ clase_actual.foto.url }}">
+        <img src="{{ clase_actual.foto.url }}" alt="Foto de clase">
         <div>
             <p>{{ clase_actual.escuela }}</p>
             <p>Codigo de la clase: {{ clase_actual.codigo }}</p>
