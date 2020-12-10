@@ -32,10 +32,17 @@
 }
 
 .input-fechas-actividades{
-    width: 25%;
+    width: 28%;
     display: block;
     float: left;
     margin-right: 1%;
+}
+
+#id_fecha_inicio,
+#id_fecha_cierre{
+    background: url('../imagenes/fecha.svg') no-repeat scroll 5px 5px;
+    background-size: 25px 25px;
+    padding-left: 35px;
 }
 
 #inputs-registro-actvidad input[type="submit"]{

@@ -3,8 +3,7 @@
 {% block nombre_pagina %} Registro de actividad {% endblock %}
 {% block estilos-extra %}
     <link rel="stylesheet" type="text/css" href="{% static 'actividades/registro-actividad/estilos/registro-actividades.css' %}">
-    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 {% endblock %}
 {% block links %}
     <li>
@@ -48,17 +47,11 @@
                     <label for="descripcion">{{ form.descripcion.label }}</label>
                     {{ form.descripcion }}
                 </div>
-                <div class="form-group pmd-textfield pmd-textfield-floating-label input-fechas-actividades">
+                <div class="form-group input-fechas-actividades">
                     <label for="fecha_inicio">{{ form.fecha_inicio.label }}</label>
-                    <div class='input-group date' id='datetimepicker1'>
-                        {{ form.fecha_inicio }}
-                        <span class="input-group-addon">
-                            <span class="glyphicon glyphicon-calendar"></span>
-                     </span>
-                  </div>
+                    {{ form.fecha_inicio }}
                 </div>
-
-                <div class="form-group pmd-textfield pmd-textfield-floating-label input-fechas-actividades">
+                <div class="form-group input-fechas-actividades">
                     <label for="fecha_cierre">{{ form.fecha_cierre.label }}</label>
                     {{ form.fecha_cierre }}
                 </div>
@@ -69,11 +62,6 @@
 
 {% endblock %}
 {% block scripts-adicionales %}
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.js" integrity="sha256-2JRzNxMJiS0aHOJjG+liqsEOuBb6++9cY4dSOyiijX4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="{% static 'actividades/registro-actividad/scripts/registro-actividad.js' %}"></script>
 {% endblock %}

@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block nombre_pagina %}Pagina de inicio Maestro{% endblock %}</title>
     {% block estilos-generales %}
-        <link href="{% static 'bootstrap-4/css/bootstrap.css' %}" rel="stylesheet">
+        <link href="{% static 'generales/bootstrap-4/css/bootstrap.css' %}" rel="stylesheet">
         <link href="{% static 'usuarios/pagina-inicio/estilos/estilos-pagina-general.css' %}" rel="stylesheet">
     {% endblock %}
     {% block estilos-extra %}
@@ -134,7 +134,7 @@
 {% block scripts %}
     {% block scripts-principales %}
         <script src="{% static 'usuarios/pagina-inicio/scripts/pagina-inicio-barra-lateral.js'%}"></script>
-        <script src="{% static 'bootstrap-4/js/bootstrap.js' %}"></script>
+        <script src="{% static 'generales/bootstrap-4/js/bootstrap.js' %}"></script>
     {% endblock %}
     {% block scripts-adicionales %}
     {% endblock %}
