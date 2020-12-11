@@ -1,0 +1,41 @@
+@import "../../../usuarios/pagina-inicio/estilos/estilos-pagina-general.css";
+
+#formulario_unirse_clase{
+    display: flex;
+    margin: calc(var(--heigh-nav) + 4%) 10%;
+    background: var(--bgcolor);
+    border-radius: 2rem;
+    padding: 2%;
+    color: white;
+    height: 300px;
+}
+
+#campos-formulario{
+    display: block;
+    float: right;
+    width: 100%;
+}
+
+.btn-danger{
+    display: block;
+    float: left;
+    margin-top: 15%;
+}
+
+.btn-primary{
+    display: block;
+    float: right;
+    margin-top: 15%;
+}
+
+.invalid-feedback{
+    display: block;
+}
+
+h2{
+    color: white;
+    text-align: center;
+}
+.form-group{
+    margin-top: 7%;
+}

@@ -81,3 +81,7 @@ def informacion_clase(request, codigo_clase):
             return render(request, 'clases/informacion-clase/InformacionClase.html', datos)
         else:
             return render(request, 'generales/NoEncontrada.html', datos)
+
+
+def unirse_clase(request):
+    return render(request, 'clases/unirse_clase/unirse_clase.html')

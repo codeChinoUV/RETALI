@@ -59,6 +59,7 @@ def _obtener_informacion_de_las_clases_del_alumno(alumno):
         'foros_abiertos': 0,
         'anuncios_sin_leer': 0,
         'tareas_que_se_cierran_hoy': 0,
+
         'tareas_que_se_cierran_esta_semana': 0
     }
     if Inscripcion.objects.filter(alumno=alumno).exists():

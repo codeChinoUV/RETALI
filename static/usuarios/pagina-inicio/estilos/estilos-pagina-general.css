@@ -2,13 +2,13 @@
     --width: 250px;
     --padding: 10px;
     --heigh-nav: 70px;
-    --bgcolor: #1f1f1f;
+    --bgcolor: #202020;
     --hovercolor: #f09a26;
     --width-collapsed: 45px;
 }
 
 body{
-    background-color: #121212;
+    background-color: #4B4B4B;
     font-family: Roboto, sans-serif;
     padding: 0;
     margin: var(--heigh-nav) 0 0 var(--width-collapsed);
