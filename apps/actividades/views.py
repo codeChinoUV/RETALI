@@ -1,3 +1,6 @@
+import datetime
+
+import pytz
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
@@ -21,13 +24,21 @@ def consultar_actividades_de_clase(request, codigo_clase):
         datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set.filter(abierta=True,
                                                                                           codigo=codigo_clase).first()
         if datos_del_maestro['clase_actual'] is not None:
-            datos_del_maestro['actividades'] = datos_del_maestro['clase_actual'].actividad_set.all()
+            datos_del_maestro['actividades'] = datos_del_maestro['clase_actual'].actividad_set.all()\
+                .order_by('-fecha_de_creacion')
+            _actualizar_estado_actividades(datos_del_maestro['actividades'])
             return render(request, 'actividades/consultar-actividades-maestro/ConsultarActividadesMaestro.html',
                           datos_del_maestro)
 
 
 @login_required()
 def registrar_actividad(request, codigo_clase):
+    """
+    Registra una actividad a la clase actual
+    :param request: La solicitud realizada por el cliente
+    :param codigo_clase: El codigo de la clase a la que se le registrara la actividad
+    :return: Una templete con los datos
+    """
     if not request.user.es_maestro:
         return redirect('paginaInicio')
     else:
@@ -53,3 +64,21 @@ def registrar_actividad(request, codigo_clase):
                 return render(request, 'actividades/registrar-actividad/RegistrarActividad.html', datos_del_maestro)
         else:
             return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
+
+
+def _actualizar_estado_actividades(actividades):
+    """
+    Actualiza el estado de las actividades que se le pasan, verificando si esta abierta o no
+    :param actividades: Las actividades a las que se le actualizara el estado
+    :return: None
+    """
+    if actividades is not None:
+        now = datetime.datetime.today()
+        now = pytz.utc.localize(now)
+        for actividad in actividades:
+            if actividad.fecha_de_cierre < now:
+                Actividad.objects.filter(pk=actividad.pk).update(abierta=False)
+                actividad.abierta = False
+            else:
+                Actividad.objects.filter(pk=actividad.pk).update(abierta=True)
+                actividad.abierta = True

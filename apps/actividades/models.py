@@ -14,6 +14,7 @@ class Actividad(models.Model):
     nombre = models.CharField(max_length=120, null=False)
     clase = models.ForeignKey(Clase, on_delete=models.RESTRICT)
     abierta = models.BooleanField(default=True)
+    fecha_de_creacion = models.DateTimeField(default=timezone.now)
 
 
 class Revision(models.Model):

@@ -77,3 +77,11 @@
     text-align: center;
     margin: 15px 0 0 0;
 }
+
+.abierta{
+    background-color: var(--success);
+}
+
+.cerrada{
+    background-color: var(--danger);
+}
