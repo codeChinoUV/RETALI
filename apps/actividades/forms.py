@@ -13,7 +13,7 @@ class ActividadForm(forms.Form):
                              widget=forms.TextInput(attrs={'class': "form-control"}))
     descripcion = forms.CharField(required=True, label='Descripcion de la actividad:',
                                   widget=forms.Textarea(attrs={'class': "form-control"}))
-    fecha_inicio = forms.DateTimeField(required=True, label='Fecha de inicio:', input_formats=['%d/%m/%Y %H:%M'],
+    fecha_inicio = forms.DateTimeField(required=True, label='Fecha de inicio:',
                                        widget=DateTimeInput(attrs={'class': "form-control"}))
-    fecha_cierre = forms.DateTimeField(required=True, label='Fecha de cierre:', input_formats=['%d/%m/%Y %H:%M'],
+    fecha_cierre = forms.DateTimeField(required=True, label='Fecha de cierre:',
                                        widget=DateTimeInput(attrs={'class': "form-control"}))

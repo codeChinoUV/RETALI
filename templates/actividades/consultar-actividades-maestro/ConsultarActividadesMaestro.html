@@ -1,0 +1,58 @@
+{% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
+{% load static %}
+{% block nombre_pagina %} Actividades {% endblock %}
+{% block estilos-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static 'actividades/consultar-actividades-maestro/estilos/consultar-actividades-maestro.css' %}">
+{% endblock %}
+{% block links %}
+    <li>
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    </li>
+    <li class="link-actual">
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Grupos</div>
+        </a>
+    </li>
+{% endblock %}
+{% block contenido %}
+    <h1 class="titulo-seccion">Actividades</h1>
+    <hr>
+    <div id="informacion-actividades">
+        <p>Actividades abiertas: </p>
+        <p>Total de actividades: </p>
+        <a href="" >
+            <div>Crear actividad</div>
+            <img src="{% static 'actividades/consultar-actividades-maestro/imagenes/actividad.svg' %}" alt="icono crear">
+        </a>
+    </div>
+    {% for actividad in actividades %}
+        <div class="actividad">
+            <img class="actividad-imagen" src="{% static 'generales/imagenes/portapapeles.png' %}" alt="imagen actividad">
+            <div class="informacion-actividad">
+                <h3>{{ actividad.nombre }}</h3>
+                <p>Del {{ actividad.fecha_inicio }} hasta las {{ actividad.fecha_cierre }}</p>
+                <p>Alumnos han entregado la actividad de </p>
+            </div>
+            <div class="estado-actividad">
+                <div class="color-actividad"></div>
+                <p>Estado</p>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

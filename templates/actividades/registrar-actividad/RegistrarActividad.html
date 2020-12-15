@@ -42,18 +42,47 @@
                 <div class="form-group" >
                     <label for="nombre">{{ form.nombre.label }}</label>
                     {{ form.nombre }}
+                    {% if form.errors %}
+                        {% for key, value in form.errors.items %}
+                            {% if key == 'nombre' %}
+                                <div class="invalid-feedback">El nombre de la actividad no puede estar vacio y debe de
+                                    tener menos de 120 caracteres </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                 </div>
                 <div class="form-group">
                     <label for="descripcion">{{ form.descripcion.label }}</label>
                     {{ form.descripcion }}
+                    {% if form.errors %}
+                        {% for key, value in form.errors.items %}
+                            {% if key == 'descripcion' %}
+                                <div class="invalid-feedback">La descripción de la actividad no puede estar vacia</div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                 </div>
                 <div class="form-group input-fechas-actividades">
                     <label for="fecha_inicio">{{ form.fecha_inicio.label }}</label>
                     {{ form.fecha_inicio }}
+                    {% if form.errors %}
+                        {% for key, value in form.errors.items %}
+                            {% if key == 'fecha_inicio' %}
+                                <div class="invalid-feedback">Este campo es requerido</div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                 </div>
                 <div class="form-group input-fechas-actividades">
                     <label for="fecha_cierre">{{ form.fecha_cierre.label }}</label>
                     {{ form.fecha_cierre }}
+                    {% if form.errors %}
+                        {% for key, value in form.errors.items %}
+                            {% if key == 'fecha_cierre' %}
+                                <div class="invalid-feedback">Este campo es requerido</div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                 </div>
                 <input type="submit" value="Registrar actividad">
             </div>

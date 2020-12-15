@@ -6,13 +6,13 @@
 {% endblock %}
 {% block links %}
     <li class="link-actual">
-        <a href="">
+        <a href="{% url 'ver_materia' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
             <div class="titulo">Inicio</div>
         </a>
     </li>
     <li>
-        <a href="">
+        <a href="{% url 'actividades' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
             <div class="titulo">Actividades</div>
         </a>

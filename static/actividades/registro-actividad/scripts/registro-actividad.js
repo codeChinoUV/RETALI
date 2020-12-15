@@ -1,13 +1,13 @@
 const configuracion_fecha_inicio = {
     enableTime: true,
-    dateFormat: "d/m/y H:i",
+    dateFormat: "Z",
     minDate: "today",
     defaultDate: new Date()
 }
 
 const configuracion_fecha_cierre = {
     enableTime: true,
-    dateFormat: "d/m/y H:i",
+    dateFormat: "Z",
     minDate: "today",
     maxDate: new Date().fp_incr(365)
 }

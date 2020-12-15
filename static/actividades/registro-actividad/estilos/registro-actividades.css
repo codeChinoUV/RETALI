@@ -32,7 +32,7 @@
 }
 
 .input-fechas-actividades{
-    width: 28%;
+    width: auto;
     display: block;
     float: left;
     margin-right: 1%;
@@ -54,4 +54,9 @@
     vertical-align: center;
     margin: 2.5% 0;
     float: right;
+}
+
+.invalid-feedback{
+    display: block;
+    margin-left: 1rem;
 }

@@ -13,6 +13,7 @@ class Actividad(models.Model):
     fecha_de_cierre = models.DateTimeField(null=False)
     nombre = models.CharField(max_length=120, null=False)
     clase = models.ForeignKey(Clase, on_delete=models.RESTRICT)
+    abierta = models.BooleanField(default=True)
 
 
 class Revision(models.Model):
