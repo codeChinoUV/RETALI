@@ -27,6 +27,7 @@ def consultar_actividades_de_clase(request, codigo_clase):
             datos_del_maestro['actividades'] = datos_del_maestro['clase_actual'].actividad_set.all()\
                 .order_by('-fecha_de_creacion')
             _actualizar_estado_actividades(datos_del_maestro['actividades'])
+            datos_del_maestro['total_alumnos'] = datos_del_maestro['clase_actual'].inscripcion_set.filter(aceptado='Aceptado').count()
             return render(request, 'actividades/consultar-actividades-maestro/ConsultarActividadesMaestro.html',
                           datos_del_maestro)
 
