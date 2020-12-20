@@ -76,10 +76,22 @@ WSGI_APPLICATION = 'RETALI.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
+# DATABASES = { # Base de datos desarrollo
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+# }
+
+
+DATABASES = { # Base de datos producción
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'retali',
+        'USER': 'retali',
+        'PASSWORD': 'retali123456789.0',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
