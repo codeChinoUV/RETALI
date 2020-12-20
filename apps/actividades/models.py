@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
-from apps.clases.models import Clase
+from apps.clases.models import Clase, Alumno
 
 
 class Actividad(models.Model):
@@ -15,6 +15,7 @@ class Actividad(models.Model):
     clase = models.ForeignKey(Clase, on_delete=models.RESTRICT)
     abierta = models.BooleanField(default=True)
     fecha_de_creacion = models.DateTimeField(default=timezone.now)
+    entregas = models.ManyToManyField(Alumno, through='Entrega')
 
 
 class Revision(models.Model):
@@ -32,5 +33,13 @@ class Entrega(models.Model):
     comentarios = models.TextField(null=True)
     fecha_de_entrega = models.DateTimeField(default=timezone.now)
     revision = models.OneToOneField(Revision, on_delete=models.RESTRICT)
-    entrega = models.FileField(upload_to='entregas')
+    alumno = models.ForeignKey(Alumno, on_delete=models.RESTRICT)
+    actvidad = models.ForeignKey(Actividad, on_delete=models.RESTRICT)
 
+
+class Archivo(models.Model):
+    """
+    Es un archivo el cual puede subir un alumno a su actividad
+    """
+    entrega = models.ForeignKey(Entrega, on_delete=models.RESTRICT)
+    archivo = models.FileField(upload_to='entregas')
