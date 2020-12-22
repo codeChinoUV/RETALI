@@ -85,3 +85,7 @@
 .cerrada{
     background-color: var(--danger);
 }
+
+.por-abrir{
+    background-color: #121212;
+}

@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-
+from django.utils.translation import gettext_lazy as _
 from apps.clases.models import Clase, Alumno
 
 
@@ -8,12 +8,16 @@ class Actividad(models.Model):
     """
     Representa una actividad que crea el maestro
     """
+    class EstadoActividad(models.TextChoices):
+        ABIERTA = 'Abierta', _('Abierta')
+        CERRADA = 'Cerrada', _('Cerrada')
+        POR_ABRIR = 'Por abrir', _('Por abrir')
     descripcion = models.TextField(null=False)
     fecha_de_inicio = models.DateTimeField(null=False)
     fecha_de_cierre = models.DateTimeField(null=False)
     nombre = models.CharField(max_length=120, null=False)
     clase = models.ForeignKey(Clase, on_delete=models.RESTRICT)
-    abierta = models.BooleanField(default=True)
+    estado = models.CharField(max_length=9, choices=EstadoActividad.choices, default=EstadoActividad.POR_ABRIR)
     fecha_de_creacion = models.DateTimeField(default=timezone.now)
     entregas = models.ManyToManyField(Alumno, through='Entrega')
 

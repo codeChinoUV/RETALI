@@ -84,12 +84,16 @@ def _actualizar_estado_actividades(actividades):
         now = datetime.datetime.today()
         now = pytz.utc.localize(now)
         for actividad in actividades:
-            if actividad.fecha_de_cierre < now:
-                Actividad.objects.filter(pk=actividad.pk).update(abierta=False)
-                actividad.abierta = False
+            if actividad.fecha_de_inicio > now:
+                Actividad.objects.filter(pk=actividad.pk).update(estado='Por abrir')
+                actividad.estado = 'Por abrir'
             else:
-                Actividad.objects.filter(pk=actividad.pk).update(abierta=True)
-                actividad.abierta = True
+                if actividad.fecha_de_cierre < now:
+                    Actividad.objects.filter(pk=actividad.pk).update(estado='Cerrada')
+                    actividad.estado = 'Cerrada'
+                else:
+                    Actividad.objects.filter(pk=actividad.pk).update(estado='Abierta')
+                    actividad.estado = 'Abierta'
 
 
 def _colocar_cantidad_de_entregas_de_actividad(actividades):

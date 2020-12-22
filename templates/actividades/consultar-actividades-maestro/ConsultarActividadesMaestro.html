@@ -53,12 +53,15 @@
                 <p>{{ actividad.cantidad_entregas }} Alumnos han entregado la actividad de {{ total_alumnos }}</p>
             </div>
             <div class="estado-actividad">
-                {% if actividad.abierta %}
+                {% if actividad.estado == 'Abierta' %}
                     <div class="color-actividad abierta"></div>
                     <p>Abierta</p>
-                {% else %}
+                {% elif actividad.estado == 'Cerrada'%}
                     <div class="color-actividad cerrada"></div>
                     <p>Cerrada</p>
+                {% else %}
+                    <div class="color-actividad por-abrir"></div>
+                    <p>Por abrir</p>
                 {% endif %}
             </div>
         </div>
