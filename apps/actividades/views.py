@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 
 from apps.actividades.forms import ActividadForm
 from apps.actividades.models import Actividad
+from apps.clases.views import obtener_cantidad_de_alumnos_inscritos_a_clase
 from apps.usuarios.views import obtener_informacion_de_clases_de_maestro
 
 
@@ -24,10 +25,16 @@ def consultar_actividades_de_clase(request, codigo_clase):
         datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set.filter(abierta=True,
                                                                                           codigo=codigo_clase).first()
         if datos_del_maestro['clase_actual'] is not None:
-            datos_del_maestro['actividades'] = datos_del_maestro['clase_actual'].actividad_set.all()\
+            datos_del_maestro['actividades'] = datos_del_maestro['clase_actual'].actividad_set.all() \
                 .order_by('-fecha_de_creacion')
             _actualizar_estado_actividades(datos_del_maestro['actividades'])
-            datos_del_maestro['total_alumnos'] = datos_del_maestro['clase_actual'].inscripcion_set.filter(aceptado='Aceptado').count()
+            _colocar_cantidad_de_entregas_de_actividad(datos_del_maestro['actividades'])
+            datos_del_maestro['total_alumnos'] = \
+                obtener_cantidad_de_alumnos_inscritos_a_clase(datos_del_maestro['clase_actual'].id)
+            datos_del_maestro['total_de_actividades'] = \
+                obtener_cantidad_total_de_actividades(datos_del_maestro['clase_actual'])
+            datos_del_maestro['cantidad_actividades_abiertas'] = \
+                _obtener_cantidad_de_actividades_abiertas(datos_del_maestro['actividades'])
             return render(request, 'actividades/consultar-actividades-maestro/ConsultarActividadesMaestro.html',
                           datos_del_maestro)
 
@@ -83,3 +90,38 @@ def _actualizar_estado_actividades(actividades):
             else:
                 Actividad.objects.filter(pk=actividad.pk).update(abierta=True)
                 actividad.abierta = True
+
+
+def _colocar_cantidad_de_entregas_de_actividad(actividades):
+    """
+    Coloca la cantidad de entregas en la actividad
+    :param actividades: La lista de actividades
+    :return: None
+    """
+    if actividades is not None:
+        for actividad in actividades:
+            actividad.cantidad_entregas = actividad.entrega_set.count()
+
+
+def _obtener_cantidad_de_actividades_abiertas(actividades):
+    """
+    Cuenta la cantidad de actividades que su fecha de entrega es despues de la fecha actual
+    :param actividades: Las actividades a checar
+    :return: La cantidad de actividades abiertas
+    """
+    now = datetime.datetime.today()
+    now = pytz.utc.localize(now)
+    cantidad_actividades_abiertas = 0
+    for actividad in actividades:
+        if actividad.fecha_de_cierre > now:
+            cantidad_actividades_abiertas += 1
+    return cantidad_actividades_abiertas
+
+
+def obtener_cantidad_total_de_actividades(clase):
+    """
+    Cuenta la cantidad total de actividades de una clase
+    :param clase: La clase de la cual se contaran las actividades
+    :return: EL total de actividades de una clase
+    """
+    return clase.actividad_set.count()

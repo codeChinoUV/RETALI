@@ -18,8 +18,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 from django.conf import settings
-from apps.usuarios.views import iniciar_sesion, pagina_inicio, cerrar_sesion, registrar_usuario
-from apps.clases.views import registrar_clase
 
 urlpatterns = [
     path('admin/', admin.site.urls),

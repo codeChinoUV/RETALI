@@ -7,13 +7,13 @@
 {% endblock %}
 {% block links %}
     <li>
-        <a href="">
+        <a href="{% url 'ver_materia' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
             <div class="titulo">Inicio</div>
         </a>
     </li>
     <li class="link-actual">
-        <a href="">
+        <a href="{% url 'actividades' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
             <div class="titulo">Actividades</div>
         </a>
@@ -35,9 +35,9 @@
     <h1 class="titulo-seccion">Actividades</h1>
     <hr>
     <div id="informacion-actividades">
-        <p>Actividades abiertas: </p>
-        <p>Total de actividades: </p>
-        <a href="" >
+        <p>Actividades abiertas: {{ cantidad_actividades_abiertas }}</p>
+        <p>Total de actividades: {{ total_de_actividades }}</p>
+        <a href="{% url 'registrar_actividad' clase_actual.codigo %}" >
             <div>Crear actividad</div>
             <img src="{% static 'actividades/consultar-actividades-maestro/imagenes/actividad.svg' %}" alt="icono crear">
         </a>
@@ -50,7 +50,7 @@
                 {% timezone 'America/Mexico_City' %}
                 <p>Del {{ actividad.fecha_de_inicio }} hasta las {{ actividad.fecha_de_cierre }}</p>
                 {% endtimezone %}
-                <p>{{ actividad }} Alumnos han entregado la actividad de {{ total_alumnos }}</p>
+                <p>{{ actividad.cantidad_entregas }} Alumnos han entregado la actividad de {{ total_alumnos }}</p>
             </div>
             <div class="estado-actividad">
                 {% if actividad.abierta %}

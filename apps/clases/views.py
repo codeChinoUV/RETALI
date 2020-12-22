@@ -81,3 +81,12 @@ def informacion_clase(request, codigo_clase):
             return render(request, 'clases/informacion-clase/InformacionClase.html', datos)
         else:
             return render(request, 'generales/NoEncontrada.html', datos)
+
+
+def obtener_cantidad_de_alumnos_inscritos_a_clase(id_clase):
+    """
+    Obtiene la cantidad de alumnos inscritos a una clase
+    :param id_clase: El id de la clase
+    :return: La cantidad de alumnos aceptados en la clase
+    """
+    return Clase.objects.filter(pk=id_clase).first().inscripcion_set.filter(aceptado='Aceptado').count()
