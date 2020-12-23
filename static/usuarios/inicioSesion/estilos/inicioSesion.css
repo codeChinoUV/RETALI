@@ -1,7 +1,15 @@
-@import "../../../generales/bootstrap-4/css/bootstrap.css";
+:root{
+    --width: 250px;
+    --padding: 10px;
+    --heigh-nav: 70px;
+    --bgcolor: #2E3034;
+    --hovercolor: #f09a26;
+    --width-collapsed: 45px;
+    --primary-color: #4b4b4b;
+}
 
 html, body{
-    background-color: #121212;
+    background-color: var(--primary-color);
     margin: 0;
     padding: 0;
     height: 100%;
@@ -12,18 +20,6 @@ html, body{
 .form-group label{
     font-size: 0.9em;
     margin-left: 2%;
-}
-
-#imagen{
-    display: block;
-    float: left;
-    width: 50%;
-    height: 100%;
-    max-height: 100%;
-    margin: 0;
-    padding: 0;
-    background-image: url("../imagenes/inicioSesion.jpeg");
-    background-size: 100% 100%;
 }
 
 h1{
@@ -48,6 +44,7 @@ h1{
     font-weight:bold;
     padding:0;
     margin-right: 1%;
+    color: white;
 }
 
 button:hover{
@@ -55,11 +52,19 @@ button:hover{
 }
 
 #formularioInicioSesion{
-    width: 50%;
-    height: 100%;
+    width: 30%;
     display: block;
-    float: right;
-    padding: 2% 12.5% 0 12.5%;
+    padding: 2% 5%;
+    margin: 50px auto;
+    background-color: var(--bgcolor);
+    border-radius: 5%;
+}
+
+#formularioInicioSesion form div input{
+    background-color: var(--primary-color);
+    border-radius: 1rem;
+    border: none;
+    color: white;
 }
 
 #logo{
@@ -76,6 +81,9 @@ button:hover{
 #btnIniciarSesion button{
     width: 100%;
     margin: 0 15%;
+    background-color: var(--hovercolor);
+    border: none;
+    border-radius: 1rem;
 }
 
 .form-group{
@@ -124,4 +132,14 @@ p{
 
 button{
     background-color: var(--hovercolor);
+}
+
+a{
+    text-decoration: none;
+    color: white;
+}
+
+a:hover{
+    text-decoration: none;
+    color: var(--hovercolor);
 }
