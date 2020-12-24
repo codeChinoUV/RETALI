@@ -8,6 +8,18 @@ import re
 from apps.foros.models import Foro
 
 
+def redireccion_path_vacio(request):
+    """
+    Redigere al usuario a la pagina principal o la pagina de inicio de sesion
+    :param request: La solicitud del cliente
+    :return: Redirect a la pagina indicada
+    """
+    if request.user.is_authenticated:
+        return redirect('paginaInicio')
+    else:
+        return redirect('login')
+
+
 def iniciar_sesion(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -28,6 +40,11 @@ def iniciar_sesion(request):
 
 @login_required
 def pagina_inicio(request):
+    """
+    Renderiza la pagina de inicio del maestro o del alumno
+    :param request: La solictud del cliente
+    :return: Un render de la pagina adecuada
+    """
     if request.user.es_maestro:
         datos = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
         return render(request, 'usuarios/paginaInicio/PaginaInicioMaestro.html', datos)
