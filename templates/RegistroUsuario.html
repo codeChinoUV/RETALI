@@ -5,12 +5,9 @@
     Registro
 {% endblock %}
 {% block estilos %} 
-    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-4/css/bootstrap.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'generales/bootstrap-4/css/bootstrap.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'usuarios/registro/estilos/registro.css' %}">
 {% endblock %}
-{% block imagenPrincipal %}
-    <div id="imagenPortada"></div>
-    {% endblock %}
 {% block formulario %}
     <div id="registerForm">
         <h1>Registrate</h1>
@@ -72,7 +69,7 @@
             </div>
             <p>¿Ya tienes una cuenta?</p>
             <div id="btnInicioSesion">
-                <a href="http://localhost:8000/login/" class="btn btn-secondary">Iniciar sesión</a>
+                <a href="http://localhost:8000/login/">Iniciar sesión</a>
             </div>
         </form>
     </div>

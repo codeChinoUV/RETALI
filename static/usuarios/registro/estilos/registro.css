@@ -1,26 +1,51 @@
-@import "../../../generales/bootstrap-4/css/bootstrap.css";
-
-#registerForm{
-    width: 50%;
-    height: 100%;
-    display: block;
-    float: right;
-    padding: 2% 12.5% 0% 12.5%;
+:root{
+    --width: 250px;
+    --padding: 10px;
+    --heigh-nav: 70px;
+    --bgcolor: #2E3034;
+    --hovercolor: #f09a26;
+    --width-collapsed: 45px;
+    --primary-color: #4b4b4b;
+    --secondary-color: #0f4c81;
 }
-#imagenPortada{
-    display: block;
-    float: left;
-    width: 50%;
-    height: 100%;
-    max-height: 100%;
+
+html, body{
+    background-color: var(--primary-color);
     margin: 0;
     padding: 0;
-    background-image: url("../imagenes/inicioSesion.jpeg");
+    height: 100%;
+    font-family: Roboto, serif;
+    color: white;
 }
+
+/*
+    Formulario registro
+ */
 
 h1{
     text-align: center;
     margin-bottom: 7%;
+}
+
+#registerForm{
+    width: 35%;
+    display: block;
+    padding: 2% 5%;
+    margin: 50px auto;
+    background-color: var(--bgcolor);
+    border-radius: 1rem;
+}
+
+/*
+    Inputs formulario registro
+ */
+
+#registerForm form div input,
+#registerForm form div select{
+    background-color: var(--primary-color);
+    border-radius: 1rem;
+    border: none;
+    color: white;
 }
 
 .form-group{
@@ -35,30 +60,10 @@ h1{
     margin-left: 2%;
 }
 
-.color-primario{
-    background-color: var(--primary);
-    border-color: var(--primary);
-}
 
-
-#btnRegistro button{
-    width: 50%;
-    margin: 10% 25%;
-    text-align: center;
-}
-button:hover{
-    cursor:pointer;
-  }
-button{
-    margin: auto;
-}
-#btnInicioSesion{
-    width: 50%;
-    margin: 10% 25%;
-    text-align: center;
-}
 #showPassword{
     position:absolute;
+    color: white;
     right: 0;
     top: 4px;
     border:none;
@@ -71,10 +76,52 @@ button{
     padding:0;
     margin-right: 1%;
 }
+
+/*
+    Boton registro
+ */
+
+#btnRegistro button{
+    background-color: var(--hovercolor);
+    border-color: var(--hovercolor);
+    border-radius: 1rem;
+}
+
+#btnRegistro button{
+    width: 50%;
+    margin: 10% 25%;
+    text-align: center;
+}
+
+button:hover{
+    cursor:pointer;
+}
+
+button{
+    margin: auto;
+}
+
+/*
+    Boton inicio de sesion
+ */
+
+#btnInicioSesion{
+    width: 50%;
+    margin: 5% 25%;
+    text-align: center;
+    background-color: var(--secondary-color);
+    padding: 0.5rem 0;
+    border-radius: 1rem;
+}
+
+#btnInicioSesion a{
+    text-decoration: none;
+    color: white;
+}
+
 .button-inside{
     position: relative;
 }
-
 
 #linea{
     margin-top: 1%;
@@ -101,8 +148,9 @@ button{
     text-align: center;
     color: #707070;
 }
+
 p{
     text-align: center;
     margin-top: 7.5%;
-    margin-bottom: 0%;
+    margin-bottom: 0;
 }
