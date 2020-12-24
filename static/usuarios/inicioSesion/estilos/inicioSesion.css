@@ -4,15 +4,17 @@
     --heigh-nav: 70px;
     --bgcolor: #2E3034;
     --hovercolor: #f09a26;
+    --hovercolor-hover: #e6890b;
     --width-collapsed: 45px;
     --primary-color: #4b4b4b;
+    --secondary-color: #0f4c81;
+    --secondary-color-hover: #063359;
 }
 
 html, body{
     background-color: var(--primary-color);
     margin: 0;
     padding: 0;
-    height: 100%;
     font-family: Roboto, serif;
     color: white;
 }
@@ -84,6 +86,10 @@ button:hover{
     background-color: var(--hovercolor);
     border: none;
     border-radius: 1rem;
+}
+
+#btnIniciarSesion button:hover{
+    background-color: var(--hovercolor-hover);
 }
 
 .form-group{

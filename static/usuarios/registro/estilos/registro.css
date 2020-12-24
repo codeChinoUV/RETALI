@@ -4,9 +4,11 @@
     --heigh-nav: 70px;
     --bgcolor: #2E3034;
     --hovercolor: #f09a26;
+    --hovercolor-hover: #e6890b;
     --width-collapsed: 45px;
     --primary-color: #4b4b4b;
     --secondary-color: #0f4c81;
+    --secondary-color-hover: #063359;
 }
 
 html, body{
@@ -85,12 +87,13 @@ h1{
     background-color: var(--hovercolor);
     border-color: var(--hovercolor);
     border-radius: 1rem;
-}
-
-#btnRegistro button{
     width: 50%;
     margin: 10% 25%;
     text-align: center;
+}
+
+#btnRegistro button:hover{
+    background-color: var(--hovercolor-hover);
 }
 
 button:hover{
@@ -112,6 +115,11 @@ button{
     background-color: var(--secondary-color);
     padding: 0.5rem 0;
     border-radius: 1rem;
+}
+
+#btnInicioSesion:hover{
+    background-color: var(--secondary-color-hover);
+    cursor: pointer;
 }
 
 #btnInicioSesion a{
