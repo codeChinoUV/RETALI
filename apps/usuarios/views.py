@@ -4,7 +4,6 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
 from apps.clases.models import Inscripcion, Alumno, Maestro
 import re
-
 from apps.foros.models import Foro
 
 
@@ -49,6 +48,8 @@ def pagina_inicio(request):
         datos = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
         return render(request, 'usuarios/paginaInicio/PaginaInicioMaestro.html', datos)
     else:
+        # from apps.clases.views import unir_alumnos_a_clase
+        # unir_alumnos_a_clase(codigo_clase='ysladrbyyx', id_alumno=request.user.persona.alumno.pk)
         datos_de_las_clases_del_alumno = _obtener_informacion_de_las_clases_del_alumno(request.user.persona.alumno)
         return render(request, 'PaginaInicioAlumno.html', datos_de_las_clases_del_alumno)
 
@@ -79,16 +80,16 @@ def _obtener_informacion_de_las_clases_del_alumno(alumno):
         'tareas_que_se_cierran_esta_semana': 0
     }
     if Inscripcion.objects.filter(alumno=alumno).exists():
-        inscritos = Inscripcion.objects.get(alumno=alumno)
+        inscritos = Inscripcion.objects.filter(alumno=alumno).all()
         for inscripcion in inscritos:
             if inscripcion.aceptado:
                 datos['clases_inscrito'] += 1
                 for foro in inscripcion.clase.foro_set.all():
                     if foro.EstadoForo == Foro.EstadoForo.ABIERTO:
                         datos['foros_abiertos'] += 1
-                for aviso in inscripcion.clase.anuncio_set.all():
-                    if alumno not in aviso.leido_por:
-                        datos['anuncios_sin_leer'] += 1
+                # for aviso in inscripcion.clase.anuncio_set.all():
+                #    if alumno not in aviso.leido_por:
+                #        datos['anuncios_sin_leer'] += 1
                 # for tarea in inscripcion.clase.actividad_set.filter(fecha_de_cierre=):
             else:
                 datos['clases_pendientes'] += 1

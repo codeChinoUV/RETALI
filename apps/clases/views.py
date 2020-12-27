@@ -3,7 +3,7 @@ import random
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .forms import ClaseForm
-from .models import Clase
+from .models import Clase, Inscripcion
 from ..usuarios.views import obtener_informacion_de_clases_de_maestro
 
 
@@ -90,3 +90,9 @@ def obtener_cantidad_de_alumnos_inscritos_a_clase(id_clase):
     :return: La cantidad de alumnos aceptados en la clase
     """
     return Clase.objects.filter(pk=id_clase).first().inscripcion_set.filter(aceptado='Aceptado').count()
+
+
+def unir_alumnos_a_clase(id_alumno, codigo_clase):
+    clase = Clase.objects.filter(codigo=codigo_clase, abierta=True).first()
+    inscripcion = Inscripcion(clase_id=clase.pk, alumno_id=id_alumno, aceptado='Aceptado')
+    inscripcion.save()

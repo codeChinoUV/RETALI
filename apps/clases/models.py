@@ -36,7 +36,7 @@ class Inscripcion(models.Model):
     class EstadoSolicitudUnirse(models.TextChoices):
         ACEPTADO = 'Aceptado', _('Aceptado')
         RECHAZADO = 'Rechazado', _('Rechazado')
-        EN_ESPERA =  'En espera', _('En espera')
+        EN_ESPERA = 'En espera', _('En espera')
     aceptado = models.CharField(max_length=9, choices=EstadoSolicitudUnirse.choices,
                                 default=EstadoSolicitudUnirse.EN_ESPERA)
     alumno = models.ForeignKey(Alumno, on_delete=models.RESTRICT)

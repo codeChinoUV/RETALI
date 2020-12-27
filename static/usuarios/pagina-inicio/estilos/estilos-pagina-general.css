@@ -4,8 +4,11 @@
     --heigh-nav: 70px;
     --bgcolor: #2E3034;
     --hovercolor: #f09a26;
+    --hovercolor-hover: #e6890b;
     --width-collapsed: 45px;
     --primary-color: #4b4b4b;
+    --secondary-color: #0f4c81;
+    --secondary-color-hover: #063359;
 }
 
 body{

@@ -51,8 +51,6 @@
 }
 
 .actividad img{
-    /*display: block;
-    float: left;*/
     height: calc(var(--height-tarjeta-actividad) - 30px );
     width: calc(var(--height-tarjeta-actividad) - 30px );
     object-fit: cover;
@@ -65,6 +63,15 @@
 
 .actividad .estado-actividad{
     margin-left: auto;
+}
+
+.actividad .informacion-actividad h3 a{
+    text-decoration: none;
+    color: white;
+}
+
+.actividad .informacion-actividad h3 a:hover{
+    color: var(--hovercolor);
 }
 
 .actividad .estado-actividad .color-actividad{
