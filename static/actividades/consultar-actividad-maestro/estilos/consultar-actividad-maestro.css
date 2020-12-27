@@ -1,0 +1,104 @@
+:root{
+    --heigh-tarjeta-entrega: 100px;
+}
+
+/*
+    Boton editar
+ */
+
+#boton-editar{
+    display: flex;
+    color: white;
+    background-color: var(--hovercolor);
+    text-decoration: none;
+    padding: 0.5rem;
+    border-radius: 1rem;
+    vertical-align: center;
+    margin: 4.5% 0 0 0;
+    float: right;
+    justify-content: space-between;
+}
+
+#boton-editar img,
+#boton-editar div{
+    font-size: 1rem;
+    vertical-align: middle;
+    overflow: hidden;
+    display: inline-block;
+}
+
+#boton-editar:hover{
+    background-color: var(--hovercolor-hover);
+}
+
+#boton-editar img#imagen-boton-editar{
+    height: 20px;
+    width: 20px;
+    margin: 0 7px;
+}
+
+/*
+    Seccion entregas
+ */
+
+#lista-entregas{
+    margin: 5%;
+}
+
+#lista-entregas h2{
+    color: white;
+}
+
+/*
+    Tarjeta entrega
+ */
+
+#lista-entregas .tarjeta-entrega{
+    background-color: var(--bgcolor);
+    height: var(--heigh-tarjeta-entrega);
+    display: flex;
+    justify-content: flex-start;
+    padding: 15px;
+    margin: 0 0 5% 0;
+    border-radius: 1rem;
+    color: white;
+}
+
+#lista-entregas .tarjeta-entrega img{
+    height: calc(var(--heigh-tarjeta-entrega) - 30px );
+    width: calc(var(--heigh-tarjeta-entrega) - 30px );
+    object-fit: cover;
+    margin-right: 2%;
+    border-radius: 50%;
+}
+
+#lista-entregas .tarjeta-entrega .informacion-tarjeta-entrega{
+    width: 70%;
+}
+
+#lista-entregas .tarjeta-entrega .informacion-tarjeta-entrega{
+    margin-right: auto;
+}
+
+#lista-entregas .tarjeta-entrega .calificacion-entrega .calificacion-actividad{
+    height: calc((var(--heigh-tarjeta-entrega)/1.8));
+    width: calc((var(--heigh-tarjeta-entrega)/1.8));
+    border-radius: 50%;
+    text-align: center;
+    margin: 0 auto;
+    line-height: calc(var(--heigh-tarjeta-entrega)/1.8);
+    font-size: 1.5rem;
+}
+
+#lista-entregas .tarjeta-entrega .calificacion-entrega p{
+    text-align: center;
+    margin: 5px 0 0 0;
+}
+
+.calificada{
+    background-color: var(--hovercolor);
+}
+
+.sin-calificar{
+    background-color: var(--primary-color);
+}

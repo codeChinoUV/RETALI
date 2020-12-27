@@ -1,5 +1,7 @@
 from django import forms
 
+from apps.actividades.models import Actividad
+
 
 class DateTimeInput(forms.DateTimeInput):
     input_type = 'datetime-local'
@@ -17,3 +19,17 @@ class ActividadForm(forms.Form):
                                        widget=DateTimeInput(attrs={'class': "form-control"}))
     fecha_cierre = forms.DateTimeField(required=True, label='Fecha de cierre:',
                                        widget=DateTimeInput(attrs={'class': "form-control"}))
+
+
+class ActividadDisableForm(forms.Form):
+    nombre = forms.CharField(max_length=120, required=True, label='Nombre de la actividad:',
+                             widget=forms.TextInput(attrs={'class': "form-control"}), disabled=True)
+    descripcion = forms.CharField(required=True, label='Descripcion de la actividad:',
+                                  widget=forms.Textarea(attrs={'class': "form-control"}), disabled=True)
+    fecha_inicio = forms.DateTimeField(required=True, label='Fecha de inicio:',
+                                       widget=DateTimeInput(attrs={'class': "form-control"}), disabled=True)
+    fecha_cierre = forms.DateTimeField(required=True, label='Fecha de cierre:',
+                                       widget=DateTimeInput(attrs={'class': "form-control"}), disabled=True)
+
+    class Meta:
+        model = Actividad

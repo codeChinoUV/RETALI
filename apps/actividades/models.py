@@ -36,7 +36,7 @@ class Entrega(models.Model):
     """
     comentarios = models.TextField(null=True)
     fecha_de_entrega = models.DateTimeField(default=timezone.now)
-    revision = models.OneToOneField(Revision, on_delete=models.RESTRICT)
+    revision = models.OneToOneField(Revision, on_delete=models.RESTRICT, null=True)
     alumno = models.ForeignKey(Alumno, on_delete=models.RESTRICT)
     actvidad = models.ForeignKey(Actividad, on_delete=models.RESTRICT)
 
