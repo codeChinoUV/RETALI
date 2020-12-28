@@ -1,0 +1,109 @@
+#entrega-alumno{
+    background-color: var(--bgcolor);
+    color: white;
+    margin: 2% 10%;
+    padding: 1%;
+    display: flow-root;
+    border-radius: 2rem;
+}
+
+img#foto-alumno{
+    width: 88px;
+    display: block;
+    float: left;
+}
+
+#informacion-entrega{
+    width: calc(100% - 88px);
+    float: right;
+    padding: 1%;
+}
+
+#informacion-entrega div input,
+#informacion-entrega div textarea{
+    background-color: var(--primary-color);
+    border-radius: 1rem;
+    border: none;
+    color: white;
+}
+
+#informacion-entrega div label{
+    margin-left: 1rem;
+}
+
+#informacion-entrega #alumno{
+    width: 50%;
+    display: block;
+    float: left;
+    margin-right: auto;
+}
+
+#informacion-entrega #fecha_entrega{
+    width: 40%;
+    display: block;
+    float: right;
+}
+
+/*
+    Retroalimentación
+ */
+
+#retroalimentacion{
+    background-color: var(--bgcolor);
+    color: white;
+    margin: 2% 10%;
+    padding: 2%;
+    display: flow-root;
+    border-radius: 2rem;
+}
+
+#retroalimentacion form div select,
+#retroalimentacion form div textarea{
+    background-color: var(--primary-color);
+    border-radius: 1rem;
+    border: none;
+    color: white;
+}
+
+
+button[type="submit"]{
+    background-color: var(--hovercolor);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 1rem;
+    vertical-align: center;
+    margin: 2.5% 0;
+    float: right;
+}
+
+button[type="submit"]:hover{
+    background-color: var(--hovercolor-hover);
+}
+
+#opciones{
+    display: flex;
+    justify-content: space-between;
+}
+
+a{
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 1rem;
+    vertical-align: center;
+    margin: 2.5% 0;
+    float: right;
+}
+
+a:hover{
+    text-decoration: none;
+    background-color: var(--danger);
+    color: white;
+}
+
+.invalid-feedback{
+    display: block;
+    margin-left: 1rem;
+}

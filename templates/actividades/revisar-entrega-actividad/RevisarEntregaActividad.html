@@ -1,0 +1,95 @@
+{% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
+{% load static %}
+{% load tz %}
+{% block nombre_pagina %} Revisión de actividad {% endblock %}
+{% block estilos-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static 'actividades/revisar-entrega-actividad/estilos/revisar-entrega-actividad.css' %}">
+{% endblock %}
+{% block links %}
+    <li>
+        <a href="{% url 'ver_materia' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    </li>
+    <li class="link-actual">
+        <a href="{% url 'actividades' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Grupos</div>
+        </a>
+    </li>
+{% endblock %}
+{% block contenido %}
+    <h1 class="titulo-seccion">Revisión de entrega</h1>
+    <hr>
+    <div id="entrega-alumno">
+        {% if entrega.alumno.foto_de_perfil %}
+            <img id="foto-alumno" src="{{ entrega.alumno.foto_de_perfil.url }}" alt="foto del alumno">
+        {% else %}
+            <img id="foto-alumno" src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
+        {% endif %}
+        <div id="informacion-entrega">
+            <div class="form-group">
+                <label for="id_nombre_actividad">Actividad: </label>
+                <input type="text" name="Actividad" id="id_nombre_actividad" class="form-control" disabled value="{{ actividad_actual.nombre }}">
+            </div>
+            <div class="form-group" id="alumno">
+                <label for="id_alumno">Alumno: </label>
+                <input type="text" name="Alumno" id="id_nombre_actividad" class="form-control" disabled value="{{ entrega_actual.alumno.nombre }} {{ entrega_actual.alumno.apellidos }}">
+            </div>
+            <div class="form-group" id="fecha_entrega">
+            <label for="id_fecha_entrega">Fecha de entrega: </label>
+                {% timezone 'America/Mexico_City' %}
+                    <input type="text" name="Fecha de entrega" id="id_fecha_entrega" class="form-control" disabled value="{{ entrega_actual.fecha_de_entrega }}">
+                {% endtimezone %}
+            </div>
+            <div class="form-group">
+                <label for="id_descripcion">Entrega del alumno: </label>
+                <textarea name="descripcion" cols="40" rows="10" class="form-control" disabled id="id_descripcion">{{ entrega_actual.comentarios }}</textarea>
+            </div>
+            <div id="archivos-de-entrega">
+
+            </div>
+        </div>
+    </div>
+    <div id="retroalimentacion">
+        <form method="post">
+            <div class="form-group">
+                <label for="id_comentarios_de_revision">Comentarios de la revisión: </label>
+                <textarea name="comnetarios_de_revision" cols="40" rows="10" class="form-control" disabled id="id_comentarios_de_revision"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="id_calificacion">Calificacion</label>
+                <select class="form-control" id="id_calificacion" name="tipoUsuario">
+                    <option value="0">Seleccione una opción</option>
+                    <option value="10">10</option>
+                    <option value="9">9</option>
+                    <option value="8">8</option>
+                    <option value="7">7</option>
+                    <option value="6">6</option>
+                    <option value="5">5</option>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                </select>
+            </div>
+            <div id="opciones">
+                <a href="">Regresar</a>
+                <button type="submit">Guardar</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

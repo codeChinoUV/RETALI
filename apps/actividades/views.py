@@ -36,6 +36,8 @@ def consultar_actividades_de_clase(request, codigo_clase):
                 obtener_cantidad_total_de_actividades(datos_del_maestro['clase_actual'])
             datos_del_maestro['cantidad_actividades_abiertas'] = \
                 _obtener_cantidad_de_actividades_abiertas(datos_del_maestro['actividades'])
+            # _registrar_entrega(1, "adjunto el link del repositorio de github: https://github.com/codeChinoUV/RETALI.git",
+            #                   2)
             return render(request, 'actividades/consultar-actividades-maestro/ConsultarActividadesMaestro.html',
                           datos_del_maestro)
 
@@ -141,7 +143,7 @@ def consultar_actividad(request, codigo_clase, id_actividad):
         datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
         datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set. \
             filter(codigo=codigo_clase, abierta=True).first()
-        if validar_existe_actividad(codigo_clase, id_actividad, request.user.persona.maestro):
+        if _validar_existe_actividad(codigo_clase, id_actividad, request.user.persona.maestro):
             datos_del_maestro['actividad_actual'] = datos_del_maestro['clase_actual']. \
                 actividad_set.filter(pk=id_actividad).first()
             datos_del_maestro['form'] = ActividadDisableForm()
@@ -152,7 +154,7 @@ def consultar_actividad(request, codigo_clase, id_actividad):
             return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
 
 
-def validar_existe_actividad(codigo_clase, id_actividad, maestro):
+def _validar_existe_actividad(codigo_clase, id_actividad, maestro):
     """
     Valida si existe la actividad indicada dentro de la clase indicada del maestro
     :param codigo_clase: EL codigo de la clase de la cual se va a buscar la actividad
@@ -170,3 +172,39 @@ def validar_existe_actividad(codigo_clase, id_actividad, maestro):
 def _registrar_entrega(actividad_id, entrega, alumno_id):
     entrega = Entrega(alumno_id=alumno_id, actvidad_id=actividad_id, comentarios=entrega)
     entrega.save()
+
+
+def revisar_entrega_actividad(request, codigo_clase, id_actividad, id_entrega):
+    if not request.user.es_maestro:
+        return redirect('paginaInicio')
+    else:
+        datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
+        datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set. \
+            filter(codigo=codigo_clase, abierta=True).first()
+        if _validar_existe_entrega(codigo_clase, id_actividad, id_entrega, request.user.persona.maestro):
+            datos_del_maestro['actividad_actual'] = datos_del_maestro['clase_actual']. \
+                actividad_set.filter(pk=id_actividad).first()
+            datos_del_maestro['form'] = ActividadDisableForm()
+            datos_del_maestro['entrega_actual'] = datos_del_maestro['actividad_actual'].\
+                entrega_set.filter(pk=id_actividad).first()
+            return render(request, 'actividades/revisar-entrega-actividad/RevisarEntregaActividad.html',
+                          datos_del_maestro)
+        else:
+            return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
+
+
+def _validar_existe_entrega(codigo_clase, id_actividad, id_entrega, maestro):
+    """
+    Valida si existe la entrega en la clase y la actividad señaladas
+    :param codigo_clase: El codigo de la clase
+    :param id_actividad: El id de la actividad
+    :param id_entrega: El id de la entrega
+    :param maestro: El maestro actual
+    :return: True si existe la entrega o False si no
+    """
+    existe_entrega = False
+    if _validar_existe_actividad(codigo_clase, id_actividad, maestro):
+        if maestro.clase_set.filter(abierta=True, codigo=codigo_clase).first().actividad_set. \
+                filter(pk=id_actividad).first().entrega_set.filter(pk=id_entrega).count() > 0:
+            existe_entrega = True
+    return existe_entrega

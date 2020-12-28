@@ -36,8 +36,7 @@
     <h1 class="titulo-seccion">Ver actvidad</h1>
     <hr>
     <div id="formulario-registro-actividad">
-        <form method="">
-            {% csrf_token %}
+        <form>
             <img src="{% static 'generales/imagenes/portapapeles.png' %}">
             <div id="inputs-registro-actvidad">
                 <div class="form-group" >
@@ -77,7 +76,7 @@
                     <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
                 {% endif %}
                 <div class="informacion-tarjeta-entrega">
-                    <h3>{{ entrega.alumno.nombre }} {{ entrega.alumno.apellidos }}</h3>
+                    <h3><a href="{% url 'revisar_entrega' clase_actual.codigo actividad_actual.pk entrega.pk %}">{{ entrega.alumno.nombre }} {{ entrega.alumno.apellidos }}</a></h3>
                     {% timezone 'America/Mexico_City' %}
                         <p><b>Fecha de entrega:</b> {{ entrega.fecha_de_entrega }}</p>
                     {% endtimezone %}
