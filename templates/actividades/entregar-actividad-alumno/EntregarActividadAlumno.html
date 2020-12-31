@@ -1,0 +1,54 @@
+{%  extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
+{% load static %}
+{% load tz %}
+{% block nombre_pagina%}Entregar activdad{% endblock %}
+{% block estilos-extra %}
+    <link rel="stylesheet" href="{% static 'actividades/entregar-actividad-alumno/estilos/entregar-actividad-alumno.css' %}">
+{% endblock %}
+{% block contenido %}
+    <h1 class="titulo-seccion">Entregar actividad</h1>
+    <hr>
+    <div id="entrega">
+        <div id="cabecera-actividad">
+            <img src="{% static 'generales/imagenes/portapapeles.png' %}" alt="imagen activdad">
+            <div id="informacion-actividad">
+                <h2>{{ actividad_actual.nombre }}</h2>
+                {% timezone 'America/Mexico_City' %}
+                <p>Del: {{ actividad_actual.fecha_de_inicio }} hasta: {{ actividad_actual.fecha_de_cierre }} </p>
+                {% endtimezone %}
+            </div>
+            <div id="calificacion-actividad">
+                <div id="calificacion-circulo">
+                    {% if entrega_alumno %}
+                        {{ entrega_alumno.calificacion }}
+                    {% else %}
+                        SC
+                    {% endif %}
+                </div>
+                <p>Calificación</p>
+            </div>
+        </div>
+        <div id="cuerpo-entrega">
+            <div class="form-group">
+                <label for="descripcion_actividad">Descripción de la actividad: </label>
+                <textarea id="descripcion_actividad" class="form-control" disabled cols="40" rows="10">{{ actividad_actual.descripcion }}</textarea>
+            </div>
+            <form method="post">
+                <div class="form-group">
+                    <label for="comentarios_entrega">Comentarios de la entrega: </label>
+                    <textarea id="comentarios_entrega" class="form-control" cols="40" rows="5"></textarea>
+                </div>
+                <div class="form-group" id="archivos-adjuntos">
+                    <label>Archivos adjuntos: </label>
+                    <div class="drop-zone">
+                        <input id="drop-zone-input" name="file" type="file" multiple />
+                        <span class="drop-zone__prompt">Suelta los archivos o da click aquí</span>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts-adicionales %}
+    <script src="{% static 'actividades/entregar-actividad-alumno/scripts/entregar-actividad-alumno.js' %}"></script>
+{% endblock %}

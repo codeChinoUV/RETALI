@@ -2,11 +2,11 @@ import datetime
 
 import pytz
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 
 from apps.actividades.forms import ActividadForm, ActividadDisableForm
-from apps.actividades.models import Actividad, Entrega
-from apps.clases.models import Alumno
+from apps.actividades.models import Actividad, Entrega, Archivo
+from apps.clases.models import Clase
 from apps.clases.views import obtener_cantidad_de_alumnos_inscritos_a_clase
 from apps.usuarios.views import obtener_informacion_de_clases_de_maestro
 
@@ -185,7 +185,7 @@ def revisar_entrega_actividad(request, codigo_clase, id_actividad, id_entrega):
             datos_del_maestro['actividad_actual'] = datos_del_maestro['clase_actual']. \
                 actividad_set.filter(pk=id_actividad).first()
             datos_del_maestro['form'] = ActividadDisableForm()
-            datos_del_maestro['entrega_actual'] = datos_del_maestro['actividad_actual'].\
+            datos_del_maestro['entrega_actual'] = datos_del_maestro['actividad_actual']. \
                 entrega_set.filter(pk=id_actividad).first()
             return render(request, 'actividades/revisar-entrega-actividad/RevisarEntregaActividad.html',
                           datos_del_maestro)
@@ -208,3 +208,51 @@ def _validar_existe_entrega(codigo_clase, id_actividad, id_entrega, maestro):
                 filter(pk=id_actividad).first().entrega_set.filter(pk=id_entrega).count() > 0:
             existe_entrega = True
     return existe_entrega
+
+
+@login_required()
+def entregar_actividad_alumno(request, codigo_clase, id_actividad):
+    if request.user.es_maestro:
+        return redirect('paginaInicio')
+    else:
+        clase = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()
+        datos_del_alumno = {
+            'clase_actual': request.user.persona.alumno.inscripcion_set.filter(aceptado='Aceptado',
+                                                                               clase_id=clase.pk).first().clase
+        }
+        datos_del_alumno['actividad_actual'] = datos_del_alumno['clase_actual'].actividad_set.filter(
+            pk=id_actividad).first()
+        return render(request, 'actividades/entregar-actividad-alumno/EntregarActividadAlumno.html', datos_del_alumno)
+
+
+@login_required()
+def subir_archivo_entrega(request, codigo_clase, id_actividad):
+    if request.user.es_maestro:
+        return HttpResponse(400)
+    if request.method == 'POST':
+        if _validar_existe_actividad_de_alumno(codigo_clase, id_actividad, request.user.persona.alumno):
+            clase = Clase.objects.filter(codigo=codigo_clase, abierta=True).first()
+            clase_del_alumno = request.user.persona.alumno.inscripcion_set. \
+                filter(aceptado='Aceptado', clase_id=clase.pk).first().clase
+            actividad_actual = clase_del_alumno.actividad_set.filter(pk=id_actividad).first()
+            entrega = Entrega.objects.\
+                filter(actvidad_id=actividad_actual.pk, alumno_id=request.user.persona.alumno.pk).first()
+            if entrega is None:
+                entrega = Entrega(alumno_id=request.user.persona.alumno.pk, actvidad_id=actividad_actual.pk)
+                entrega.save()
+            archivos = request.FILES
+            for archivo in archivos.items():
+                documento_entrega = Archivo(entrega_id=entrega.pk, archivo=archivo[1])
+                documento_entrega.save()
+            return HttpResponse(200)
+    return HttpResponse(400)
+
+
+def _validar_existe_actividad_de_alumno(codigo_clase, id_actividad, alumno):
+    existe_actividad = False
+    clase = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()
+    clase_del_alumno = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.pk).first().clase
+    if clase_del_alumno is not None:
+        if clase_del_alumno.actividad_set.filter(pk=id_actividad).count() > 0:
+            existe_actividad = True
+    return existe_actividad
