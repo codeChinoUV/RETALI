@@ -1,21 +1,23 @@
 @import "../../../generales/bootstrap-4/css/bootstrap.css";
+html, body{
+    background-color: #4B4B4B;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Roboto, serif;
+    color: white;
+}
 
 #registerForm{
     width: 50%;
-    height: 100%;
+    height: auto;
     display: block;
-    float: right;
-    padding: 2% 12.5% 0% 12.5%;
-}
-#imagenPortada{
-    display: block;
-    float: left;
-    width: 50%;
-    height: 100%;
-    max-height: 100%;
-    margin: 0;
-    padding: 0;
-    background-image: url("../imagenes/inicioSesion.jpeg");
+    float: snap;
+    padding: 2% 10.5% 0% 10.5%;
+    align-content: center;
+    margin: auto;
+    background-color: #2E3034;
+
 }
 
 h1{
@@ -48,7 +50,7 @@ h1{
 }
 button:hover{
     cursor:pointer;
-  }
+}
 button{
     margin: auto;
 }
@@ -84,14 +86,14 @@ button{
     width: 40%;
     display: block;
     float: left;
-    border-color: #707070;
+    border-color: #F59600;
 }
 
 #linea-derecha{
     width: 40%;
     display: block;
     float: left;
-    border-color: #707070;
+    border-color: #F59600;
 }
 
 #texto-entre-lineas{
@@ -99,10 +101,14 @@ button{
     display: block;
     float: left;
     text-align: center;
-    color: #707070;
+    color: #F59600;
 }
 p{
     text-align: center;
     margin-top: 7.5%;
     margin-bottom: 0%;
+}
+.btn-secondary{
+    background-color: #F59600;
+    border-color: #F59600;
 }

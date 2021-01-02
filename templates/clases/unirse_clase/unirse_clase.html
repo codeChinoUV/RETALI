@@ -10,13 +10,27 @@
             <h2>Unirse a clase</h2>
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
-               <div class="form-group">
-                <label for="nombre">Código</label>
-                <input type="text"  class="form-control" name="nombre" id="nombre" placeholder="Ingresa el código de la clase">
-            </div>
-                <a href="{% url 'paginaInicio' %}" class="btn btn-danger">Cancelar</a>
-                <input type="button" id="btn-registrar" class="btn btn-primary" value="Unirse">
+{% comment %}                <div class="form-group">
+                    <label for="nombre">Código</label>
+                    <input type="text"  class="form-control" name="nombre" id="nombre" placeholder="Ingresa el código de la clase">
+                    <input type="button" id="btn-buscar" class="btn btn-buscar" value="Buscar">
+                </div>{% endcomment %}
+                 <div id="boton-registro-clase">
+                     <label for="nombre">Código</label>
+                    <div id="barra-busqueda">
+                        <a id="busqueda-boton" href="#">
+                            <img src="{% static 'usuarios/pagina-inicio/imagenes/busqueda.svg' %}" alt="">
+                        </a>
+                        <input id="busqueda-txt" type="text" name="busqueda" placeholder="Ingresa el código de la clase">
+                    </div>
+                 </div>
+                <div>
+                     <input type="button" id="btn-unirse" class="btn btn-primary" value="Unirse">
+                </div>
             </form>
+        </div>
+        <div>
+           <a href="{% url 'paginaInicio' %}" class="btn btn-danger">X</a>
         </div>
     </div>
     <script type="module" src="{% static 'clases/registro-clase/scripts/registro-clase.js' %}"></script>

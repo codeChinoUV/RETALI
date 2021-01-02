@@ -19,13 +19,18 @@
 .btn-danger{
     display: block;
     float: left;
-    margin-top: 15%;
+    margin-right: auto;
 }
 
 .btn-primary{
     display: block;
     float: right;
     margin-top: 15%;
+}
+.btn-buscar{
+    display: block;
+    float: right;
+    margin-right: 5%;
 }
 
 .invalid-feedback{
@@ -37,5 +42,40 @@ h2{
     text-align: center;
 }
 .form-group{
-    margin-top: 7%;
+    margin-top: 6%;
+}
+#boton-registro-clase img,
+#boton-registro-clase div{
+    font-size: 14px;
+    vertical-align: middle;
+    overflow: hidden;
+    display: inline-block;
+}
+#barra-busqueda{
+    background-color: white;
+    border-radius: 30px;
+    padding: 0;
+    width: 100%;
+}
+#barra-busqueda #busqueda-boton{
+    background-color: var(--hovercolor);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    float: left;
+    border-color: var(--hovercolor);
+}
+#busqueda-txt{
+    border: none;
+    background: none;
+    outline: none;
+    float: left;
+    margin: 5px 0 5px 0;
+    height: 25px;
+    line-height: 40px;
+    width: 50%;
 }
