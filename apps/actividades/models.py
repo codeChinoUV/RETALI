@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -47,3 +48,22 @@ class Archivo(models.Model):
     """
     entrega = models.ForeignKey(Entrega, on_delete=models.RESTRICT)
     archivo = models.FileField(upload_to='entregas')
+
+    def extension(self):
+        nombre, extension = os.path.splitext(self.archivo.name)
+        tipo_archivo = 'otro'
+        if extension == 'pdf':
+            tipo_archivo = 'pdf'
+        if extension == 'doc':
+            tipo_archivo = 'word'
+        if extension == 'jpg' or extension == 'png' or extension == 'gif':
+            tipo_archivo = 'imagen'
+        if extension == 'avi' or extension == 'mp4' or extension == 'mkv' or extension == 'fvl' or extension == 'wmv':
+            tipo_archivo = 'video'
+        return tipo_archivo
+
+    def nombre(self):
+        nombre, extesion = os.path.splitext(self.archivo.name)
+        if nombre.lenght > 30:
+            nombre = "..." + nombre[-30:]
+        return nombre

@@ -107,3 +107,8 @@ a:hover{
     display: block;
     margin-left: 1rem;
 }
+
+.invalid-feedback{
+    display: block;
+    color: var(--danger);
+}

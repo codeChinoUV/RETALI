@@ -1,6 +1,7 @@
 {% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
 {% load static %}
 {% load tz %}
+{% load sizify  %}
 {% block nombre_pagina %} Revisión de actividad {% endblock %}
 {% block estilos-extra %}
     <link rel="stylesheet" type="text/css" href="{% static 'actividades/revisar-entrega-actividad/estilos/revisar-entrega-actividad.css' %}">
@@ -34,6 +35,13 @@
 {% block contenido %}
     <h1 class="titulo-seccion">Revisión de entrega</h1>
     <hr>
+    {% if errores %}
+        {% for key, item in errores.items %}
+            {% if key == 'fecha-cierre' %}
+            <div id="error-no-se-puede-guardar">{{ item }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
     <div id="entrega-alumno">
         {% if entrega.alumno.foto_de_perfil %}
             <img id="foto-alumno" src="{{ entrega.alumno.foto_de_perfil.url }}" alt="foto del alumno">
@@ -60,7 +68,28 @@
                 <textarea name="descripcion" cols="40" rows="10" class="form-control" disabled id="id_descripcion">{{ entrega_actual.comentarios }}</textarea>
             </div>
             <div id="archivos-de-entrega">
-
+                {% for archivo in archivos %}
+                    <div class="archivo">
+                        {% if archivo.extension == 'otro' %}
+                            <img src="{% static 'actividades/revisar-entrega-activdad/imagenes/archivo.svg' %}" alt="archivo">
+                        {% elif archivo.extension == 'pdf' %}
+                            <img src="{% static 'actividades/revisar-entrega-activdad/imagenes/pdf.svg' %}" alt="archivo">
+                        {% elif archivo.extension == 'imagen' %}
+                            <img src="{{ archivo.archivo.url }}" alt="archivo">
+                        {% elif archivo.extension == 'video' %}
+                            <img src="{% static 'actividades/revisar-entrega-activdad/imagenes/video.svg' %}" alt="archivo">
+                        {% endif %}
+                        <div class="informacion-archivo">
+                            <p>Tamaño: {{ archivo.archivo.size|sizify }}</p>
+                            <p>{{ archivo.nombre }}</p>
+                        </div>
+                        <div class="descargar">
+                            <a href="">
+                                <img src="{% static 'generales/imagenes/descargar.svg' %}" alt="Descargar">
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -68,11 +97,11 @@
         <form method="post">
             <div class="form-group">
                 <label for="id_comentarios_de_revision">Comentarios de la revisión: </label>
-                <textarea name="comnetarios_de_revision" cols="40" rows="10" class="form-control" disabled id="id_comentarios_de_revision"></textarea>
+                <textarea name="comemtarios" cols="40" rows="10" class="form-control" disabled id="id_comentarios_de_revision"></textarea>
             </div>
             <div class="form-group">
                 <label for="id_calificacion">Calificacion</label>
-                <select class="form-control" id="id_calificacion" name="tipoUsuario">
+                <select class="form-control" id="id_calificacion" name="calificacion">
                     <option value="0">Seleccione una opción</option>
                     <option value="10">10</option>
                     <option value="9">9</option>
@@ -84,11 +113,18 @@
                     <option value="3">3</option>
                     <option value="2">2</option>
                     <option value="1">1</option>
+                    {% if errors %}
+                        {% for key, value in errores.items %}
+                            {% if key == 'calificacion' %}
+                                <div class="invalid-feedback">{{ value }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                 </select>
             </div>
             <div id="opciones">
                 <a href="">Regresar</a>
-                <button type="submit">Guardar</button>
+                <button type="submit" estado-activdad="{{ actividad_actual.estado }}" id="btn-registar-evaluacion">Guardar</button>
             </div>
         </form>
     </div>

@@ -5,8 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
 from apps.actividades.forms import ActividadForm, ActividadDisableForm
-from apps.actividades.models import Actividad, Entrega
-from apps.clases.models import Alumno
+from apps.actividades.models import Actividad, Entrega, Revision
 from apps.clases.views import obtener_cantidad_de_alumnos_inscritos_a_clase
 from apps.usuarios.views import obtener_informacion_de_clases_de_maestro
 
@@ -185,10 +184,40 @@ def revisar_entrega_actividad(request, codigo_clase, id_actividad, id_entrega):
             datos_del_maestro['actividad_actual'] = datos_del_maestro['clase_actual']. \
                 actividad_set.filter(pk=id_actividad).first()
             datos_del_maestro['form'] = ActividadDisableForm()
-            datos_del_maestro['entrega_actual'] = datos_del_maestro['actividad_actual'].\
+            datos_del_maestro['entrega_actual'] = datos_del_maestro['actividad_actual']. \
                 entrega_set.filter(pk=id_actividad).first()
-            return render(request, 'actividades/revisar-entrega-actividad/RevisarEntregaActividad.html',
-                          datos_del_maestro)
+            if datos_del_maestro['entrega_actual'].revision is not None:
+                datos_del_maestro['revision'] = datos_del_maestro['entrega_actual'].revision
+            if request.method == 'GET':
+                return render(request, 'actividades/revisar-entrega-actividad/RevisarEntregaActividad.html',
+                              datos_del_maestro)
+            elif request.method == 'POST':
+                hoy = datetime.datetime.today()
+                hoy = pytz.utc.localize(hoy)
+                actividad_actual = datos_del_maestro['clase_actual'].actividad_set.filter(pk=id_actividad).first()
+                if actividad_actual.fecha_de_cierre < hoy:
+                    if request.POST.get('calificacion') is None or request.POST.get('calificacion') == '':
+                        datos_del_maestro['errores'] = {
+                            'calificacion': 'Debe de escoger una calificacion'
+                        }
+                    else:
+                        if datos_del_maestro['entrega_actual'].revision is not None:
+                            Revision.objects.filter(id_entrega=datos_del_maestro['entrega_actual'.pk]).\
+                                update(calificacion=request.POST.get('calificacion'), retroalimentacion=request.POST.
+                                       get('comentarios'))
+                        else:
+                            revision = Revision(id_actividad=actividad_actual.pk,
+                                                calificacion=request.POST.get('calificacion'),
+                                                retroalimentacion=request.POST.get('comentarios'))
+                            revision.save()
+                        return redirect('actividades')
+                else:
+                    datos_del_maestro['errores'] = {
+                        'fecha-cierre': 'No puede guardar su revisión hasta que la activdad se cierre'
+                    }
+                    return render(request, 'actividades/revisar-entrega-actividad/RevisarEntregaActividad.html',
+                                  datos_del_maestro)
+
         else:
             return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
 
