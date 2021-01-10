@@ -34,24 +34,16 @@ class Entrega(models.Model):
     """
     Representa la entrega de la actividad de un Alumno
     """
-    class EstadoEntrega(models.TextChoices):
-        BORRADOR = 'Borrador', _('Borrador')
-        FINAL = 'Final', _('Final')
     comentarios = models.TextField(null=True)
     fecha_de_entrega = models.DateTimeField(default=timezone.now)
     revision = models.OneToOneField(Revision, on_delete=models.RESTRICT, null=True)
     alumno = models.ForeignKey(Alumno, on_delete=models.RESTRICT)
     actvidad = models.ForeignKey(Actividad, on_delete=models.RESTRICT)
-    estado = models.CharField(max_length=8, choices=EstadoEntrega.choices, default=EstadoEntrega.BORRADOR)
 
 
 class Archivo(models.Model):
     """
     Es un archivo el cual puede subir un alumno a su actividad
     """
-    class EstadoArchivoEntrega(models.TextChoices):
-        BORRADOR = 'Borrador', _('Borrador')
-        FINAL = 'Final', _('Final')
     entrega = models.ForeignKey(Entrega, on_delete=models.RESTRICT)
     archivo = models.FileField(upload_to='entregas')
-    estado = models.CharField(max_length=8, choices=EstadoArchivoEntrega.choices, default=EstadoArchivoEntrega.BORRADOR)

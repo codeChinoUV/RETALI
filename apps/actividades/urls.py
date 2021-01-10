@@ -1,7 +1,7 @@
 from django.urls import path
 
 from apps.actividades.views import consultar_actividades_de_clase, registrar_actividad, consultar_actividad, \
-    revisar_entrega_actividad, entregar_actividad_alumno, subir_archivo_entrega
+    revisar_entrega_actividad, entregar_actividad_alumno
 
 urlpatterns = [
     path('<str:codigo_clase>/actividades', consultar_actividades_de_clase, name='actividades'),
@@ -11,6 +11,4 @@ urlpatterns = [
          name='revisar_entrega'),
     path('<str:codigo_clase>/actividades/<int:id_actividad>/entregar_actividad', entregar_actividad_alumno,
          name='entregar_actividad'),
-    path('<str:codigo_clase>/actividades/<int:id_actividad>/subir_documento', subir_archivo_entrega,
-         name='subir_entrega' )
 ]

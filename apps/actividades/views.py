@@ -224,30 +224,6 @@ def entregar_actividad_alumno(request, codigo_clase, id_actividad):
             pk=id_actividad).first()
         return render(request, 'actividades/entregar-actividad-alumno/EntregarActividadAlumno.html', datos_del_alumno)
 
-
-@login_required()
-def subir_archivo_entrega(request, codigo_clase, id_actividad):
-    if request.user.es_maestro:
-        return HttpResponse(400)
-    if request.method == 'POST':
-        if _validar_existe_actividad_de_alumno(codigo_clase, id_actividad, request.user.persona.alumno):
-            clase = Clase.objects.filter(codigo=codigo_clase, abierta=True).first()
-            clase_del_alumno = request.user.persona.alumno.inscripcion_set. \
-                filter(aceptado='Aceptado', clase_id=clase.pk).first().clase
-            actividad_actual = clase_del_alumno.actividad_set.filter(pk=id_actividad).first()
-            entrega = Entrega.objects.\
-                filter(actvidad_id=actividad_actual.pk, alumno_id=request.user.persona.alumno.pk).first()
-            if entrega is None:
-                entrega = Entrega(alumno_id=request.user.persona.alumno.pk, actvidad_id=actividad_actual.pk)
-                entrega.save()
-            archivos = request.FILES
-            for archivo in archivos.items():
-                documento_entrega = Archivo(entrega_id=entrega.pk, archivo=archivo[1])
-                documento_entrega.save()
-            return HttpResponse(200)
-    return HttpResponse(400)
-
-
 def _validar_existe_actividad_de_alumno(codigo_clase, id_actividad, alumno):
     existe_actividad = False
     clase = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()
