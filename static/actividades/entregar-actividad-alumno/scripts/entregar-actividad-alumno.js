@@ -1,63 +1,77 @@
 let zonaArchivos = document.querySelector("#archivos-adjuntos");
 let archivosSeleccionados = new DataTransfer();
 let inputElement = document.querySelector("#drop-zone-input");
-const dropZoneElement = inputElement.closest(".drop-zone");
+var dropZoneElement = inputElement.closest(".drop-zone");
+let seEstaCargando = false;
 
 function agregarEventosDropzone(zonaAgregarEventosDrag){
 
-  zonaAgregarEventosDrag.addEventListener("click", (e) => {
-    inputElement.click();
-  });
+  zonaAgregarEventosDrag.addEventListener("click", agregarClickListenerDropZone);
+  zonaAgregarEventosDrag.addEventListener("dragover", dragOver);
+  zonaAgregarEventosDrag.addEventListener("drop", procesarAgregarArchivosDrag);
+  inputElement.addEventListener("change", procesarAgregarArchivosChange);
 
-  zonaAgregarEventosDrag.addEventListener("dragover", (e) => {
+  function agregarClickListenerDropZone(e){
+    if(!seEstaCargando){
+      inputElement.click();
+    }
+  }
+
+  function dragOver(e){
     e.preventDefault();
+    dropZoneElement = inputElement.closest(".drop-zone");
     dropZoneElement.classList.add("drop-zone--over");
-  });
+  }
 
-  zonaAgregarEventosDrag.addEventListener("drop", (e) => {
+  function crearArchivosVisualizacion(archivosAgregar, archivosSeleccionados, zonaEventos){
+      let nodoPadreZonaDrag = zonaEventos.parentNode;
+      nodoPadreZonaDrag.removeChild(zonaEventos);
+      console.log("Pase aquí");
+      for(let i = 0; i < archivosAgregar.files.length; i++) {
+        if (validarTamanioArchivo(archivosAgregar.files[i])) {
+          archivosSeleccionados.items.add(archivosAgregar.files[i]);
+          console.log("Paso el archivo " + i.toString());
+          let nuevaZona = crearNuevaZonaDrop();
+          nodoPadreZonaDrag.appendChild(nuevaZona);
+          nuevaZona.setAttribute('position', i.toString());
+          nuevaZona.addEventListener("click", (e) => {
+            if (!seEstaCargando) {
+              eliminarArchivo(e.target, parseInt(e.target.getAttribute("position")));
+            }
+          })
+          nuevaZona.classList.add('archivo');
+          updateThumbnail(nuevaZona, archivosAgregar.files[i]);
+        }
+      }
+  }
+
+  function procesarAgregarArchivosDrag(e){
     e.preventDefault();
-
-    if (e.dataTransfer.files.length) {
-      let nodoPadreZonaDrag = zonaAgregarEventosDrag.parentNode;
-      nodoPadreZonaDrag.removeChild(zonaAgregarEventosDrag);
-      for(let i = 0; i < e.dataTransfer.files.length; i++){
-        archivosSeleccionados.items.add(e.dataTransfer.files[i]);
-        let nuevaZona = crearNuevaZonaDrop();
-        nodoPadreZonaDrag.appendChild(nuevaZona);
-        nuevaZona.setAttribute('position', i.toString());
-        nuevaZona.classList.add('archivo');
-        updateThumbnail(nuevaZona, e.dataTransfer.files[i]);
-      }
+    if (e.dataTransfer.files.length && validarCantidadArchivos(e.dataTransfer, archivosSeleccionados) &&
+    !seEstaCargando) {
+      crearArchivosVisualizacion(e.dataTransfer, archivosSeleccionados, zonaAgregarEventosDrag);
+      colocarNuevoZonaDrop();
       inputElement.files = archivosSeleccionados.files;
     }
-    colocarNuevoZonaDrop();
-  });
+  }
 
-  inputElement.addEventListener("change", (e) => {
-    if (inputElement.files.length) {
-      let nodoPadreZonaDrag = zonaAgregarEventosDrag.parentNode;
-      nodoPadreZonaDrag.removeChild(zonaAgregarEventosDrag);
-      for(let i = 0; i < inputElement.files.length; i++){
-        archivosSeleccionados.items.add(inputElement.files[i]);
-        let nuevaZona = crearNuevaZonaDrop();
-        nuevaZona.setAttribute('position', i.toString());
-        nuevaZona.classList.add('archivo');
-        nuevaZona.addEventListener("click", (e) =>{
-          eliminarArchivo(e.target, parseInt(e.target.getAttribute("position")));
-        })
-        nodoPadreZonaDrag.appendChild(nuevaZona);
-        updateThumbnail(nuevaZona, inputElement.files[i]);
-      }
+  function procesarAgregarArchivosChange(e){
+    console.log("Entro al evento");
+    if (inputElement.files.length && validarCantidadArchivos(inputElement, archivosSeleccionados) && !seEstaCargando) {
+      inputElement = document.querySelector("#drop-zone-input");
+      console.log("Entro al if");
+      crearArchivosVisualizacion(inputElement, archivosSeleccionados, zonaAgregarEventosDrag);
+      colocarNuevoZonaDrop();
       inputElement.files = archivosSeleccionados.files;
     }
-    colocarNuevoZonaDrop();
-  });
+  }
 
   ["dragleave", "dragend"].forEach((type) => {
     zonaAgregarEventosDrag.addEventListener(type, (e) => {
       zonaAgregarEventosDrag.classList.remove("drop-zone--over");
     });
   });
+
 }
 
   function crearNuevaZonaDrop(){
@@ -76,6 +90,7 @@ function agregarEventosDropzone(zonaAgregarEventosDrag){
     inputElement.type = "file";
     inputElement.id = "drop-zone-input";
     inputElement.multiple = true;
+    inputElement.name = "archivos";
     nuevoDivDrop.appendChild(inputElement);
     zonaArchivos.appendChild(nuevoDivDrop);
     agregarEventosDropzone(nuevoDivDrop);
@@ -148,7 +163,9 @@ function volverACrearElementos(archivos){
         nuevaZona.setAttribute('position', i.toString());
         nuevaZona.classList.add('archivo');
         nuevaZona.addEventListener("click", (e) =>{
-          eliminarArchivo(e.target, parseInt(e.target.getAttribute("position")));
+          if(!seEstaCargando){
+            eliminarArchivo(e.target, parseInt(e.target.getAttribute("position")));
+          }
         })
         zonaArchivos.appendChild(nuevaZona);
         updateThumbnail(nuevaZona, archivos.files[i]);
@@ -157,4 +174,166 @@ function volverACrearElementos(archivos){
   colocarNuevoZonaDrop();
 }
 
+/**
+ * Valida que la cantidad de archivos no supere los 5
+ * @param archivosNuevos Los archivos a agregar
+ * @param archivosViejos Los archivos previamente agregados
+ * @returns {boolean} True si no supera el maximo o False si no
+ */
+function validarCantidadArchivos(archivosNuevos, archivosViejos){
+  let cantidadDeArchivosPermitidos = true;
+  const CANTIDAD_MAXIMA_ARCHIVOS = 5;
+  if((archivosNuevos.files.length + archivosViejos.files.length) > CANTIDAD_MAXIMA_ARCHIVOS ){
+    Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Lo siento, No puedes adjuntar mas de 5 archivos',
+        })
+    cantidadDeArchivosPermitidos = false;
+  }
+  return cantidadDeArchivosPermitidos;
+}
+
+/**
+ * Valida si el tamaño de un archivo no supera los 50 MB
+ * @param archivo el archivo a validar su tamaño
+ * @returns {boolean} true si el tamaño es valido o false si no
+ */
+function validarTamanioArchivo(archivo) {
+  let tamanioValido = true;
+  const TAMANIO_MAXIMO_ARCHIVO = 51200; //50 MB
+  const MEGABYTE = 1024;
+  let tamanioArchivo = Math.round((archivo.size)/MEGABYTE);
+  if(tamanioArchivo > TAMANIO_MAXIMO_ARCHIVO){
+    Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Lo siento el archivo ' + archivo.name + ' es demasiado grande y no se agregara',
+        })
+    tamanioValido = false;
+  }
+  return tamanioValido;
+}
+
 agregarEventosDropzone(dropZoneElement);
+
+const entregaActividadForm = document.querySelector("#entregaForm");
+const progressBarFill = document.querySelector("#progressBar > .progressbar-fill");
+const progressBarText = progressBarFill.querySelector(".progressbar-text");
+const seccionBarraCarga = document.querySelector("#progeso-subida");
+
+entregaActividadForm.addEventListener("submit", enviarFormulario);
+
+/*
+  Crea un form data a partir de la información de los inputs
+ */
+function crearFormData(){
+  let formdata = new FormData();
+  let textarea = document.querySelector("textarea[name='comentarios']");
+  formdata.append(textarea.name, textarea.value);
+  document.querySelectorAll("input").forEach((e) => {
+    if(e.type === "file"){
+      for(let i = 0; i < e.files.length; i++){
+        formdata.append(e.name + "[" + i + "]", e.files[i], e.files[i].name);
+      }
+    }else{
+      formdata.append(e.name, e.value);
+    }
+  });
+  return formdata;
+}
+
+function enviarFormulario(e){
+  seEstaCargando = true;
+  let comentariosEntrega = document.querySelector("textarea[name='comentarios']");
+  comentariosEntrega.disabled = true;
+  e.preventDefault();
+  let request = new XMLHttpRequest();
+    request.open("POST","", true);
+    request.upload.addEventListener("progress", (e) =>{
+      let porcentaje = e.lengthComputable ? (e.loaded / e.total) * 100 : 0;
+      progressBarFill.style.width = porcentaje.toFixed(2) + "%";
+      progressBarText.textContent = porcentaje.toFixed(2) + "%";
+    });
+    let csrftoken = getCookie('csrftoken');
+    request.setRequestHeader("csrfmiddlewaretoken", csrftoken);
+    if(inputElement.files.length > 0){
+      seccionBarraCarga.style.display = "block";
+    }
+    let datos = crearFormData();
+    request.send(datos);
+    request.onreadystatechange = function (aeEvt){
+      seEstaCargando = false;
+      comentariosEntrega.disabled = false;
+      seccionBarraCarga.style.display = "none";
+      if (request.readyState === 4 && request.status === 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'No se logro establecer conexión con el servidor, cheque si conexición a internet',
+        })
+        seEstaCargando = false;
+        comentariosEntrega.disabled = false;
+      }
+      if(request.status === 500){
+        Swal.fire({
+            icon: 'error',
+            title: 'Algo salio mal...',
+            text: 'No puede argar su activdad',
+          })
+      }else if(request.status === 400 && request.readyState === 2){
+        Swal.fire({
+            icon: 'error',
+            title: 'Lo siento...',
+            text: 'No se puedes entregar una actividad vacia',
+          })
+      }else if(request.status === 401 && request.readyState === 2){
+        Swal.fire({
+            icon: 'error',
+            title: 'Lo siento...',
+            text: 'No puedes entregar la actividad debido a que esta no se encuentra abierta',
+          })
+      }else if(request.status === 402 && request.readyState === 2){
+        Swal.fire({
+            icon: 'error',
+            title: 'Algo salio mal...',
+            text: 'Uno de los archivos adjuntos pesa mas de 50MB por favor eliminalo e intentalo nuevamente',
+          })
+      }
+      else if(request.status === 200 && request.readyState === 2){
+        Swal.fire({
+          icon: 'success',
+          title: '¡Genial!',
+          text: 'Su actividad se ha guardado correctamente',
+          willClose: redireccionarActividades
+        })
+
+      }
+    }
+}
+
+function redireccionarActividades(){
+  const linkActual = document.querySelector("#link-redireccion");
+  //window.location.href = linkActual.href;
+}
+
+/**
+ *  Extrae una determinada Cookie
+ * @param cname El nombre de la cookie a obtener
+ * @returns {string} El valor de la cookie
+ */
+function getCookie(cname) {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) === 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}

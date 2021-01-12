@@ -3,6 +3,7 @@ from django import template
 register = template.Library()
 
 
+@register.filter(name='sizify')
 def sizify(value):
     """
     Simple kb/mb/gb size snippet for templates:
@@ -20,6 +21,3 @@ def sizify(value):
         value = value / 1073741824.0
         ext = 'gb'
     return '%s %s' % (str(round(value, 2)), ext)
-
-
-register.filter('sizify', sizify)

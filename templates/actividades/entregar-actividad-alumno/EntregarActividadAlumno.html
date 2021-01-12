@@ -5,6 +5,32 @@
 {% block estilos-extra %}
     <link rel="stylesheet" href="{% static 'actividades/entregar-actividad-alumno/estilos/entregar-actividad-alumno.css' %}">
 {% endblock %}
+{% block links %}
+    <li>
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    </li>
+    <li class="link-actual">
+        <a href="#hoola" id="link-redireccion">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Anuncios</div>
+        </a>
+    </li>
+{% endblock %}
 {% block contenido %}
     <h1 class="titulo-seccion">Entregar actividad</h1>
     <hr>
@@ -33,17 +59,30 @@
                 <label for="descripcion_actividad">Descripción de la actividad: </label>
                 <textarea id="descripcion_actividad" class="form-control" disabled cols="40" rows="10">{{ actividad_actual.descripcion }}</textarea>
             </div>
-            <form method="post">
+            <form method="post" id="entregaForm">
+                {% csrf_token %}
                 <div class="form-group">
                     <label for="comentarios_entrega">Comentarios de la entrega: </label>
-                    <textarea id="comentarios_entrega" class="form-control" cols="40" rows="5"></textarea>
+                    <textarea id="comentarios_entrega" name="comentarios" class="form-control" cols="40" rows="5"></textarea>
                 </div>
                 <label>Archivos adjuntos: </label>
                 <div class="form-group" id="archivos-adjuntos">
                     <div class="drop-zone">
-                        <input id="drop-zone-input" name="file" type="file" multiple />
+                        <input id="drop-zone-input" name="archivos" type="file" multiple />
                         <span class="drop-zone__prompt">Suelta los archivos o da click aquí</span>
                     </div>
+                </div>
+                <hr id="linea-entrega">
+                <div id="enviar-formulario">
+                    <div id="progeso-subida">
+                        <label id="archivo-subiendo">Subiendo archivos: </label>
+                        <div class="progressbar" id="progressBar">
+                            <div class="progressbar-fill">
+                                <span class="progressbar-text">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit">Entregar actividad</button>
                 </div>
             </form>
         </div>

@@ -116,6 +116,11 @@
   text-align: center;
 }
 
+.drop-zone__thumb.file{
+    background-image: url("../../revisar-entrega-actividad/imagenes/archivo.svg");
+    background-position: center;
+}
+
 /*
     Thumbzone hover
  */
@@ -132,4 +137,63 @@
   display:none;
 }
 
+/*
+    Zona envio archivos
+ */
 
+#enviar-formulario{
+    margin-top: 2%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#linea-entrega{
+    margin: 0 1%;
+}
+
+/*
+    progress-bar
+ */
+
+#progeso-subida{
+    margin-right: auto;
+    display: none;
+}
+
+.progressbar{
+    height: 30px;
+    width: 300px;
+    border: 1px solid var(--hovercolor);
+    border-radius: 1rem;
+    background-color: var(--primary-color);
+}
+
+.progressbar-fill{
+    height: 100%;
+    width: 0;
+    background: var(--hovercolor);
+    display: flex;
+    align-items: center;
+    transition: width 0.25s;
+    border-radius: 1rem;
+}
+
+.progressbar-text{
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+/*
+    Boton enviar
+ */
+
+button[type="submit"]{
+    background-color: var(--hovercolor);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 1rem;
+    vertical-align: center;
+    margin: 0 2.5% 2% 0;
+    float: right;
+}

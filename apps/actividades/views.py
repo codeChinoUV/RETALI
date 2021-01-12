@@ -85,19 +85,27 @@ def _actualizar_estado_actividades(actividades):
     :return: None
     """
     if actividades is not None:
-        now = datetime.datetime.today()
-        now = pytz.utc.localize(now)
         for actividad in actividades:
-            if actividad.fecha_de_inicio > now:
-                Actividad.objects.filter(pk=actividad.pk).update(estado='Por abrir')
-                actividad.estado = 'Por abrir'
-            else:
-                if actividad.fecha_de_cierre < now:
-                    Actividad.objects.filter(pk=actividad.pk).update(estado='Cerrada')
-                    actividad.estado = 'Cerrada'
-                else:
-                    Actividad.objects.filter(pk=actividad.pk).update(estado='Abierta')
-                    actividad.estado = 'Abierta'
+            _actualizar_estado_actividad(actividad)
+
+
+def _actualizar_estado_actividad(actividad):
+    """
+    Actualiza el estado de una sola actividad dependiendo la fecha de cierre de esta
+    :param actividad: La actividad a la cual se le actualiza el estado
+    :return: None
+    """
+    now = datetime.datetime.today()
+    now = pytz.utc.localize(now)
+    if actividad.fecha_de_inicio > now:
+        Actividad.objects.filter(pk=actividad.pk).update(estado='Por abrir')
+        actividad.estado = 'Por abrir'
+    elif actividad.fecha_de_cierre < now:
+        Actividad.objects.filter(pk=actividad.pk).update(estado='Cerrada')
+        actividad.estado = 'Cerrada'
+    else:
+        Actividad.objects.filter(pk=actividad.pk).update(estado='Abierta')
+        actividad.estado = 'Abierta'
 
 
 def _colocar_cantidad_de_entregas_de_actividad(actividades):
@@ -169,11 +177,6 @@ def _validar_existe_actividad(codigo_clase, id_actividad, maestro):
     return False
 
 
-def _registrar_entrega(actividad_id, entrega, alumno_id):
-    entrega = Entrega(alumno_id=alumno_id, actvidad_id=actividad_id, comentarios=entrega)
-    entrega.save()
-
-
 def revisar_entrega_actividad(request, codigo_clase, id_actividad, id_entrega):
     if not request.user.es_maestro:
         return redirect('paginaInicio')
@@ -186,7 +189,9 @@ def revisar_entrega_actividad(request, codigo_clase, id_actividad, id_entrega):
                 actividad_set.filter(pk=id_actividad).first()
             datos_del_maestro['form'] = ActividadDisableForm()
             datos_del_maestro['entrega_actual'] = datos_del_maestro['actividad_actual']. \
-                entrega_set.filter(pk=id_actividad).first()
+                entrega_set.filter(pk=id_entrega).first()
+            datos_del_maestro['archivos'] = datos_del_maestro['entrega_actual'].archivo_set.all()
+            print(datos_del_maestro['archivos'])
             if datos_del_maestro['entrega_actual'].revision is not None:
                 datos_del_maestro['revision'] = datos_del_maestro['entrega_actual'].revision
             if request.method == 'GET':
@@ -203,7 +208,7 @@ def revisar_entrega_actividad(request, codigo_clase, id_actividad, id_entrega):
                         }
                     else:
                         if datos_del_maestro['entrega_actual'].revision is not None:
-                            Revision.objects.filter(id_entrega=datos_del_maestro['entrega_actual'.pk]).\
+                            Revision.objects.filter(id_entrega=datos_del_maestro['entrega_actual'.pk]). \
                                 update(calificacion=request.POST.get('calificacion'), retroalimentacion=request.POST.
                                        get('comentarios'))
                         else:
@@ -242,19 +247,127 @@ def _validar_existe_entrega(codigo_clase, id_actividad, id_entrega, maestro):
 
 @login_required()
 def entregar_actividad_alumno(request, codigo_clase, id_actividad):
-    if request.user.es_maestro:
-        return redirect('paginaInicio')
+    if request.method == "POST":
+        if request.user.es_maestro:
+            return HttpResponse(status=500)
+        else:
+            codigo_revision_entrega = _validar_entrega_actividad(request.user.persona.alumno, codigo_clase,
+                                                                 id_actividad, request.POST['comentarios'],
+                                                                 request.FILES)
+            if codigo_revision_entrega == 200:
+                _registrar_entrega(request.user.persona.alumno, id_actividad, request.POST['comentarios'],
+                                   request.FILES)
+            return HttpResponse(status=codigo_revision_entrega)
     else:
-        clase = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()
-        datos_del_alumno = {
-            'clase_actual': request.user.persona.alumno.inscripcion_set.filter(aceptado='Aceptado',
-                                                                               clase_id=clase.pk).first().clase
-        }
-        datos_del_alumno['actividad_actual'] = datos_del_alumno['clase_actual'].actividad_set.filter(
-            pk=id_actividad).first()
-        return render(request, 'actividades/entregar-actividad-alumno/EntregarActividadAlumno.html', datos_del_alumno)
+        if request.user.es_maestro:
+            return redirect('paginaInicio')
+        else:
+            clase = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()
+            datos_del_alumno = {
+                'clase_actual': request.user.persona.alumno.inscripcion_set.filter(aceptado='Aceptado',
+                                                                                   clase_id=clase.pk).first().clase
+            }
+            datos_del_alumno['actividad_actual'] = datos_del_alumno['clase_actual'].actividad_set.filter(
+                pk=id_actividad).first()
+            return render(request, 'actividades/entregar-actividad-alumno/EntregarActividadAlumno.html',
+                          datos_del_alumno)
+
+
+def _registrar_entrega(alumno, id_actividad, comentarios, archivos):
+    """
+    Crea una entrega de un Alumno con sus Archivos adjuntos
+    :param alumno: El alumno que entrego la actividad
+    :param id_actividad: El id de la activdad de la entrega
+    :param comentarios: Los comentarios de la entrega
+    :param archivos: Los archivos adjuntos
+    :return: None
+    """
+    entrega = Entrega(alumno_id=alumno.pk, actvidad_id=id_actividad, comentarios=comentarios)
+    entrega.save()
+    for archivo in archivos.values():
+        archivo_entrega = Archivo(entrega_id=entrega.pk, archivo=archivo)
+        archivo_entrega.save()
+
+
+def _validar_entrega_actividad(alumno, codigo_clase, id_actividad, comentarios, archivos):
+    """
+    Valida que los datos de la entrega sean correctos, valida si la actividad existe, se encuentra abierta y si los
+    archivos no superan el tamaño maximo
+    :param alumno: El alumno que realizara la entrega
+    :param codigo_clase: El codigo de la clase de la actividad
+    :param id_actividad: El id de la actividad a la cual se realizara la entrega
+    :param comentarios: Los comentarios de la entrega
+    :param archivos: Los archivos adjuntos de la entrega
+    :return: El codiogo correspondiente al estado de la actividad
+    """
+    # Codigo 400 La actividad no tiene archivos adjuntos ni comentarios
+    # Codigo 401 La actividad se encuentra cerrada o todavia no abre
+    # Codigo 402 Los archivos de la actividad superan los 50 MB
+    # Codigo 403 No existe la actividad
+    estado_actividad = 400
+    if _validar_existe_actividad_de_alumno(codigo_clase, id_actividad, alumno):
+        actividad = Actividad.objects.filter(pk=id_actividad).first()
+        if _validar_actividad_abierta(actividad):
+            if comentarios is not None and comentarios != "" or len(archivos) > 0:
+                if _validar_tamanio_archivos(archivos):
+                    estado_actividad = 200
+                else:
+                    estado_actividad = 402
+        else:
+            estado_actividad = 401
+    else:
+        estado_actividad = 403
+    return estado_actividad
+
+
+def _validar_actividad_abierta(actividad):
+    """
+    Valida si la actividad se encuentra abierta
+    :param actividad: La actividad a validad
+    :return: True si la actividad se encuentra abierta o False si no
+    """
+    esta_abierta = True
+    _actualizar_estado_actividad(actividad)
+    if actividad.estado != 'Abierta':
+        esta_abierta = False
+    return esta_abierta
+
+
+def _validar_tamanio_archivos(archivos):
+    """
+    Valida si los archivos adjuntos no superan los 50MB de tamaño
+    :param archivos: Los archivos a validar
+    :return: True si todos los archivos no superan el tamaño valido o False si no
+    """
+    son_validos = True
+    for archivo in archivos.items():
+        if not _validar_tamanio_archivo(archivo[1]):
+            son_validos = False
+            break
+    return son_validos
+
+
+def _validar_tamanio_archivo(archivo):
+    """
+    Valida si un archivo supera los 50MB de tamaño
+    :param archivo: El archivo a validar
+    :return: True si es menor a el tamaño maximo o False si no
+    """
+    tamano_maximo = 51068760 # 50MB
+    es_valido = True
+    if archivo.size > tamano_maximo:
+        es_valido = False
+    return es_valido
+
 
 def _validar_existe_actividad_de_alumno(codigo_clase, id_actividad, alumno):
+    """
+    Valida su existe una actividad para el alumno
+    :param codigo_clase: El codigo de la clase a la cual pertenece la actividad
+    :param id_actividad: El id de la actividad a entregar
+    :param alumno: El alumno que realizara la entrega
+    :return: True si existe la actividad o False si no
+    """
     existe_actividad = False
     clase = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()
     clase_del_alumno = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.pk).first().clase

@@ -50,7 +50,7 @@ class Archivo(models.Model):
     archivo = models.FileField(upload_to='entregas')
 
     def extension(self):
-        nombre, extension = os.path.splitext(self.archivo.name)
+        extension = self.archivo.name.split('.')[-1]
         tipo_archivo = 'otro'
         if extension == 'pdf':
             tipo_archivo = 'pdf'
@@ -63,7 +63,7 @@ class Archivo(models.Model):
         return tipo_archivo
 
     def nombre(self):
-        nombre, extesion = os.path.splitext(self.archivo.name)
-        if nombre.lenght > 30:
-            nombre = "..." + nombre[-30:]
-        return nombre
+        nombre = self.archivo.name
+        if len(nombre) > 30:
+            nombre = "..." + nombre[-20:]
+        return nombre.split('/')[-1]
