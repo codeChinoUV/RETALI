@@ -64,6 +64,6 @@ class Archivo(models.Model):
 
     def nombre(self):
         nombre = self.archivo.name
-        if len(nombre) > 30:
-            nombre = "..." + nombre[-20:]
+        if len(nombre) > 18:
+            nombre = "..." + nombre[-18:]
         return nombre.split('/')[-1]

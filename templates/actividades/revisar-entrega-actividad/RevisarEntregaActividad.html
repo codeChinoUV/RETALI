@@ -67,6 +67,7 @@
                 <label for="id_descripcion">Entrega del alumno: </label>
                 <textarea name="descripcion" cols="40" rows="10" class="form-control" disabled id="id_descripcion">{{ entrega_actual.comentarios }}</textarea>
             </div>
+            <p>Archivos adjuntos de la entrega: </p>
             <div id="archivos-de-entrega">
                 {% for archivo in archivos %}
                     <div class="archivo">
@@ -84,7 +85,7 @@
                             <p class="tamano-archivo">{{ archivo.archivo.size|sizify }}</p>
                         </div>
                         <div class="descargar">
-                            <a href="">
+                            <a href="{% url 'descargar_archivo_entrega' clase_actual.codigo actividad_actual.pk entrega_actual.pk archivo.pk %}">
                                 <img src="{% static 'generales/imagenes/descargar.svg' %}" alt="Descargar">
                             </a>
                         </div>
@@ -95,24 +96,25 @@
     </div>
     <div id="retroalimentacion">
         <form method="post">
+        {% csrf_token %}
             <div class="form-group">
                 <label for="id_comentarios_de_revision">Comentarios de la revisión: </label>
-                <textarea name="comemtarios" cols="40" rows="10" class="form-control" disabled id="id_comentarios_de_revision"></textarea>
+                <textarea name="comentarios" cols="40" rows="10" class="form-control"  id="id_comentarios_de_revision">{{ revision.retroalimentacion }}</textarea>
             </div>
             <div class="form-group">
                 <label for="id_calificacion">Calificacion</label>
                 <select class="form-control" id="id_calificacion" name="calificacion">
                     <option value="0">Seleccione una opción</option>
-                    <option value="10">10</option>
-                    <option value="9">9</option>
-                    <option value="8">8</option>
-                    <option value="7">7</option>
-                    <option value="6">6</option>
-                    <option value="5">5</option>
-                    <option value="4">4</option>
-                    <option value="3">3</option>
-                    <option value="2">2</option>
-                    <option value="1">1</option>
+                    <option value="10" {% if revision.calificacion == 10 %} selected="selected" {% endif %}>10</option>
+                    <option value="9" {% if revision.calificacion == 9 %} selected="selected" {% endif %}>9</option>
+                    <option value="8" {% if revision.calificacion == 8 %} selected="selected" {% endif %}>8</option>
+                    <option value="7" {% if revision.calificacion == 7 %} selected="selected" {% endif %}>7</option>
+                    <option value="6" {% if revision.calificacion == 6 %} selected="selected" {% endif %}>6</option>
+                    <option value="5" {% if revision.calificacion == 5 %} selected="selected" {% endif %}>5</option>
+                    <option value="4" {% if revision.calificacion == 4 %} selected="selected" {% endif %}>4</option>
+                    <option value="3" {% if revision.calificacion == 3 %} selected="selected" {% endif %}>3</option>
+                    <option value="2" {% if revision.calificacion == 2 %} selected="selected" {% endif %}>2</option>
+                    <option value="1" {% if revision.calificacion == 1 %} selected="selected" {% endif %}>1</option>
                     {% if errors %}
                         {% for key, value in errores.items %}
                             {% if key == 'calificacion' %}
@@ -123,9 +125,18 @@
                 </select>
             </div>
             <div id="opciones">
-                <a href="" class="regresar">Regresar</a>
-                <button type="submit" estado-activdad="{{ actividad_actual.estado }}" id="btn-registar-evaluacion">Guardar</button>
+                <a href="{% url 'consultar_actividad_mestro' clase_actual.codigo actividad_actual.id %}" class="regresar">Regresar</a>
+                <button type="submit" estado-activdad="{{ actividad_actual.estado }}" id="btn-registar-evaluacion">
+                    {% if revision %}
+                        Actualizar revisión
+                    {% else %}
+                        Guardar
+                    {% endif %}
+                </button>
             </div>
         </form>
     </div>
+{% endblock %}
+{% block scripts-adicionales %}
+    <script src="{% static 'actividades/revisar-entrega-actividad/scripts/RevisarEntregaActividad.js' %}"></script>
 {% endblock %}

@@ -1,9 +1,11 @@
 import datetime
-
+import os
 import pytz
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from django.shortcuts import render, redirect, HttpResponse
 
+from RETALI import settings
 from apps.actividades.forms import ActividadForm, ActividadDisableForm
 from apps.actividades.models import Actividad, Entrega, Archivo, Revision
 from apps.clases.models import Clase
@@ -36,8 +38,6 @@ def consultar_actividades_de_clase(request, codigo_clase):
                 obtener_cantidad_total_de_actividades(datos_del_maestro['clase_actual'])
             datos_del_maestro['cantidad_actividades_abiertas'] = \
                 _obtener_cantidad_de_actividades_abiertas(datos_del_maestro['actividades'])
-            # _registrar_entrega(1, "adjunto el link del repositorio de github: https://github.com/codeChinoUV/RETALI.git",
-            #                   2)
             return render(request, 'actividades/consultar-actividades-maestro/ConsultarActividadesMaestro.html',
                           datos_del_maestro)
 
@@ -177,6 +177,7 @@ def _validar_existe_actividad(codigo_clase, id_actividad, maestro):
     return False
 
 
+@login_required()
 def revisar_entrega_actividad(request, codigo_clase, id_actividad, id_entrega):
     if not request.user.es_maestro:
         return redirect('paginaInicio')
@@ -185,47 +186,80 @@ def revisar_entrega_actividad(request, codigo_clase, id_actividad, id_entrega):
         datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set. \
             filter(codigo=codigo_clase, abierta=True).first()
         if _validar_existe_entrega(codigo_clase, id_actividad, id_entrega, request.user.persona.maestro):
-            datos_del_maestro['actividad_actual'] = datos_del_maestro['clase_actual']. \
-                actividad_set.filter(pk=id_actividad).first()
-            datos_del_maestro['form'] = ActividadDisableForm()
-            datos_del_maestro['entrega_actual'] = datos_del_maestro['actividad_actual']. \
-                entrega_set.filter(pk=id_entrega).first()
-            datos_del_maestro['archivos'] = datos_del_maestro['entrega_actual'].archivo_set.all()
-            print(datos_del_maestro['archivos'])
-            if datos_del_maestro['entrega_actual'].revision is not None:
-                datos_del_maestro['revision'] = datos_del_maestro['entrega_actual'].revision
+            datos_del_maestro = _colocar_informacion_de_la_actividad(datos_del_maestro, id_actividad, id_entrega)
             if request.method == 'GET':
                 return render(request, 'actividades/revisar-entrega-actividad/RevisarEntregaActividad.html',
                               datos_del_maestro)
             elif request.method == 'POST':
-                hoy = datetime.datetime.today()
-                hoy = pytz.utc.localize(hoy)
-                actividad_actual = datos_del_maestro['clase_actual'].actividad_set.filter(pk=id_actividad).first()
-                if actividad_actual.fecha_de_cierre < hoy:
-                    if request.POST.get('calificacion') is None or request.POST.get('calificacion') == '':
+                if not _validar_actividad_abierta(datos_del_maestro['actividad_actual']):
+                    if request.POST.get('calificacion') is None or request.POST.get('calificacion') == '0':
                         datos_del_maestro['errores'] = {
                             'calificacion': 'Debe de escoger una calificacion'
                         }
                     else:
                         if datos_del_maestro['entrega_actual'].revision is not None:
-                            Revision.objects.filter(id_entrega=datos_del_maestro['entrega_actual'.pk]). \
-                                update(calificacion=request.POST.get('calificacion'), retroalimentacion=request.POST.
-                                       get('comentarios'))
+                            _actualizar_revision(datos_del_maestro['revision'].pk,
+                                                 request.POST['calificacion'], request.POST['comentarios'])
                         else:
-                            revision = Revision(id_actividad=actividad_actual.pk,
-                                                calificacion=request.POST.get('calificacion'),
-                                                retroalimentacion=request.POST.get('comentarios'))
-                            revision.save()
-                        return redirect('actividades')
+                            _registrar_revision(datos_del_maestro['entrega_actual'], request.POST['calificacion'],
+                                                request.POST['comentarios'], )
+                        return redirect('consultar_actividad_mestro', codigo_clase=codigo_clase,
+                                        id_actividad=id_actividad)
                 else:
                     datos_del_maestro['errores'] = {
                         'fecha-cierre': 'No puede guardar su revisión hasta que la activdad se cierre'
                     }
                     return render(request, 'actividades/revisar-entrega-actividad/RevisarEntregaActividad.html',
                                   datos_del_maestro)
-
         else:
             return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
+
+
+def _colocar_informacion_de_la_actividad(datos_anteriores, id_actividad, id_entrega):
+    """
+    Coloca la información necesaria para desplegar la pagina de calificar actividad
+    :param datos_anteriores: Los datos anteriores de la actividad
+    :param id_actividad: El id de la actividad a revisar la entrega
+    :param id_entrega: EL id de la entrega a revisar
+    :return: Los datos actualizados
+    """
+    datos_anteriores['actividad_actual'] = datos_anteriores['clase_actual']. \
+        actividad_set.filter(pk=id_actividad).first()
+    datos_anteriores['form'] = ActividadDisableForm()
+    datos_anteriores['entrega_actual'] = datos_anteriores['actividad_actual']. \
+        entrega_set.filter(pk=id_entrega).first()
+    datos_anteriores['archivos'] = datos_anteriores['entrega_actual'].archivo_set.all()
+    if datos_anteriores['entrega_actual'].revision is not None:
+        datos_anteriores['revision'] = datos_anteriores['entrega_actual'].revision
+        datos_anteriores['revision'].calificacion = datos_anteriores['revision'].calificacion = \
+            int(datos_anteriores['revision'].calificacion)
+    return datos_anteriores
+
+
+def _registrar_revision(entrega_actual, calificacion, comentarios):
+    """
+    Registra una revisión de una entrega de una actividad
+    :param entrega_actual: La entrega a revisar
+    :param calificacion: La calificación a guardar
+    :param comentarios: Los comentarios de la actividad
+    :return: None
+    """
+    revision = Revision(calificacion=calificacion,
+                        retroalimentacion=comentarios)
+    revision.save()
+    Entrega.objects.filter(pk=entrega_actual.pk).update(revision=revision)
+
+
+def _actualizar_revision(id_revision_actual, calificacion, comentarios):
+    """
+    Actualiza la infomración de una revisión previa
+    :param id_revision_actual: El id de la revision
+    :param calificacion: La calificación nueva
+    :param comentarios: Los comentarios nuevos
+    :return: None
+    """
+    Revision.objects.filter(pk=id_revision_actual). \
+        update(calificacion=calificacion, retroalimentacion=comentarios)
 
 
 def _validar_existe_entrega(codigo_clase, id_actividad, id_entrega, maestro):
@@ -353,7 +387,7 @@ def _validar_tamanio_archivo(archivo):
     :param archivo: El archivo a validar
     :return: True si es menor a el tamaño maximo o False si no
     """
-    tamano_maximo = 51068760 # 50MB
+    tamano_maximo = 51068760  # 50MB
     es_valido = True
     if archivo.size > tamano_maximo:
         es_valido = False
@@ -375,3 +409,27 @@ def _validar_existe_actividad_de_alumno(codigo_clase, id_actividad, alumno):
         if clase_del_alumno.actividad_set.filter(pk=id_actividad).count() > 0:
             existe_actividad = True
     return existe_actividad
+
+
+@login_required()
+def descargar_archivo_de_entrega(request, codigo_clase, id_actividad, id_entrega, id_archivo):
+    """
+    Valida si el usuario es el maestro correspondiente de la entrega que contiene el archivo
+    :param request: El request
+    :param codigo_clase: El codigo de la clase de la actividad
+    :param id_actividad: El id de la activdad de la entrega
+    :param id_entrega: El id de la entrega
+    :param id_archivo: El id del archivo a descargar
+    :return: HttpResponse con el archivo
+    """
+    if request.user.es_maestro:
+        archivo = Archivo.objects.filter(pk=id_archivo).first()
+        file_path = os.path.join(settings.MEDIA_ROOT, archivo.archivo.path)
+        if _validar_existe_actividad(codigo_clase, id_actividad, request.user.persona.maestro):
+            if Entrega.objects.filter(pk=id_entrega).count() > 0:
+                if os.path.exists(file_path):
+                    with open(file_path, 'rb') as fh:
+                        response = HttpResponse(fh.read(), content_type="application/octet-stream")
+                        response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+                        return response
+    raise Http404
