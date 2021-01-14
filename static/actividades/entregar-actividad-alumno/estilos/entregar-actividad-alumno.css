@@ -149,6 +149,8 @@
 
 #linea-entrega{
     margin: 0 1%;
+    display: inline-block;
+    width: 98%;
 }
 
 /*
@@ -196,4 +198,55 @@ button[type="submit"]{
     vertical-align: center;
     margin: 0 2.5% 2% 0;
     float: right;
+}
+
+/*
+    Archivos de entrega anteriores
+ */
+
+#archivos-de-entrega-anteriores{
+    width: 100%;
+}
+
+.archivo-previo{
+    display: block;
+    float: left;
+    width: 230px;
+    height: 100px;
+    border: 1px solid var(--hovercolor);
+    border-radius: 8px;
+    background-color: var(--primary-color);
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.img-tipo-archivo{
+    display: block;
+    float: left;
+    height: 72px;
+    width: 75px;
+    margin: 13px 5px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.informacion-archivo{
+    display: block;
+    float: left;
+    margin-top: 13px;
+    width: 120px;
+}
+
+.nombre-archivo{
+    font-weight: bold;
+    overflow-wrap: break-word;
+}
+
+.tamano-archivo{
+    font-size: 0.8rem;
+}
+
+.titulo-completo{
+    display: inline-block;
+    width: 100%;
 }

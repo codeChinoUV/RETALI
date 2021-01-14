@@ -26,11 +26,9 @@ function agregarEventosDropzone(zonaAgregarEventosDrag){
   function crearArchivosVisualizacion(archivosAgregar, archivosSeleccionados, zonaEventos){
       let nodoPadreZonaDrag = zonaEventos.parentNode;
       nodoPadreZonaDrag.removeChild(zonaEventos);
-      console.log("Pase aquí");
       for(let i = 0; i < archivosAgregar.files.length; i++) {
         if (validarTamanioArchivo(archivosAgregar.files[i])) {
           archivosSeleccionados.items.add(archivosAgregar.files[i]);
-          console.log("Paso el archivo " + i.toString());
           let nuevaZona = crearNuevaZonaDrop();
           nodoPadreZonaDrag.appendChild(nuevaZona);
           nuevaZona.setAttribute('position', i.toString());
@@ -56,10 +54,8 @@ function agregarEventosDropzone(zonaAgregarEventosDrag){
   }
 
   function procesarAgregarArchivosChange(e){
-    console.log("Entro al evento");
     if (inputElement.files.length && validarCantidadArchivos(inputElement, archivosSeleccionados) && !seEstaCargando) {
       inputElement = document.querySelector("#drop-zone-input");
-      console.log("Entro al if");
       crearArchivosVisualizacion(inputElement, archivosSeleccionados, zonaAgregarEventosDrag);
       colocarNuevoZonaDrop();
       inputElement.files = archivosSeleccionados.files;
@@ -221,8 +217,35 @@ const entregaActividadForm = document.querySelector("#entregaForm");
 const progressBarFill = document.querySelector("#progressBar > .progressbar-fill");
 const progressBarText = progressBarFill.querySelector(".progressbar-text");
 const seccionBarraCarga = document.querySelector("#progeso-subida");
+const botonEntrega = document.querySelector("button[type='submit']");
 
-entregaActividadForm.addEventListener("submit", enviarFormulario);
+entregaActividadForm.addEventListener("submit", (e)=> {
+  e.preventDefault();
+  let entregaPrevia = botonEntrega.getAttribute('entrega-previa');
+  if(entregaPrevia === 'si'){
+    Swal.fire({
+      title: 'Los archivos adjuntados previamente se borraran, ¿Estas seguro de que quieres guardar los cambios?',
+      showCancelButton: true,
+      confirmButtonText: `Guardar`,
+      cancelButtonText: `Cancelar`,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        enviarFormulario(e);
+      }
+    })
+  }else{
+    Swal.fire({
+      title: '¿Seguro que desea guardar su entrega? Podra editarla mientras esta siga abierta',
+      showCancelButton: true,
+      confirmButtonText: `Guardar`,
+      cancelButtonText: `Cancelar`,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        enviarFormulario(e);
+      }
+    })
+  }
+});
 
 /*
   Crea un form data a partir de la información de los inputs
@@ -247,7 +270,6 @@ function enviarFormulario(e){
   seEstaCargando = true;
   let comentariosEntrega = document.querySelector("textarea[name='comentarios']");
   comentariosEntrega.disabled = true;
-  e.preventDefault();
   let request = new XMLHttpRequest();
     request.open("POST","", true);
     request.upload.addEventListener("progress", (e) =>{

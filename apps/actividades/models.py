@@ -46,7 +46,7 @@ class Archivo(models.Model):
     """
     Es un archivo el cual puede subir un alumno a su actividad
     """
-    entrega = models.ForeignKey(Entrega, on_delete=models.RESTRICT)
+    entrega = models.ForeignKey(Entrega, on_delete=models.CASCADE)
     archivo = models.FileField(upload_to='entregas')
 
     def extension(self):

@@ -49,7 +49,7 @@ def pagina_inicio(request):
         return render(request, 'usuarios/paginaInicio/PaginaInicioMaestro.html', datos)
     else:
         #from apps.clases.views import unir_alumnos_a_clase
-        #unir_alumnos_a_clase(codigo_clase='akkivxfxnk', id_alumno=request.user.persona.alumno.pk)
+        #unir_alumnos_a_clase(codigo_clase='phrdyqmxhj', id_alumno=request.user.persona.alumno.pk)
         datos_de_las_clases_del_alumno = _obtener_informacion_de_las_clases_del_alumno(request.user.persona.alumno)
         return render(request, 'PaginaInicioAlumno.html', datos_de_las_clases_del_alumno)
 

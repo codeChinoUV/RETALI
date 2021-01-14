@@ -289,22 +289,68 @@ def entregar_actividad_alumno(request, codigo_clase, id_actividad):
                                                                  id_actividad, request.POST['comentarios'],
                                                                  request.FILES)
             if codigo_revision_entrega == 200:
-                _registrar_entrega(request.user.persona.alumno, id_actividad, request.POST['comentarios'],
-                                   request.FILES)
+                if _validar_existe_entrega_previa(request.user.persona.alumno, codigo_clase, id_actividad):
+                    _actualizar_entrega(request.user.persona.alumno, id_actividad, request.POST['comentarios'],
+                                        request.FILES)
+                else:
+                    _registrar_entrega(request.user.persona.alumno, id_actividad, request.POST['comentarios'],
+                                       request.FILES)
             return HttpResponse(status=codigo_revision_entrega)
-    else:
+    elif request.method == "GET":
         if request.user.es_maestro:
             return redirect('paginaInicio')
         else:
-            clase = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()
-            datos_del_alumno = {
-                'clase_actual': request.user.persona.alumno.inscripcion_set.filter(aceptado='Aceptado',
-                                                                                   clase_id=clase.pk).first().clase
-            }
-            datos_del_alumno['actividad_actual'] = datos_del_alumno['clase_actual'].actividad_set.filter(
-                pk=id_actividad).first()
-            return render(request, 'actividades/entregar-actividad-alumno/EntregarActividadAlumno.html',
-                          datos_del_alumno)
+            if _validar_existe_actividad_de_alumno(codigo_clase, id_actividad, request.user.persona.alumno):
+                clase = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()
+                datos_del_alumno = dict(
+                    clase_actual=request.user.persona.alumno.inscripcion_set.filter(aceptado='Aceptado',
+                                                                                    clase_id=clase.pk).first().clase)
+                datos_del_alumno['actividad_actual'] = datos_del_alumno['clase_actual'].actividad_set.filter(
+                    pk=id_actividad).first()
+                if _validar_existe_entrega_previa(request.user.persona.alumno, codigo_clase, id_actividad):
+                    datos_del_alumno['entrega'] = Entrega.objects.filter(alumno_id=request.user.persona.alumno.pk,
+                                                                         actvidad_id=id_actividad).first()
+                    datos_del_alumno['entrega_archivos'] = datos_del_alumno['entrega'].archivo_set.all()
+                return render(request, 'actividades/entregar-actividad-alumno/EntregarActividadAlumno.html',
+                              datos_del_alumno)
+            return render(request, 'generales/NoEncontrada.html')
+
+
+def validar_existe_actividad_alumno(codigo_clase, id_actividad, alumno):
+    """
+    Valida si existe la actividad en las clases inscriptas del alumno
+    :param codigo_clase: El codigo de la clase a la que pertenece a la actividad
+    :param id_actividad: El id de la actividdad a validar si existe
+    :param alumno: El alumno a validar
+    :return: True si la actividad existe o False si no
+    """
+    existe_actividad = False
+    clase = Clase.objects.filter(codigo=codigo_clase).first()
+    clase = alumno.inscripcion_set.filter(clase_id=clase.pk).first()
+    if clase is not None:
+        actividad = clase.actividad_set.filter(pk=id_actividad).first()
+        if actividad is not None:
+            existe_actividad = True
+    return existe_actividad
+
+
+def _validar_existe_entrega_previa(alumno, codigo_clase, id_actividad):
+    """
+    Actualiza la entrega previa con la nueva entrega
+    :param alumno: El alumno que entrega la actividad
+    :param codigo_clase: El codigo de la clase en donde se encuentra la actividad
+    :param id_actividad: La actividad en donde se revisara si ya se entrego
+    :return: True si existe una entrega previa o False si no
+    """
+    existe_entrega = False
+    clase = Clase.objects.filter(codigo=codigo_clase).first()
+    inscripcion = alumno.inscripcion_set.filter(clase_id=clase.pk).first()
+    if inscripcion is not None:
+        actividad = inscripcion.clase.actividad_set.filter(pk=id_actividad).first()
+        if actividad is not None:
+            if Entrega.objects.filter(actvidad_id=id_actividad, alumno_id=alumno.pk).count() > 0:
+                existe_entrega = True
+    return existe_entrega
 
 
 def _registrar_entrega(alumno, id_actividad, comentarios, archivos):
@@ -318,6 +364,25 @@ def _registrar_entrega(alumno, id_actividad, comentarios, archivos):
     """
     entrega = Entrega(alumno_id=alumno.pk, actvidad_id=id_actividad, comentarios=comentarios)
     entrega.save()
+    for archivo in archivos.values():
+        archivo_entrega = Archivo(entrega_id=entrega.pk, archivo=archivo)
+        archivo_entrega.save()
+
+
+def _actualizar_entrega(alumno, id_actividad, comentarios, archivos):
+    """
+    Actualiza la entrega previa que habia del alumno
+    :param alumno: El alumno que realizo la entrega
+    :param id_actividad: El id de la actividad a la que se realizara la entrega
+    :param comentarios: Los nuevos comentarios
+    :param archivos: Los nuevos archivos
+    :return: None
+    """
+    entrega = Entrega.objects.filter(alumno_id=alumno.pk, actvidad_id=id_actividad).first()
+    archivos_entrega_previa = entrega.archivo_set.all()
+    for archivo in archivos_entrega_previa:
+        archivo.delete()
+    Entrega.objects.filter(alumno_id=alumno.pk, actvidad_id=id_actividad).update(comentarios=comentarios)
     for archivo in archivos.values():
         archivo_entrega = Archivo(entrega_id=entrega.pk, archivo=archivo)
         archivo_entrega.save()
@@ -404,10 +469,11 @@ def _validar_existe_actividad_de_alumno(codigo_clase, id_actividad, alumno):
     """
     existe_actividad = False
     clase = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()
-    clase_del_alumno = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.pk).first().clase
-    if clase_del_alumno is not None:
-        if clase_del_alumno.actividad_set.filter(pk=id_actividad).count() > 0:
-            existe_actividad = True
+    if clase is not None:
+        clase_del_alumno = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.pk).first().clase
+        if clase_del_alumno is not None:
+            if clase_del_alumno.actividad_set.filter(pk=id_actividad).count() > 0:
+                existe_actividad = True
     return existe_actividad
 
 
@@ -422,14 +488,29 @@ def descargar_archivo_de_entrega(request, codigo_clase, id_actividad, id_entrega
     :param id_archivo: El id del archivo a descargar
     :return: HttpResponse con el archivo
     """
-    if request.user.es_maestro:
-        archivo = Archivo.objects.filter(pk=id_archivo).first()
+    archivo = Archivo.objects.filter(pk=id_archivo).first()
+    if archivo is not None:
         file_path = os.path.join(settings.MEDIA_ROOT, archivo.archivo.path)
-        if _validar_existe_actividad(codigo_clase, id_actividad, request.user.persona.maestro):
-            if Entrega.objects.filter(pk=id_entrega).count() > 0:
-                if os.path.exists(file_path):
-                    with open(file_path, 'rb') as fh:
-                        response = HttpResponse(fh.read(), content_type="application/octet-stream")
-                        response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
-                        return response
+        if request.user.es_maestro:
+            if _validar_existe_actividad(codigo_clase, id_actividad, request.user.persona.maestro):
+                if Entrega.objects.filter(pk=id_entrega).count() > 0:
+                    return _obtener_archivo(file_path)
+        else:
+            if _validar_existe_actividad_de_alumno(codigo_clase, id_actividad, request.user.persona.alumno):
+                if Entrega.objects.filter(pk=id_entrega).count() > 0:
+                    return _obtener_archivo(file_path)
+
     raise Http404
+
+
+def _obtener_archivo(ruta_archivo):
+    """
+    Obtiene el archivo del disco y lo regresa al usuario
+    :param ruta_archivo: La ruta del archivo a obtener
+    :return: HttpResponse
+    """
+    if os.path.exists(ruta_archivo):
+        with open(ruta_archivo, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/octet-stream")
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(ruta_archivo)
+            return response
