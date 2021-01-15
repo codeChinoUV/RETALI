@@ -18,7 +18,8 @@ def consultar_foros_maestro(request, codigo_clase):
             datos_del_maestro["clase_actual"] = request.user.persona.maestro.clase_set.filter(
                 codigo=codigo_clase).first()
             if datos_del_maestro["clase_actual"] is not None:
-                datos_del_maestro["foros"] = datos_del_maestro["clase_actual"].foro_set.filter(eliminado=False).all()
+                datos_del_maestro["foros"] = datos_del_maestro["clase_actual"].foro_set.filter(eliminado=False).all().\
+                    order_by('-fecha_de_creacion')
                 _colocar_cantidad_participaciones_de_foro(datos_del_maestro["foros"])
                 datos_del_maestro["cantidad_foros_abiertos"] = contar_foros_activos(datos_del_maestro["foros"])
                 datos_del_maestro["total_de_foros"] = len(datos_del_maestro["foros"])
