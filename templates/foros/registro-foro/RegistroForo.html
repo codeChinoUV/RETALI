@@ -1,8 +1,8 @@
 {% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
 {% load static %}
-{% block nombre_pagina %} Registro de actividad {% endblock %}
+{% block nombre_pagina %} Registro de Foro {% endblock %}
 {% block estilos-extra %}
-    <link rel="stylesheet" type="text/css" href="{% static 'actividades/registro-actividad/estilos/registro-actividades.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'foros/registro-foro/estilos/registro-foro.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 {% endblock %}
 {% block links %}
@@ -12,14 +12,14 @@
             <div class="titulo">Inicio</div>
         </a>
     </li>
-    <li class="link-actual">
+    <li>
         <a href="{% url 'actividades' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
             <div class="titulo">Actividades</div>
         </a>
     </li>
-    <li>
-        <a href="">
+    <li class="link-actual">
+        <a href="{% url 'foros' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
             <div class="titulo">Foros</div>
         </a>
@@ -32,21 +32,21 @@
     </li>
 {% endblock %}
 {% block contenido %}
-    <h1 class="titulo-seccion">Registrar actvidad</h1>
+    <h1 class="titulo-seccion">Registrar foro</h1>
     <hr>
-    <div id="formulario-registro-actividad">
+    <div id="formulario-registro-foro">
         <form method="POST">
             {% csrf_token %}
-            <img src="{% static 'generales/imagenes/portapapeles.png' %}">
-            <div id="inputs-registro-actvidad">
+            <img src="{% static 'generales/imagenes/charlando.png' %}">
+            <div id="inputs-registro-foro">
                 <div class="form-group" >
                     <label for="nombre">{{ form.nombre.label }}</label>
                     {{ form.nombre }}
                     {% if form.errors %}
                         {% for key, value in form.errors.items %}
                             {% if key == 'nombre' %}
-                                <div class="invalid-feedback">El nombre de la actividad no puede estar vacio y debe de
-                                    tener menos de 120 caracteres </div>
+                                <div class="invalid-feedback">El nombre del foro no puede estar vacio y debe de
+                                    tener menos de 80 caracteres </div>
                             {% endif %}
                         {% endfor %}
                     {% endif %}
@@ -57,12 +57,12 @@
                     {% if form.errors %}
                         {% for key, value in form.errors.items %}
                             {% if key == 'descripcion' %}
-                                <div class="invalid-feedback">La descripción de la actividad no puede estar vacia</div>
+                                <div class="invalid-feedback">La descripción del foro no puede estar vacia</div>
                             {% endif %}
                         {% endfor %}
                     {% endif %}
                 </div>
-                <div class="form-group input-fechas-actividades">
+                <div class="form-group input-fechas-foro">
                     <label for="fecha_inicio">{{ form.fecha_inicio.label }}</label>
                     {{ form.fecha_inicio }}
                     {% if form.errors %}
@@ -73,7 +73,7 @@
                         {% endfor %}
                     {% endif %}
                 </div>
-                <div class="form-group input-fechas-actividades">
+                <div class="form-group input-fechas-foro">
                     <label for="fecha_cierre">{{ form.fecha_cierre.label }}</label>
                     {{ form.fecha_cierre }}
                     {% if form.errors %}
@@ -84,7 +84,7 @@
                         {% endfor %}
                     {% endif %}
                 </div>
-                <input type="submit" value="Registrar actividad">
+                <input type="submit" value="Registrar foro">
             </div>
         </form>
     </div>
@@ -93,4 +93,5 @@
 {% block scripts-adicionales %}
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="{% static 'actividades/registro-actividad/scripts/agregar-evento-a-fechas.js' %}"></script>
+    <script type="module" src="{% static 'foros/registro-foro/scripts/registro-foro.js' %}"></script>
 {% endblock %}

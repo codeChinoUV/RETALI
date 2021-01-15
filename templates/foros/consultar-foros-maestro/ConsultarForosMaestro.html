@@ -1,7 +1,7 @@
 {% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
 {% load static %}
 {% load tz %}
-{% block nombre_pagina %} Actividades {% endblock %}
+{% block nombre_pagina %} Foros {% endblock %}
 {% block estilos-extra %}
     <link rel="stylesheet" type="text/css" href="{% static 'foros/consultar-foros-maestro/estilos/consultar-foros-maestro.css' %}">
 {% endblock %}
@@ -37,7 +37,7 @@
     <div id="informacion-foros">
         <p>Foros abiertos: {{ cantidad_foros_abiertos }}</p>
         <p>Total de foros: {{ total_de_foros }}</p>
-        <a href="{% url 'registrar_actividad' clase_actual.codigo %}" >
+        <a href="{% url 'registro_foro' clase_actual.codigo %}" >
             <div>Crear foro</div>
             <img src="{% static 'foros/consultar-foros-maestro/imagenes/registro-foro.svg' %}" alt="icono crear">
         </a>
@@ -55,10 +55,10 @@
             <div class="estado-foro">
                 {% if foro.estado == 'Abierta' %}
                     <div class="color-foro abierta"></div>
-                    <p>Abierta</p>
+                    <p>Abierto</p>
                 {% elif foro.estado == 'Cerrada'%}
                     <div class="color-foro cerrada"></div>
-                    <p>Cerrada</p>
+                    <p>Cerrado</p>
                 {% else %}
                     <div class="color-actividad por-abrir"></div>
                     <p>Por abrir</p>

@@ -20,6 +20,7 @@ class Foro(models.Model):
     estado = models.CharField(max_length=9, choices=EstadoForo.choices, default=EstadoForo.ABIERTO)
     fecha_de_inicio = models.DateTimeField(null=False)
     fecha_de_cierre = models.DateTimeField(null=False)
+    fecha_de_creacion = models.DateTimeField(default=timezone.now)
     clase = models.ForeignKey(Clase, on_delete=models.RESTRICT)
     participaciones = models.ManyToManyField(Persona, through='Participacion')
     eliminado = models.BooleanField(default=False)
