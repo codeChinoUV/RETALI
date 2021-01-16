@@ -10,5 +10,6 @@ urlpatterns = [
     path('<str:codigo_clase>/', informacion_clase, name='ver_materia'),
     path('unirse_a_clase/<str:codigo_clase>', unir_alumno_a_clase, name='unirse_a_clase'),
     path('', include('apps.actividades.urls')),
-    path('', include('apps.foros.urls'))
+    path('', include('apps.foros.urls')),
+    path('', include('apps.avisos.urls'))
 ]

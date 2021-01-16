@@ -1,11 +1,12 @@
 {% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
 {% load static %}
-{% block nombre_pagina %} Clase {{ clase_actual.nombre}} {% endblock %}
+{% load tz %}
+{% block nombre_pagina %} Avisos {% endblock %}
 {% block estilos-extra %}
-    <link rel="stylesheet" type="text/css" href="{% static 'clases/informacion-clase/estilos/informacion-clase.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'avisos/consultar-avisos-maestro/estilos/consultar-avisos.css' %}">
 {% endblock %}
 {% block links %}
-    <li class="link-actual">
+    <li>
         <a href="{% url 'ver_materia' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
             <div class="titulo">Inicio</div>
@@ -23,7 +24,7 @@
             <div class="titulo">Foros</div>
         </a>
     </li>
-    <li>
+    <li class="link-actual">
         <a href="{% url 'avisos' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/alertas.svg' %}" alt="Icono de inicio"></div>
             <div class="titulo">Avisos</div>
@@ -37,36 +38,29 @@
     </li>
 {% endblock %}
 {% block contenido %}
-    <h1>{{ clase_actual.nombre }}</h1>
+    <h1 class="titulo-seccion">Avisos</h1>
     <hr>
-    <div id="tarjeta-informacion-clase">
-        <img src="{{ clase_actual.foto.url }}" alt="Foto de clase">
-        <div>
-            <p>{{ clase_actual.escuela }}</p>
-            <p>Codigo de la clase: {{ clase_actual.codigo }}</p>
-        </div>
+    <div id="informacion-avisos">
+        <p>Total de avisos: {{ avisos|length }}</p>
+        <a href="{% url 'crear_aviso' clase_actual.codigo %}" >
+            <div>Nuevo aviso</div>
+            <img src="{% static 'avisos/consultar-avisos-maestro/imagenes/registrar-aviso.svg' %}" alt="icono crear">
+        </a>
     </div>
-    <div id="tarjeta-estadistica-clase">
-        <div class="tarjeta-estadistica">
-            <img src="{% static 'generales/imagenes/portapapeles.png' %}" alt="imagen actividades">
-            <div class="estadistica">
-                <p>Total de actividades: </p>
-                <p>Actividades abiertas: </p>
+    {% for aviso in avisos %}
+        <div class="aviso">
+            <div class="cabecera-aviso">
+                <img class="aviso-imagen" src="{% static 'generales/imagenes/altoparlante.png' %}" alt="imagen aviso">
+                <div class="informacion-aviso">
+                    <h3>{{ aviso.nombre }}</h3>
+                </div>
+                {% timezone 'America/Mexico_City' %}
+                <p>{{ aviso.fecha_publicado }}</p>
+                {% endtimezone %}
+            </div>
+            <div class="aviso-contenido">
+                <p>{{ aviso.descripcion }}</p>
             </div>
         </div>
-        <div class="tarjeta-estadistica">
-            <img src="{% static 'generales/imagenes/charlando.png' %}" alt="imagen foros">
-            <div class="estadistica">
-                <p>Total de foros: </p>
-                <p>Foros activos: </p>
-            </div>
-        </div>
-        <div class="tarjeta-estadistica">
-            <img src="{% static 'generales/imagenes/graduado.png' %}" alt="imagen alumno">
-            <div class="estadistica">
-                <p>Alumnos aceptados: </p>
-                <p>Alumnos pendientes de aceptar: </p>
-            </div>
-        </div>
-    </div>
+    {% endfor %}
 {% endblock %}

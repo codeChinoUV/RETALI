@@ -1,0 +1,77 @@
+:root{
+    --height-tarjeta-actividad: 150px;
+}
+
+/*
+    Información sobre los avisos
+ */
+
+#informacion-avisos{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--bgcolor);
+    margin: 2% 5%;
+    padding: 0.5% 1%;
+    color: white;
+    border-radius: 1rem;
+}
+
+#informacion-avisos p{
+    margin: auto 0;
+}
+
+#informacion-avisos a{
+    display: flex;
+    text-decoration: none;
+    background-color: var(--hovercolor);
+    color: white;
+    padding: 5px;
+    border-radius: 1rem;
+}
+
+#informacion-avisos a img{
+    height: 22px;
+    margin: 0 5px;
+}
+
+/*
+    Tarjetas de aviso
+ */
+
+.aviso{
+    padding: 15px;
+    margin: 5%;
+    background-color: var(--bgcolor);
+    border-radius: 2rem;
+    color: white;
+}
+
+.cabecera-aviso{
+    display: flex;
+    justify-content: flex-start;
+}
+
+.aviso img{
+    height: calc(var(--height-tarjeta-actividad)/2 );
+    width: calc(var(--height-tarjeta-actividad)/2 );
+    object-fit: cover;
+    margin-right: 20px;
+}
+
+.aviso-contenido{
+    margin-left: calc((var(--height-tarjeta-actividad)/2) + 20px);
+}
+
+.aviso .informacion-aviso{
+    width: 70%;
+}
+
+.aviso .informacion-aviso h3 a{
+    text-decoration: none;
+    color: white;
+}
+
+.aviso .informacion-aviso h3 a:hover{
+    color: var(--hovercolor);
+}

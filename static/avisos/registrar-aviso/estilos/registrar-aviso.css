@@ -1,0 +1,53 @@
+#formulario-registro-aviso{
+    background-color: var(--bgcolor);
+    color: white;
+    margin: 2% 10%;
+    padding: 1%;
+    display: flow-root;
+    border-radius: 2rem;
+}
+
+#formulario-registro-aviso img{
+    width: 88px;
+    display: block;
+    float: left;
+    margin-top: 20px;
+}
+
+#inputs-registro-aviso{
+    width: calc(100% - 88px);
+    float: right;
+    padding: 1%;
+}
+
+#inputs-registro-aviso input,
+#inputs-registro-aviso textarea{
+    background-color: var(--primary-color);
+    border-radius: 1rem;
+    border: none;
+    color: white;
+}
+
+#inputs-registro-aviso div label{
+    margin-left: 1rem;
+}
+
+#inputs-registro-aviso input[type="submit"]{
+    background-color: var(--hovercolor);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 1rem;
+    vertical-align: center;
+    margin: 2.5% 0;
+    float: right;
+}
+
+#inputs-registro-aviso input[type="submit"]:hover{
+    background-color: var(--hovercolor-hover);
+}
+
+.invalid-feedback{
+    display: block;
+    margin-left: 1rem;
+}
