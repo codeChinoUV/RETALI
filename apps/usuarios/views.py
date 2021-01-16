@@ -48,9 +48,9 @@ def pagina_inicio(request):
         datos = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
         return render(request, 'usuarios/paginaInicio/PaginaInicioMaestro.html', datos)
     else:
-        #from apps.clases.views import unir_alumnos_a_clase
-        #unir_alumnos_a_clase(codigo_clase='phrdyqmxhj', id_alumno=request.user.persona.alumno.pk)
-        datos_de_las_clases_del_alumno = _obtener_informacion_de_las_clases_del_alumno(request.user.persona.alumno)
+        # from apps.clases.views import unir_alumnos_a_clase
+        # unir_alumnos_a_clase(codigo_clase='phrdyqmxhj', id_alumno=request.user.persona.alumno.pk)
+        datos_de_las_clases_del_alumno = {}
         return render(request, 'PaginaInicioAlumno.html', datos_de_las_clases_del_alumno)
 
 
@@ -61,43 +61,40 @@ def obtener_informacion_de_clases_de_maestro(maestro):
     :return: Un diccionario con las clases y la cantidad de clases
     """
     datos = {
-        'clases': [],
-        'cantidad_clases': 0
+        'cantidad_clases' : 0,
+        'clases': None
     }
     if maestro.clase_set.exists():
-        datos['clases'] = maestro.clase_set.filter(abierta=True)
-        datos['cantidad_clases'] = (datos['clases'])
+        datos = {
+            'clases': maestro.clase_set.filter(abierta=True),
+            'cantidad_clases': maestro.clase_set.filter(abierta=True).count()
+        }
     return datos
 
 
-def _obtener_informacion_de_las_clases_del_alumno(alumno):
-    datos = {
-        'clases_inscrito': 0,
-        'clases_pendientes': 0,
-        'foros_abiertos': 0,
-        'anuncios_sin_leer': 0,
-        'tareas_que_se_cierran_hoy': 0,
-        'tareas_que_se_cierran_esta_semana': 0
-    }
-    if Inscripcion.objects.filter(alumno=alumno).exists():
-        inscritos = Inscripcion.objects.filter(alumno=alumno).all()
-        for inscripcion in inscritos:
-            if inscripcion.aceptado:
-                datos['clases_inscrito'] += 1
-                for foro in inscripcion.clase.foro_set.all():
-                    if foro.EstadoForo == Foro.EstadoForo.ABIERTO:
-                        datos['foros_abiertos'] += 1
-                # for aviso in inscripcion.clase.anuncio_set.all():
-                #    if alumno not in aviso.leido_por:
-                #        datos['anuncios_sin_leer'] += 1
-                # for tarea in inscripcion.clase.actividad_set.filter(fecha_de_cierre=):
-            else:
-                datos['clases_pendientes'] += 1
-
-    return datos
+def obtener_informacion_de_clases_del_alumno(alumno):
+    """
+    Recuoera la información de las clases del alumno
+    :param alumno: El alumno a recuperar sus clases
+    :return: Un diccionario con las clases del alumno en las que se encuentra inscrito y la cantidad de clases
+    """
+    if alumno.inscripcion_set.exists():
+        clases = []
+        for inscripcion in alumno.inscripcion_set.all():
+            clases.append(inscripcion.clase)
+        datos = {
+            'clases': clases,
+            'cantidad_clases': len(clases)
+        }
+        return datos
 
 
 def cerrar_sesion(request):
+    """
+    Cierra la sesion del usuario actual
+    :param request: La solicitud
+    :return: Redirect hacia el login
+    """
     if request.user.is_authenticated:
         logout(request)
     return redirect('login')

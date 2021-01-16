@@ -1,0 +1,132 @@
+{% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
+{% load static %}
+{% load tz %}
+{% block nombre_pagina %} Foro: {{ foro.nombre }}{% endblock %}
+{% block estilos-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static 'foros/consultar-foro/estilos/consultar-foro.css' %}">
+{% endblock %}
+{% block links %}
+    <li>
+        <a href="{% url 'ver_materia' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'actividades' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    </li>
+    <li class="link-actual">
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    </li>
+    <li>
+        <a href="">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Grupos</div>
+        </a>
+    </li>
+{% endblock %}
+{% block contenido %}
+    <h1 id="titulo-foro">Foro: {{ foro.nombre }} </h1>
+    <hr>
+    <div id="informacion-foro">
+        <div id="cabecera-informacion-foro">
+            <img src="{% static 'generales/imagenes/charlando.png' %}" alt="foro">
+            {% timezone 'America/Mexico_City' %}
+            <p id="fechas-foro">Del: {{ foro.fecha_de_inicio }} Hasta: {{ foro.fecha_de_cierre }}</p>
+            <p id="estado-foro">{{ foro.estado }}</p>
+        {% endtimezone %}
+        </div>
+        <p id="titulo-descripcion">Descripción:</p>
+        <p>{{ foro.descripcion }}</p>
+    </div>
+    {% if foro.estado == 'Abierta' %}
+    <div id="participa-en-foro">
+        <div id="informacion-alumno">
+            {% if user.es_maestro %}
+                {% if user.persona.maestro.foto_de_perfil %}
+                <img src="{{ user.persona.maestro.foto_de_perfil.url }}" alt="foto del usuario">
+                {% else %}
+                <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto del usuario">
+                {% endif %}
+                <p>{{ user.persona.maestro.nombre }} {{ user.persona.maestro.apellidos }}</p>
+            {% else %}
+                {% if user.persona.alumno.foto_de_perfil %}
+                <img src="{{ user.persona.foto_de_perfil.url }}" alt="foto del usuario">
+                {% else %}
+                <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto del usuario">
+                {% endif %}
+                <p>{{ user.persona.alumno.nombre }} {{ user.persona.alumno.apellidos }}</p>
+            {% endif %}
+        </div>
+        <hr>
+        <form method="POST" action="{% url 'registrar_participacion' clase_actual.codigo foro.pk %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_participacion">Participación: </label>
+                <textarea id="id_participacion" name="participacion" class="form-control" cols="40" rows="5"></textarea>
+            </div>
+            <div id="zona-boton-enviar-participacion">
+                <button id="btn-enviar-participacion" type="submit">Participar</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+    {% for participacion in participaciones %}
+        <div class="participacion">
+            <div class="informacion-participacion">
+                {% if participacion.participante.foto_de_perfil %}
+                <img class="imagen-alumno-participacion" src="{{ participacion.participante.foto_de_perfil.url }}" alt="foto participante">
+                {% else %}
+                <img class="imagen-alumno-participacion" src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto participante">
+                {% endif %}
+                <p>{{ user.persona.nombre }} {{ user.persona.apellidos }}</p>
+                {% timezone 'America/Mexico_City' %}
+                <p class="fecha-participacion">{{ participacion.fecha }}</p>
+                {% endtimezone %}
+            </div>
+            <hr class="separacion-participacion">
+            <p>{{ participacion.participacion }}</p>
+            <hr class="separacion-respuestas">
+            {% for respuesta in participacion.respuestas %}
+                <div class="respuesta">
+                    <div class="informacion-respuesta">
+                        {% if respuesta.autor.foto_de_perfil %}
+                            <img class="imagen-autor-respuesta" src="{{ respuesta.autor.foto_de_perfil.url }}" alt="foto autor respuesta">
+                        {% else %}
+                            <img class="imagen-autor-respuesta" src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto autor respuesta">
+                        {% endif %}
+                        <p>{{ respuesta.autor.nombre }} {{ respuesta.autor.apellidos }}</p>
+                        {% timezone 'America/Mexico_City' %}
+                        <p class="fecha-respuesta">{{ respuesta.fecha }}</p>
+                        {% endtimezone %}
+                    </div>
+                    <div class="respuesta">
+                        <p>{{ respuesta.respuesta }}</p>
+                    </div>
+                </div>
+                <hr class="separacion-respuestas">
+            {% endfor %}
+            {% if foro.estado == 'Abierta' %}
+            <form method="POST" id="{{ participacion.pk }}" class="form-respuesta" action="{% url 'responder_participacion' clase_actual.codigo foro.pk participacion.pk %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_respuesta-{{ participacion.pk }}">Responder: </label>
+                    <textarea id="id_respuesta-{{ participacion.pk }}" name="respuesta" class="form-control" cols="40" rows="2"></textarea>
+                </div>
+                <div class="zona-boton-enviar-respuesta">
+                    <button class="btn-enviar-respuesta" id="btn-enviar-respuesta-{{ participacion.pk }}" type="submit">Responder</button>
+                </div>
+            </form>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endblock %}
+{% block scripts-adicionales %}
+    <script type="text/javascript" src="{% static 'foros/consultar-foro/scripts/consultar-foro.js' %}"></script>
+{% endblock %}

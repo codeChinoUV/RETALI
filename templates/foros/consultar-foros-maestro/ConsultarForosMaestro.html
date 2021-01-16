@@ -46,7 +46,7 @@
         <div class="foro">
             <img class="foro-imagen" src="{% static 'generales/imagenes/charlando.png' %}" alt="imagen actividad">
             <div class="informacion-foro">
-                <h3><a href="">{{ foro.nombre }}</a></h3>
+                <h3><a href="{% url 'consultar_foro' clase_actual.codigo foro.pk %}">{{ foro.nombre }}</a></h3>
                 {% timezone 'America/Mexico_City' %}
                 <p>Del {{ foro.fecha_de_inicio }} hasta las {{ foro.fecha_de_cierre }}</p>
                 {% endtimezone %}

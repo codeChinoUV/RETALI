@@ -34,15 +34,16 @@ class Participacion(models.Model):
     foro = models.ForeignKey(Foro, on_delete=models.RESTRICT)
     fecha = models.DateTimeField(default=timezone.now)
     participacion = models.TextField(null=False)
-    eliminada = models.BooleanField(default=True)
+    eliminada = models.BooleanField(default=False)
 
 
 class Respuesta(models.Model):
     """
     Representa una respuesta a una participación
     """
-    foro = models.ForeignKey(Foro, on_delete=models.CASCADE)
+    participacion = models.ForeignKey(Participacion, on_delete=models.CASCADE)
     numero_respuesta = models.IntegerField(null=False)
     fecha = models.DateTimeField(default=timezone.now)
     respuesta = models.TextField(null=False)
-    eliminada = True
+    autor = models.ForeignKey(Persona, on_delete=models.RESTRICT)
+    eliminada = models.BooleanField(default=False)
