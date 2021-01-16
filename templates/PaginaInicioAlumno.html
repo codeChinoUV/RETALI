@@ -1,15 +1,48 @@
+{% extends  'usuarios/paginaInicio/PaginaInicioMaestro.html'%}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{% block titulo %} Pagina inicio Alumno{% endblock %}</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-4/css/bootstrap.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'estilos/paginaPrincipal.css' %}">
-    {% block estilos-adicionales %} {% endblock %}
-</head>
+{% block nombre_pagina %} Inicio Alumno{% endblock %}
 <body>
-    {% block navbar %}
+{% block contenido %}
+    <h1 class="titulo-seccion">Mis clases</h1>
+    <hr>
+    <div id="boton-registro-clase">
+        <div id="barra-busqueda">
+            <a id="busqueda-boton" href="#">
+                <img src="{% static 'usuarios/pagina-inicio/imagenes/busqueda.svg' %}" alt="">
+            </a>
+            <input id="busqueda-txt" type="text" name="busqueda" placeholder="Buscar clase">
+        </div>
+        <a href="{% url 'unirse_clase' %}" class="boton-primario">
+            <img src="{% static 'usuarios/pagina-inicio/imagenes/agregar-elemento.svg' %}" alt="icono agregar">
+            <div>unirse a clase</div>
+        </a>
+    </div>
+    {% if clases_inscrito == 0 %}
+        <div id="mensaje-inicio-maestro">
+            <p>Al parecer aún no tienes ninguna clase registrada, puedes empezar pulsando el botón de unirse a clase.</p>
+        </div>
+    {% else %}
+        <div id="clases-del-maestro">
+            <div id="tarjetas-clases">
+                {% for clase in clases %}
+                    <div class="clase">
+                        {% if clase.foto  %}
+                            <img src="{{ clase.foto.url }}" alt="Imagen de la clase">
+                        {% else %}
+                            <img src="{% static 'usuarios/pagina-inicio/imagenes/libro.png' %}" alt="Imagen de la clase">
+                        {% endif %}
+                        <div class="informacion-clase">
+                            <h2>{{ clase.nombre }}</h2>
+                            <p>{{ clase.escuela }}</p>
+                            <p>Codigo para unirse a clase: {{ clase.codigo }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+{% block navbar %}
         <nav class="navbar navbar-expand-lg navbar-dark color-primario">
             <a class="navbar-brand" href="#">
                 <img src="{% static 'imagenes/Logo.png' %}" alt="">
@@ -26,7 +59,7 @@
             </div>
         </nav>
     {% endblock %}
-    {% block cuerpo %}
+{% block cuerpo %}
         <h2>¡Bienvenido {{ user.persona.nombre }}!</h2>
         <div id="tarjetas">
             <div class="tarjeta" id="clases">
@@ -61,6 +94,18 @@
             </div>
         </div>
     {% endblock %}
+{% block datosPerfil %}
+    <div id="perfil">
+        <div id="foto">
+            {% if user.persona.alumno.foto_de_perfil %}
+                <img src="{{ user.persona.alumno.foto_de_perfil.url }}" alt="foto de perfil">
+            {% else %}
+                <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
+            {% endif %}
+        </div>
+        <div id="nombre">{{ user.persona.alumno.nombre }} {{ user.persona.alumno.apellidos }}</div>
+    </div>
+{% endblock %}
     <script src="{% static 'bootstrap-4/js/bootstrap.js' %}"></script>
 </body>
 </html>

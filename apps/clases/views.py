@@ -96,3 +96,34 @@ def unir_alumnos_a_clase(id_alumno, codigo_clase):
     clase = Clase.objects.filter(codigo=codigo_clase, abierta=True).first()
     inscripcion = Inscripcion(clase_id=clase.pk, alumno_id=id_alumno, aceptado='Aceptado')
     inscripcion.save()
+
+
+def informacion_clase_alumno(request, codigo_clase):
+    if not request.user.es_alumno:
+        return redirect('login')
+    else:
+        alumno = request.user.persona.alumno
+        clase_actual = alumno.clase_set.filter(abierta=True, codigo=codigo_clase).first()
+        clases_alumno = _obtener_informacion_de_las_clases_del_alumno(request.user.persona.alumno)
+        datos = {
+            'clases': clases_alumno['clases']
+        }
+        if clase_actual is not None:
+            datos['clase_actual'] = clase_actual
+            return render(request, 'clases/informacion-clase/InformacionClaseAlumno.html', datos)
+        else:
+            return render(request, 'generales/NoEncontrada.html', datos)
+
+
+def unirse_clase(request):
+
+    return render(request, 'clases/unirse_clase/unirse_clase.html')
+
+
+def obtener_clase_actual(codigo_clase):
+    clase_actual = Clase.objects.filter(codigo_clase=codigo_clase).first()
+    print(clase_actual)
+    if clase_actual is not None:
+        return clase_actual
+    else:
+        return render('generales/NoEncontrada.html')

@@ -1,0 +1,49 @@
+{%  extends 'clases/registro-clase/registroClase.html' %}
+{% load static %}
+{% block estilos-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static 'clases/unirse_clase/estilos/unirse_clase.css' %}">
+{% endblock %}
+{% block nombre_pagina %}Unirse a clase{% endblock %}
+{% block contenido %}
+    <div id="formulario_unirse_clase" class="formulario_registro">
+        <div id="campos-formulario">
+            <h2>Unirse a clase</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+{% comment %}                <div class="form-group">
+                    <label for="nombre">Código</label>
+                    <input type="text"  class="form-control" name="nombre" id="nombre" placeholder="Ingresa el código de la clase">
+                    <input type="button" id="btn-buscar" class="btn btn-buscar" value="Buscar">
+                </div>{% endcomment %}
+                 <div id="boton-registro-clase">
+                     <label for="nombre">Código</label>
+                    <div id="barra-busqueda">
+                        <a id="busqueda-boton" href="#">
+                            <img src="{% static 'usuarios/pagina-inicio/imagenes/busqueda.svg' %}" alt="">
+                        </a>
+                        <input id="busqueda-txt" type="text" name="busqueda" placeholder="Ingresa el código de la clase">
+                    </div>
+                 </div>
+                <div>
+                     <input type="button" id="btn-unirse" class="btn btn-primary" value="Unirse">
+                </div>
+            </form>
+        </div>
+        <div>
+           <a href="{% url 'paginaInicio' %}" class="btn btn-danger">X</a>
+        </div>
+    </div>
+    <script type="module" src="{% static 'clases/registro-clase/scripts/registro-clase.js' %}"></script>
+{% endblock %}
+{% block datosPerfil %}
+    <div id="perfil">
+        <div id="foto">
+            {% if user.persona.alumno.foto_de_perfil %}
+                <img src="{{ user.persona.alumno.foto_de_perfil.url }}" alt="foto de perfil">
+            {% else %}
+                <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
+            {% endif %}
+        </div>
+        <div id="nombre">{{ user.persona.alumno.nombre }} {{ user.persona.alumno.apellidos }}</div>
+    </div>
+{% endblock %}

@@ -174,3 +174,9 @@ def validar_campos_no_vacios(username, password, nombre, apellidos, telefono):
         return False
     else:
         return True
+
+def validar_correo_no_registrado(correo):
+
+    return True
+
+    return False

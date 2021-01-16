@@ -54,6 +54,7 @@
                 <div class="btn-hamburger"></div>
             </div>
         </div>
+    {% block datosPerfil %}
         <div id="perfil">
             <div id="foto">
                 {% if user.persona.maestro.foto_de_perfil %}
@@ -64,6 +65,7 @@
             </div>
             <div id="nombre">{{ user.persona.maestro.nombre }} {{ user.persona.maestro.apellidos }}</div>
         </div>
+    {% endblock %}
         <div id="elementos-menu">
             <div class="elemento">
                 <a href="{% url 'paginaInicio' %}">
