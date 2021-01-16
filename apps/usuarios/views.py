@@ -4,7 +4,6 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
 from apps.clases.models import Inscripcion, Alumno, Maestro
 import re
-from apps.foros.models import Foro
 
 
 def redireccion_path_vacio(request):
@@ -48,10 +47,40 @@ def pagina_inicio(request):
         datos = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
         return render(request, 'usuarios/paginaInicio/PaginaInicioMaestro.html', datos)
     else:
-        # from apps.clases.views import unir_alumnos_a_clase
-        # unir_alumnos_a_clase(codigo_clase='phrdyqmxhj', id_alumno=request.user.persona.alumno.pk)
-        datos_de_las_clases_del_alumno = {}
-        return render(request, 'PaginaInicioAlumno.html', datos_de_las_clases_del_alumno)
+        datos_del_alumno = obtener_informacion_de_clases_del_alumno(request.user.persona.alumno)
+        colocar_estado_inscripcion_clase(request.user.persona.alumno, datos_del_alumno['clases'])
+        _contar_cantidad_estado_de_clases(datos_del_alumno['clases'], datos_del_alumno)
+        return render(request, 'usuarios/pagina-inicio-alumno/PaginaInicioAlumno.html', datos_del_alumno)
+
+
+def colocar_estado_inscripcion_clase(alumno, clases):
+    """
+    Coloca la informacion del estado de la inscripcion de la clase
+    :param alumno: El alumno
+    :param clases: Las clases a colocar el estado
+    :return: None
+    """
+    for clase in clases:
+        clase.estado_inscipcion = alumno.inscripcion_set.filter(clase_id=clase.pk).first().aceptado
+
+
+def _contar_cantidad_estado_de_clases(clases, datos_del_alumno):
+    """
+    Cuenta la cantidad de clases que se encuentran en cada estado posible de la inscripcion
+    :param clases: Las clases en donde se verificara el estado
+    :param datos_del_alumno: Los datos del alumno en donde se guardaran las cantidades
+    :return: None
+    """
+    datos_del_alumno['cantidad_clases_aceptado'] = 0
+    datos_del_alumno['cantidad_clases_rechazado'] = 0
+    datos_del_alumno['cantidad_clases_en_espera'] = 0
+    for clase in clases:
+        if clase.estado_inscipcion == 'Aceptado' and clase.abierta:
+            datos_del_alumno['cantidad_clases_aceptado'] += 1
+        elif clase.estado_inscipcion == 'Rechazado' and clase.abierta:
+            datos_del_alumno['cantidad_clases_rechazado'] += 1
+        elif clase.estado_inscipcion == 'En espera' and clase.abierta:
+            datos_del_alumno['cantidad_clases_en_espera'] += 1
 
 
 def obtener_informacion_de_clases_de_maestro(maestro):
@@ -61,7 +90,7 @@ def obtener_informacion_de_clases_de_maestro(maestro):
     :return: Un diccionario con las clases y la cantidad de clases
     """
     datos = {
-        'cantidad_clases' : 0,
+        'cantidad_clases': 0,
         'clases': None
     }
     if maestro.clase_set.exists():
@@ -78,6 +107,10 @@ def obtener_informacion_de_clases_del_alumno(alumno):
     :param alumno: El alumno a recuperar sus clases
     :return: Un diccionario con las clases del alumno en las que se encuentra inscrito y la cantidad de clases
     """
+    datos = {
+        'clases': None,
+        'cantidad_clases': 0
+    }
     if alumno.inscripcion_set.exists():
         clases = []
         for inscripcion in alumno.inscripcion_set.all():
@@ -86,7 +119,7 @@ def obtener_informacion_de_clases_del_alumno(alumno):
             'clases': clases,
             'cantidad_clases': len(clases)
         }
-        return datos
+    return datos
 
 
 def cerrar_sesion(request):

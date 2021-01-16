@@ -1,0 +1,170 @@
+#unirse-a-clase{
+    padding: 20px;
+    width: 80%;
+    margin: 1% 10%;
+    background-color: var(--bgcolor);
+    color: white;
+    border-radius: 10px;
+    display: none;
+}
+
+#unirse-a-clase h2{
+    text-align: center;
+}
+
+#unirse-a-clase hr{
+    width: 90%;
+    margin-bottom: 20px;
+}
+
+#grupo-buscar-clase{
+    display: flex;
+    justify-content: flex-start;
+}
+
+#grupo-buscar-clase input{
+    width: 80%;
+    margin-left: 10px;
+    background-color: var(--primary-color);
+    border: none;
+    color: white;
+}
+
+#espacio-botones-buscar{
+    display: flex;
+    justify-content: space-between;
+}
+
+#btn-buscar{
+    background-color: var(--secondary-color);
+    padding: 10px;
+    color: white;
+    border-radius: 10px;
+    border: none;
+}
+
+#btn-buscar:hover{
+    background-color: #063864;
+}
+
+#btn-cancelar-buscar{
+    background-color: var(--danger);
+    padding: 10px;
+    color: white;
+    border-radius: 10px;
+    border: none;
+}
+
+#btn-cancelar-buscar:hover{
+    background-color: #d61d2f;
+}
+
+/*
+    Informacion clase
+ */
+
+#informacion-clase{
+    display: none;
+    justify-content: space-between;
+    border-top: 1px solid var(--primary-color);
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+.separador-informacion-clase{
+    margin: 10px 2% !important;
+    width: 96% !important;
+    border: 1px solid var(--primary-color);
+    display: inline-block;
+}
+
+.separacion-seccion-informacion-clase{
+    margin: 0 2% 0 2% !important;
+    width: 96% !important;
+}
+
+.titulo-seccion-informacion-clase{
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#seccion-clase{
+    width: 48%;
+    border-radius: 1rem;
+    background-color: var(--primary-color);
+}
+
+#seccion-datos-clase{
+    display: flex;
+    justify-content: flex-start;
+}
+
+#imagen-clase{
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 1rem;
+    margin: 10px;
+}
+
+#datos-clase{
+    margin: auto 0;
+}
+
+#seccion-maestro{
+    width: 48%;
+    border-radius: 1rem;
+    background-color: var(--primary-color);
+}
+
+#seccion-datos-maestro{
+    display: flex;
+    justify-content: flex-start;
+}
+
+#imagen-maestro{
+    margin: 10px;
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+}
+
+#nombre-maestro{
+    margin: auto 0 auto 10px;
+}
+
+#btn-solicitar-unirse{
+    margin-top: 10px;
+    margin-left: auto;
+    background-color: var(--hovercolor);
+    padding: 10px;
+    color: white;
+    border-radius: 10px;
+    border: none;
+}
+
+#btn-solicitar-unirse:hover{
+    text-decoration: none;
+    background-color: var(--hovercolor-hover);
+}
+
+#seccion-solicitar-unirse{
+    margin-top: 10px;
+    display: none;
+    justify-content: flex-end;
+}
+
+/*
+    Clases
+*/
+
+.titulo-estado-clase{
+    margin-top: 40px;
+    text-align: center;
+    font-size: 1.7rem;
+}
+
+.clase{
+    margin: 2% 5% !important;
+}

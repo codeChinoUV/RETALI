@@ -292,7 +292,7 @@ function enviarFormulario(e){
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
-          text: 'No se logro establecer conexión con el servidor, cheque si conexición a internet',
+          text: 'No se logro establecer conexión con el servidor, cheque su conexión a internet',
         })
         seEstaCargando = false;
         comentariosEntrega.disabled = false;
