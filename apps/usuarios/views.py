@@ -60,8 +60,9 @@ def colocar_estado_inscripcion_clase(alumno, clases):
     :param clases: Las clases a colocar el estado
     :return: None
     """
-    for clase in clases:
-        clase.estado_inscipcion = alumno.inscripcion_set.filter(clase_id=clase.pk).first().aceptado
+    if clases is not None:
+        for clase in clases:
+            clase.estado_inscipcion = alumno.inscripcion_set.filter(clase_id=clase.pk).first().aceptado
 
 
 def _contar_cantidad_estado_de_clases(clases, datos_del_alumno):
@@ -74,13 +75,14 @@ def _contar_cantidad_estado_de_clases(clases, datos_del_alumno):
     datos_del_alumno['cantidad_clases_aceptado'] = 0
     datos_del_alumno['cantidad_clases_rechazado'] = 0
     datos_del_alumno['cantidad_clases_en_espera'] = 0
-    for clase in clases:
-        if clase.estado_inscipcion == 'Aceptado' and clase.abierta:
-            datos_del_alumno['cantidad_clases_aceptado'] += 1
-        elif clase.estado_inscipcion == 'Rechazado' and clase.abierta:
-            datos_del_alumno['cantidad_clases_rechazado'] += 1
-        elif clase.estado_inscipcion == 'En espera' and clase.abierta:
-            datos_del_alumno['cantidad_clases_en_espera'] += 1
+    if clases is not None:
+        for clase in clases:
+            if clase.estado_inscipcion == 'Aceptado' and clase.abierta:
+                datos_del_alumno['cantidad_clases_aceptado'] += 1
+            elif clase.estado_inscipcion == 'Rechazado' and clase.abierta:
+                datos_del_alumno['cantidad_clases_rechazado'] += 1
+            elif clase.estado_inscipcion == 'En espera' and clase.abierta:
+                datos_del_alumno['cantidad_clases_en_espera'] += 1
 
 
 def obtener_informacion_de_clases_de_maestro(maestro):
