@@ -147,13 +147,17 @@ def registrar_usuario(request):
         es_maestro = validar_tipo_usuario(tipoUsuario)
         if validar_campos_no_vacios(username, password, nombre, apellidos, telefono):
             if es_correo_valido(username):
-                if validar_contrasena(password, confirmPassword):
-                    Usuario = get_user_model()
-                    user = Usuario.objects.create_user(email=username, password=password, es_maestro=es_maestro)
-                    crear_tipo_usuario(nombre, apellidos, telefono, user, es_maestro)
-                    return redirect('login')
+                if validar_correo_no_registrado(username):
+                    if validar_contrasena(password, confirmPassword):
+                        Usuario = get_user_model()
+                        user = Usuario.objects.create_user(email=username, password=password, es_maestro=es_maestro)
+                        crear_tipo_usuario(nombre, apellidos, telefono, user, es_maestro)
+                        return redirect('login')
+                    else:
+                        messages.error(request, 'Las contraseñas no coinciden')
+                        return redirect('registro')
                 else:
-                    messages.error(request, 'Las contraseñas no coinciden')
+                    messages.error(request, 'El correo ingresado ya está registrado')
                     return redirect('registro')
             else:
                 messages.error(request, 'El correo ingresado es inválido')
@@ -211,7 +215,8 @@ def validar_campos_no_vacios(username, password, nombre, apellidos, telefono):
         return True
 
 def validar_correo_no_registrado(correo):
-
-    return True
+    Usuario = get_user_model()
+    if Usuario.objects.filter(email = correo).count() <=0:
+        return True
 
     return False
