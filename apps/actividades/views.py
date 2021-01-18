@@ -4,7 +4,7 @@ import pytz
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect, HttpResponse
-
+from django.utils import timezone
 from RETALI import settings
 from apps.actividades.forms import ActividadForm, ActividadDisableForm
 from apps.actividades.models import Actividad, Entrega, Archivo, Revision
@@ -164,8 +164,7 @@ def _actualizar_estado_actividad(actividad):
     :param actividad: La actividad a la cual se le actualiza el estado
     :return: None
     """
-    now = datetime.datetime.today()
-    now = pytz.utc.localize(now)
+    now = timezone.now()
     if actividad.fecha_de_inicio > now:
         Actividad.objects.filter(pk=actividad.pk).update(estado='Por abrir')
         actividad.estado = 'Por abrir'
@@ -194,11 +193,10 @@ def _obtener_cantidad_de_actividades_abiertas(actividades):
     :param actividades: Las actividades a checar
     :return: La cantidad de actividades abiertas
     """
-    now = datetime.datetime.today()
-    now = pytz.utc.localize(now)
+    now = timezone.now()
     cantidad_actividades_abiertas = 0
     for actividad in actividades:
-        if actividad.fecha_de_cierre > now:
+        if actividad.fecha_de_cierre > now > actividad.fecha_de_inicio:
             cantidad_actividades_abiertas += 1
     return cantidad_actividades_abiertas
 
