@@ -44,6 +44,12 @@
         </div>
         <p id="titulo-descripcion">Descripción:</p>
         <p>{{ foro.descripcion }}</p>
+        <div id="seccion-modificar">
+            <a id="boton-editar" href="{% url 'editar_foro' clase_actual.codigo foro.pk %}">
+                <div>Editar foro</div>
+                <img id="imagen-boton-editar" src="{% static 'actividades/consultar-actividad-maestro/imagenes/editar.svg' %}" alt="icono editar">
+            </a>
+        </div>
     </div>
     {% if foro.estado == 'Abierta' %}
     <div id="participa-en-foro">

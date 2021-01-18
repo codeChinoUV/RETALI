@@ -1,6 +1,6 @@
 {% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
 {% load static %}
-{% block nombre_pagina %} Registro de Foro {% endblock %}
+{% block nombre_pagina %} Editar foro {% endblock %}
 {% block estilos-extra %}
     <link rel="stylesheet" type="text/css" href="{% static 'foros/registro-foro/estilos/registro-foro.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -32,7 +32,7 @@
     </li>
 {% endblock %}
 {% block contenido %}
-    <h1 class="titulo-seccion">Registrar foro</h1>
+    <h1 class="titulo-seccion">Editar foro</h1>
     <hr>
     <div id="formulario-registro-foro">
         <form method="POST">
@@ -84,7 +84,7 @@
                         {% endfor %}
                     {% endif %}
                 </div>
-                <input type="submit" value="Registrar foro">
+                <input type="submit" value="Guadar cambios">
             </div>
         </form>
     </div>
@@ -92,6 +92,5 @@
 {% endblock %}
 {% block scripts-adicionales %}
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="{% static 'actividades/registro-actividad/scripts/agregar-evento-a-fechas.js' %}"></script>
-    <script type="module" src="{% static 'foros/registro-foro/scripts/registro-foro.js' %}"></script>
+    <script src="{% static 'actividades/editar-actividad/scripts/editar-actividad.js' %}"></script>
 {% endblock %}

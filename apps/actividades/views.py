@@ -100,7 +100,7 @@ def editar_actividad(request, codigo_clase, id_actividad):
                     formulario = ActividadForm(request.POST)
                     if formulario.is_valid():
                         datos = formulario.cleaned_data
-                        if _validar_fecha_cierre_mayor_a_fecha_apertura(datos["fecha_inicio"], datos["fecha_cierre"]):
+                        if validar_fecha_cierre_mayor_a_fecha_apertura(datos["fecha_inicio"], datos["fecha_cierre"]):
                             _actualizar_informacion_actividad(id_actividad, datos["nombre"], datos["descripcion"],
                                                               datos["fecha_inicio"], datos["fecha_cierre"])
                             return redirect('consultar_actividad_mestro', codigo_clase=codigo_clase,
@@ -111,13 +111,19 @@ def editar_actividad(request, codigo_clase, id_actividad):
                     datos_del_maestro["form"] = formulario
                     return render(request, 'actividades/editar_actividad/EditarActividad.html', datos_del_maestro)
         raise Http404
-
     else:
         return redirect('paginaInicio')
 
 
-def _validar_fecha_cierre_mayor_a_fecha_apertura(fecha_inicio, fecha_cierre):
+def validar_fecha_cierre_mayor_a_fecha_apertura(fecha_inicio, fecha_cierre):
+    """
+    Valida que la fecha de inicio no sea mayor a la fecha de cierre
+    :param fecha_inicio: La fecha de inicio
+    :param fecha_cierre: La fecha de cierre
+    :return: True si la fecha de cierre no es mayor a la fecha de inicio
+    """
     return fecha_cierre > fecha_inicio
+
 
 def _crear_formulario_con_informacion_de_actividad(actividad):
     """

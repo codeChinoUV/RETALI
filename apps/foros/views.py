@@ -4,7 +4,9 @@ import pytz
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect
+from django.utils import timezone
 
+from apps.actividades.views import validar_fecha_cierre_mayor_a_fecha_apertura
 from apps.clases.models import Clase
 from apps.foros.forms import ForoForm
 from apps.foros.models import Foro, Participacion, Respuesta
@@ -47,8 +49,7 @@ def _actualizar_estado_foro(foro):
     :param foro: El foro a actualizar su estado
     :return: None
     """
-    now = datetime.datetime.today()
-    now = pytz.utc.localize(now)
+    now = timezone.now()
     if foro.fecha_de_inicio > now:
         Foro.objects.filter(pk=foro.pk).update(estado='Por abrir')
         foro.estado = 'Por abrir'
@@ -79,7 +80,7 @@ def contar_foros_activos(foros):
     _actualizar_estado_foros(foros)
     cantidad_abiertos = 0
     for foro in foros:
-        if foro.estado == 'Abierto':
+        if foro.estado == 'Abierta':
             cantidad_abiertos += 1
     return cantidad_abiertos
 
@@ -100,13 +101,75 @@ def registrar_foro(request, codigo_clase):
             formulario = ForoForm(request.POST)
             if formulario.is_valid():
                 foro = formulario.cleaned_data
-                _registrar_foro(datos_del_maestro["clase_actual"].pk, foro["nombre"], foro["descripcion"],
-                                foro["fecha_inicio"], foro["fecha_cierre"])
-                return redirect('foros', codigo_clase=codigo_clase)
-            else:
-                datos_del_maestro["form"] = formulario
-                return render(request, 'foros/registro-foro/RegistroForo.html', datos_del_maestro)
+                if validar_fecha_cierre_mayor_a_fecha_apertura(foro["fecha_inicio"], foro["fecha_cierre"]):
+                    _registrar_foro(datos_del_maestro["clase_actual"].pk, foro["nombre"], foro["descripcion"],
+                                    foro["fecha_inicio"], foro["fecha_cierre"])
+                    return redirect('foros', codigo_clase=codigo_clase)
+                formulario.errors["fecha_inicio"] = "La fecha de inicio no puede ser antes que la fecha de cierre"
+            datos_del_maestro["form"] = formulario
+            return render(request, 'foros/registro-foro/RegistroForo.html', datos_del_maestro)
     raise Http404
+
+
+@login_required()
+def editar_foro(request, codigo_clase, id_foro):
+    if request.user.es_maestro:
+        datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
+        datos_del_maestro["clase_actual"] = request.user.persona.maestro.clase_set.filter(codigo=codigo_clase).first()
+        if request.method == "GET":
+            if datos_del_maestro["clase_actual"] is not None:
+                if _validar_existe_foro_maestro(request.user.persona.maestro, codigo_clase, id_foro):
+                    foro_actual = Foro.objects.filter(pk=id_foro).first()
+                    datos_del_maestro["form"] = _crear_formulario_con_informacion_de_foro(foro_actual)
+                    return render(request, 'foros/editar-foro/EditarForo.html', datos_del_maestro)
+            return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
+        elif request.method == "POST":
+            if datos_del_maestro["clase_actual"] is not None:
+                if _validar_existe_foro_maestro(request.user.persona.maestro, codigo_clase, id_foro):
+                    formulario = ForoForm(request.POST)
+                    if formulario.is_valid():
+                        datos = formulario.cleaned_data
+                        if validar_fecha_cierre_mayor_a_fecha_apertura(datos["fecha_inicio"], datos["fecha_cierre"]):
+                            _actualizar_informacion_foro(id_foro, datos["nombre"], datos["descripcion"],
+                                                              datos["fecha_inicio"], datos["fecha_cierre"])
+                            return redirect('consultar_foro', codigo_clase=codigo_clase,
+                                            id_foro=id_foro)
+                        else:
+                            formulario.errors["fecha_inicio"] = "La fecha de inicio no puede ser antes que la fecha " \
+                                                                "de cierre"
+                    datos_del_maestro["form"] = formulario
+                    return render(request, 'foros/editar-foro/EditarForo.html', datos_del_maestro)
+        raise Http404
+    else:
+        return redirect('paginaInicio')
+
+
+def _crear_formulario_con_informacion_de_foro(foro):
+    """
+    Crea un formulario y le coloca en los campos la información de un Foro
+    :param foro: El foro del cual se podra la información en sus campos
+    :return: Un ForoForm
+    """
+    formulario = ForoForm()
+    formulario.fields["nombre"].initial = foro.nombre
+    formulario.fields["descripcion"].initial = foro.descripcion
+    formulario.fields["fecha_inicio"].initial = foro.fecha_de_inicio
+    formulario.fields["fecha_cierre"].initial = foro.fecha_de_cierre
+    return formulario
+
+
+def _actualizar_informacion_foro(id_foro, nombre, descripcion, fecha_inicio, fecha_cierre):
+    """
+    Actualiza la información del foro con el id_foro
+    :param id_foro: El id del foro a actualizar la información
+    :param nombre: El nuevo nombre del foro
+    :param descripcion: La nueva descripción del foro
+    :param fecha_inicio: La nueva fecha de inicio del foro
+    :param fecha_cierre: La nueva fecha de cierre del foro
+    :return: None
+    """
+    Foro.objects.filter(pk=id_foro).update(nombre=nombre, descripcion=descripcion, fecha_de_inicio=fecha_inicio,
+                                           fecha_de_cierre=fecha_cierre)
 
 
 def _registrar_foro(id_clase, nombre, descripcion, fecha_inicio, fecha_cierre):
@@ -126,38 +189,43 @@ def _registrar_foro(id_clase, nombre, descripcion, fecha_inicio, fecha_cierre):
 
 @login_required()
 def consultar_foro(request, codigo_clase, id_foro):
-    if request.user.es_maestro:
-        datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
-        datos_del_maestro["clase_actual"] = request.user.persona.maestro.clase_set.filter(
-            codigo=codigo_clase).first()
-        if datos_del_maestro["clase_actual"] is not None:
-            datos_del_maestro["foro"] = datos_del_maestro["clase_actual"].foro_set.filter(pk=id_foro).first()
-            if datos_del_maestro["foro"] is not None:
-                datos_del_maestro["participaciones"] = datos_del_maestro["foro"].participacion_set. \
-                    filter(eliminada=False).all()
-                _colocar_respuetas_de_participaciones(datos_del_maestro["participaciones"])
-                return render(request, 'foros/consultar-foro/ConsultarForo.html', datos_del_maestro)
-        return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
-    else:
-        datos_del_alumno = obtener_informacion_de_clases_del_alumno(request.user.persona.alumno)
-        clase = Clase.objects.filter(codigo=codigo_clase).first()
-        if clase is not None:
-            inscripcion = request.user.persona.alumno.inscripcion_set. \
-                filter(aceptado='Aceptado', clase_id=clase.pk).first()
-            if inscripcion is not None:
-                datos_del_alumno["clase_actual"] = inscripcion.clase
-                datos_del_alumno["foro"] = datos_del_alumno["clase_actual"].foto_set.filter(pk=id_foro).first()
-                if datos_del_alumno["foro"] is not None:
-                    datos_del_alumno["participaciones"] = datos_del_alumno["foro"].participacion_set. \
+    if request.method == "GET":
+        if request.user.es_maestro:
+            datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
+            datos_del_maestro["clase_actual"] = request.user.persona.maestro.clase_set.filter(
+                codigo=codigo_clase).first()
+            if datos_del_maestro["clase_actual"] is not None:
+                datos_del_maestro["foro"] = datos_del_maestro["clase_actual"].foro_set.filter(pk=id_foro).first()
+                if datos_del_maestro["foro"] is not None:
+                    _actualizar_estado_foro(datos_del_maestro["foro"])
+                    datos_del_maestro["participaciones"] = datos_del_maestro["foro"].participacion_set. \
                         filter(eliminada=False).all()
-                    _colocar_respuetas_de_participaciones(datos_del_alumno["participaciones"])
-                    return render(request, 'foros/consultar-foro/ConsultarForo.html', datos_del_alumno)
-        return render(request, 'generales/NoEncontrada.html', datos_del_alumno)
+                    _colocar_respuetas_de_participaciones(datos_del_maestro["participaciones"])
+                    return render(request, 'foros/consultar-foro/ConsultarForo.html', datos_del_maestro)
+            return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
+        else:
+            datos_del_alumno = obtener_informacion_de_clases_del_alumno(request.user.persona.alumno)
+            clase = Clase.objects.filter(codigo=codigo_clase).first()
+            if clase is not None:
+                inscripcion = request.user.persona.alumno.inscripcion_set. \
+                    filter(aceptado='Aceptado', clase_id=clase.pk).first()
+                if inscripcion is not None:
+                    datos_del_alumno["clase_actual"] = inscripcion.clase
+                    datos_del_alumno["foro"] = datos_del_alumno["clase_actual"].foto_set.filter(pk=id_foro).first()
+                    if datos_del_alumno["foro"] is not None:
+                        _actualizar_estado_foro(datos_del_alumno["foro"])
+                        datos_del_alumno["participaciones"] = datos_del_alumno["foro"].participacion_set. \
+                            filter(eliminada=False).all()
+                        _colocar_respuetas_de_participaciones(datos_del_alumno["participaciones"])
+                        return render(request, 'foros/consultar-foro/ConsultarForo.html', datos_del_alumno)
+            return render(request, 'generales/NoEncontrada.html', datos_del_alumno)
+        raise Http404
 
 
 def _colocar_respuetas_de_participaciones(participaciones):
     for participacion in participaciones:
-        participacion.respuestas =participacion.respuesta_set.filter(eliminada=False).all()
+        participacion.respuestas = participacion.respuesta_set.filter(eliminada=False).all()
+
 
 @login_required()
 def participar_en_foro(request, codigo_clase, id_foro):

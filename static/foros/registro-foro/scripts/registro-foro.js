@@ -73,6 +73,9 @@ function validarFechaCierreSeleccionada(){
 
 document.querySelector("input[type='submit']").addEventListener("click", (e) => {
     e.preventDefault();
+    document.querySelectorAll(".invalid-feedback").forEach((e) => {
+        e.remove();
+    })
     validarCampoNombre();
     validarCampoDescripcion();
     validarFechaInicioSeleccionada();

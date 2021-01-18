@@ -42,6 +42,42 @@
     font-weight: bold;
 }
 
+#seccion-modificar{
+    display: flex;
+    justify-content: flex-end;
+}
+
+#boton-editar{
+    display: flex;
+    color: white;
+    background-color: var(--hovercolor);
+    text-decoration: none;
+    padding: 0.5rem;
+    border-radius: 1rem;
+    vertical-align: center;
+    margin: 4.5% 0 0 0;
+    float: right;
+    justify-content: space-between;
+}
+
+#boton-editar img,
+#boton-editar div{
+    font-size: 1rem;
+    vertical-align: middle;
+    overflow: hidden;
+    display: inline-block;
+}
+
+#boton-editar:hover{
+    background-color: var(--hovercolor-hover);
+}
+
+#boton-editar img#imagen-boton-editar{
+    height: 20px;
+    width: 20px;
+    margin: 0 7px;
+}
+
 /*
     Participacion foro
  */
