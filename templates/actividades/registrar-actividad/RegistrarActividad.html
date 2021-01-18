@@ -68,7 +68,7 @@
                     {% if form.errors %}
                         {% for key, value in form.errors.items %}
                             {% if key == 'fecha_inicio' %}
-                                <div class="invalid-feedback">Este campo es requerido</div>
+                                <div class="invalid-feedback">{{ value }}</div>
                             {% endif %}
                         {% endfor %}
                     {% endif %}

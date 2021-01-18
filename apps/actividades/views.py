@@ -62,14 +62,18 @@ def registrar_actividad(request, codigo_clase):
                 formulario = ActividadForm(request.POST)
                 if formulario.is_valid():
                     datos_de_la_actividad = formulario.cleaned_data
-                    actividad = Actividad(nombre=datos_de_la_actividad['nombre'],
-                                          descripcion=datos_de_la_actividad['descripcion'],
-                                          fecha_de_inicio=datos_de_la_actividad['fecha_inicio'],
-                                          fecha_de_cierre=datos_de_la_actividad['fecha_cierre'],
-                                          clase_id=datos_del_maestro['clase_actual'].id)
-                    actividad.save()
-                    return redirect('actividades', codigo_clase=codigo_clase)
-                else:
+                    if _validar_fecha_cierre_mayor_a_fecha_apertura(datos_de_la_actividad["fecha_inicio"],
+                                                                    datos_de_la_actividad["fecha_cierre"]):
+                        actividad = Actividad(nombre=datos_de_la_actividad['nombre'],
+                                              descripcion=datos_de_la_actividad['descripcion'],
+                                              fecha_de_inicio=datos_de_la_actividad['fecha_inicio'],
+                                              fecha_de_cierre=datos_de_la_actividad['fecha_cierre'],
+                                              clase_id=datos_del_maestro['clase_actual'].id)
+                        actividad.save()
+                        return redirect('actividades', codigo_clase=codigo_clase)
+                    else:
+                        formulario.errors["fecha_inicio"] = "La fecha de inicio no puede ser antes que la fecha " \
+                                                            "de cierre"
                     datos_del_maestro['form'] = formulario
                     return render(request, 'actividades/registrar-actividad/RegistrarActividad.html', datos_del_maestro)
             else:
