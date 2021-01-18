@@ -161,9 +161,9 @@
                 {% endfor %}
             {% endif %}
             {% if cantidad_clases_rechazado != 0 %}
+                <h3 class="titulo-estado-clase">Clases rechazadas</h3>
+                <hr>
                 {% for clase in clases %}
-                    <h3 class="titulo-estado-clase">Clases rechazadas</h3>
-                    <hr>
                     {% if clase.estado_inscipcion == 'Rechazado' %}
                     <div class="clase">
                         {% if clase.foto  %}
