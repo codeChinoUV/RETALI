@@ -91,7 +91,7 @@
                 {% else %}
                 <img class="imagen-alumno-participacion" src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto participante">
                 {% endif %}
-                <p>{{ user.persona.nombre }} {{ user.persona.apellidos }}</p>
+                <p>{{ participacion.participante.nombre }} {{ participacion.participante.apeliidos }}</p>
                 {% timezone 'America/Mexico_City' %}
                 <p class="fecha-participacion">{{ participacion.fecha }}</p>
                 {% endtimezone %}

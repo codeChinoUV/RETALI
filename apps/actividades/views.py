@@ -62,7 +62,7 @@ def registrar_actividad(request, codigo_clase):
                 formulario = ActividadForm(request.POST)
                 if formulario.is_valid():
                     datos_de_la_actividad = formulario.cleaned_data
-                    if _validar_fecha_cierre_mayor_a_fecha_apertura(datos_de_la_actividad["fecha_inicio"],
+                    if validar_fecha_cierre_mayor_a_fecha_apertura(datos_de_la_actividad["fecha_inicio"],
                                                                     datos_de_la_actividad["fecha_cierre"]):
                         actividad = Actividad(nombre=datos_de_la_actividad['nombre'],
                                               descripcion=datos_de_la_actividad['descripcion'],

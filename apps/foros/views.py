@@ -211,7 +211,7 @@ def consultar_foro(request, codigo_clase, id_foro):
                     filter(aceptado='Aceptado', clase_id=clase.pk).first()
                 if inscripcion is not None:
                     datos_del_alumno["clase_actual"] = inscripcion.clase
-                    datos_del_alumno["foro"] = datos_del_alumno["clase_actual"].foto_set.filter(pk=id_foro).first()
+                    datos_del_alumno["foro"] = datos_del_alumno["clase_actual"].foro_set.filter(pk=id_foro).first()
                     if datos_del_alumno["foro"] is not None:
                         _actualizar_estado_foro(datos_del_alumno["foro"])
                         datos_del_alumno["participaciones"] = datos_del_alumno["foro"].participacion_set. \
@@ -237,7 +237,7 @@ def participar_en_foro(request, codigo_clase, id_foro):
                     return redirect('consultar_foro', codigo_clase=codigo_clase, id_foro=id_foro)
         else:
             if _validar_existe_foro_alumno(request.user.persona.alumno, codigo_clase, id_foro):
-                if request.POST['participacion'] is not None and request.POST['particioacion'] != '':
+                if request.POST['participacion'] is not None and request.POST['participacion'] != '':
                     _registrar_participacion(request.user.persona.pk, id_foro, request.POST['participacion'])
                     return redirect('consultar_foro', codigo_clase=codigo_clase, id_foro=id_foro)
     raise Http404
@@ -284,7 +284,7 @@ def _validar_existe_foro_alumno(alumno, codigo_clase, id_foro):
     existe_foro = False
     clase = Clase.objects.filter(codigo=codigo_clase).first()
     if clase is not None:
-        inscripcion = alumno.inscripcion_set(aceptado='Aceptado', clase_id=clase.pk).first()
+        inscripcion = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.pk).first()
         if inscripcion is not None:
             foro = inscripcion.clase.foro_set.filter(pk=id_foro).first()
             if foro is not None:
