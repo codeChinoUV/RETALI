@@ -59,7 +59,7 @@
                     <input type="text" name="fecha_cierre" class="form-control" disabled id="id_fecha_cierre" value="{{ actividad_actual.fecha_de_cierre }}">
                     {% endtimezone %}
                 </div>
-                <a id="boton-editar" href="">
+                <a id="boton-editar" href="{% url 'editar_actividad' clase_actual.codigo actividad_actual.pk %}">
                     <div>Editar actividad</div>
                     <img id="imagen-boton-editar" src="{% static 'actividades/consultar-actividad-maestro/imagenes/editar.svg' %}" alt="icono editar">
                 </a>
