@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -19,14 +19,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'w_qx%^^jn8-2syo#zc)uny(*4((7odkmt_j-s5=+wijue!kt^('
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = []
-
-# Application definition
+# 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
+# For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
 INSTALLED_APPS = [
     'django_cleanup',
@@ -74,25 +74,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'RETALI.wsgi.application'
 
-#Database
+# Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 #DATABASES = { # Base de datos desarrollo
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
+#   'default': {
+#       'ENGINE': 'django.db.backends.sqlite3',
+#       'NAME': BASE_DIR / 'db.sqlite3',
+#   }
 #}
 
 
-DATABASES = { # Base de datos producción
+DATABASES = {  # Base de datos producción
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'retali',
-        'USER': 'retali',
-        'PASSWORD': 'retali123456789.0',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
+        "USER": os.environ.get("SQL_USER", "user"),
+        "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
+        "HOST": os.environ.get("SQL_HOST", "localhost"),
+        "PORT": os.environ.get("SQL_PORT", "5432"),
     }
 }
 
@@ -127,8 +127,12 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
+MEDIA_URL = "/mediafiles/"
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
+
+STATIC_URL = "/staticfiles/"
+
 STATICFILES_DIRS = (
 
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
@@ -136,12 +140,6 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     BASE_DIR / 'static/',
 )
-
-STATIC_URL = '/static/'
-
-MEDIA_URL = '/media/'
-
-MEDIA_ROOT = BASE_DIR / 'media/'
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
