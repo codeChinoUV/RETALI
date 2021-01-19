@@ -73,6 +73,7 @@
                     <div class="titulo">Clases</div>
                 </a>
             </div>
+            {% block listaDeClases %}
             <div id="clases">
                 {% for clase in clases %}
                     <div class="elemento elemento-clase">
@@ -89,6 +90,7 @@
                     </div>
                 {% endfor %}
             </div>
+            {% endblock %}
         </div>
     </div>
 {% endblock %}
