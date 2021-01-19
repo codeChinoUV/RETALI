@@ -1,21 +1,21 @@
-{% extends  'actividades/consultar-actividades-maestro/ConsultarActividadesMaestro.html'%}
+{% extends 'foros/consultar-foros-maestro/ConsultarForosMaestro.html' %}
 {% load static %}
 {% load tz %}
 {% block links %}
-    <li>
+    <li >
         <a href="{% url 'ver_materia_alumno' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
             <div class="titulo">Inicio</div>
         </a>
     </li>
-    <li class="link-actual">
-        <a href="#">
+    <li>
+        <a href="{% url 'actividades_alumno' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
             <div class="titulo">Actividades</div>
         </a>
     </li>
-    <li>
-        <a href="{% url 'foros_alumno' clase_actual.codigo %}">
+    <li class="link-actual">
+        <a href="#">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
             <div class="titulo">Foros</div>
         </a>
@@ -59,30 +59,32 @@
         {% endfor %}
     </div>
  {% endblock %}
+
 {% block contenido %}
-    <h1 class="titulo-seccion">Actividades</h1>
+    <h1 class="titulo-seccion">Foros</h1>
     <hr>
-    <div id="informacion-actividades">
-        <p>Actividades abiertas: {{ cantidad_actividades_abiertas }}</p>
-        <p>Total de actividades: {{ total_de_actividades }}</p>
+    <div id="informacion-foros">
+        <p>Foros abiertos: {{ cantidad_foros_abiertos }}</p>
+        <p>Total de foros: {{ total_de_foros }}</p>
     </div>
-    {% for actividad in actividades %}
-        <div class="actividad">
-            <img class="actividad-imagen" src="{% static 'generales/imagenes/portapapeles.png' %}" alt="imagen actividad">
-            <div class="informacion-actividad">
-                <h3><a href="{% url 'entregar_actividad' clase_actual.codigo actividad.id %}">{{ actividad.nombre }}</a></h3>
+    {% for foro in foros %}
+        <div class="foro">
+            <img class="foro-imagen" src="{% static 'generales/imagenes/charlando.png' %}" alt="imagen actividad">
+            <div class="informacion-foro">
+                <h3><a href="{% url 'consultar_foro' clase_actual.codigo foro.pk %}">{{ foro.nombre }}</a></h3>
                 {% timezone 'America/Mexico_City' %}
-                <p>Del: {{ actividad.fecha_de_inicio }} </p>
-                <p>hasta las: {{ actividad.fecha_de_cierre }}</p>
+                <p>Del: {{ foro.fecha_de_inicio }}</p>
+                <p>hasta las: {{ foro.fecha_de_cierre }}</p>
                 {% endtimezone %}
+                <p>{{ foro.cantidad_participaciones }} Alumnos han participado en el foro</p>
             </div>
-            <div class="estado-actividad">
-                {% if actividad.estado == 'Abierta' %}
-                    <div class="color-actividad abierta"></div>
-                    <p>Abierta</p>
-                {% elif actividad.estado == 'Cerrada'%}
-                    <div class="color-actividad cerrada"></div>
-                    <p>Cerrada</p>
+            <div class="estado-foro">
+                {% if foro.estado == 'Abierta' %}
+                    <div class="color-foro abierta"></div>
+                    <p>Abierto</p>
+                {% elif foro.estado == 'Cerrada'%}
+                    <div class="color-foro cerrada"></div>
+                    <p>Cerrado</p>
                 {% else %}
                     <div class="color-actividad por-abrir"></div>
                     <p>Por abrir</p>

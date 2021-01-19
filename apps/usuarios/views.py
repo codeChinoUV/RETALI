@@ -65,15 +65,6 @@ def colocar_estado_inscripcion_clase(alumno, clases):
             clase.estado_inscipcion = alumno.inscripcion_set.filter(clase_id=clase.pk).first().aceptado
 
 
-def colocar_estado_inscripcion_clase_(alumno, clase):
-    """
-    Coloca la informacion del estado de la inscripcion de la clase
-    :param alumno: El alumno
-    :param clases: Clase a la cuál se le asignará el estado
-    :return: None
-    """
-    if clase is not None:
-        clase.estado_inscipcion = alumno.inscripcion_set.filter(clase_id=clase.pk).first().aceptado
 
 
 def _contar_cantidad_estado_de_clases(clases, datos_del_alumno):

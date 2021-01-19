@@ -8,7 +8,8 @@ from django.shortcuts import render, redirect
 from apps.clases.models import Clase
 from apps.foros.forms import ForoForm
 from apps.foros.models import Foro, Participacion, Respuesta
-from apps.usuarios.views import obtener_informacion_de_clases_de_maestro, obtener_informacion_de_clases_del_alumno
+from apps.usuarios.views import obtener_informacion_de_clases_de_maestro, obtener_informacion_de_clases_del_alumno, \
+    colocar_estado_inscripcion_clase
 
 
 @login_required
@@ -27,6 +28,28 @@ def consultar_foros_maestro(request, codigo_clase):
                 return render(request, 'foros/consultar-foros-maestro/ConsultarForosMaestro.html', datos_del_maestro)
             else:
                 return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
+    raise Http404
+
+
+@login_required
+def consultar_foros_alumno(request, codigo_clase):
+    if request.method == "GET":
+        if not request.user.es_maestro:
+            alumno = request.user.persona.alumno
+            clase = Clase.objects.filter(codigo=codigo_clase).first()
+            inscripcion = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.id).first()
+            datos_del_alumno = obtener_informacion_de_clases_del_alumno(request.user.persona.alumno)
+            datos_del_alumno['clase_actual'] = inscripcion.clase
+            colocar_estado_inscripcion_clase(alumno, datos_del_alumno['clases'])
+            if datos_del_alumno['clase_actual'] is not None:
+                datos_del_alumno["foros"] = datos_del_alumno['clase_actual'].foro_set.filter(eliminado=False).all(). \
+                    order_by('-fecha_de_creacion')
+                _colocar_cantidad_participaciones_de_foro(datos_del_alumno["foros"])
+                datos_del_alumno["cantidad_foros_abiertos"] = contar_foros_activos(datos_del_alumno["foros"])
+                datos_del_alumno["total_de_foros"] = len(datos_del_alumno["foros"])
+                return render(request, 'foros/consultar-foros-alumno/ConsultarForosAlumno.html', datos_del_alumno)
+            else:
+                return render(request, 'generales/NoEncontrada.html', datos_del_alumno)
     raise Http404
 
 
@@ -146,7 +169,7 @@ def consultar_foro(request, codigo_clase, id_foro):
                 filter(aceptado='Aceptado', clase_id=clase.pk).first()
             if inscripcion is not None:
                 datos_del_alumno["clase_actual"] = inscripcion.clase
-                datos_del_alumno["foro"] = datos_del_alumno["clase_actual"].foto_set.filter(pk=id_foro).first()
+                datos_del_alumno["foro"] = datos_del_alumno["clase_actual"].foro_set.filter(pk=id_foro).first()
                 if datos_del_alumno["foro"] is not None:
                     datos_del_alumno["participaciones"] = datos_del_alumno["foro"].participacion_set. \
                         filter(eliminada=False).all()

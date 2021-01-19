@@ -10,8 +10,8 @@ from apps.actividades.forms import ActividadForm, ActividadDisableForm
 from apps.actividades.models import Actividad, Entrega, Archivo, Revision
 from apps.clases.models import Clase
 from apps.clases.views import obtener_cantidad_de_alumnos_inscritos_a_clase
-from apps.usuarios.views import obtener_informacion_de_clases_de_maestro, obtener_informacion_de_clases_del_alumno, \
-    colocar_estado_inscripcion_clase_
+from apps.usuarios.views import obtener_informacion_de_clases_de_maestro, obtener_informacion_de_clases_del_alumno\
+    , colocar_estado_inscripcion_clase
 
 
 @login_required
@@ -59,7 +59,7 @@ def consultar_actividades_de_clase_alumno(request, codigo_clase):
         inscripcion = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.id).first()
         datos_del_alumno = obtener_informacion_de_clases_del_alumno(request.user.persona.alumno)
         datos_del_alumno['clase_actual'] = inscripcion.clase
-        colocar_estado_inscripcion_clase_(alumno, datos_del_alumno['clase_actual'])
+        colocar_estado_inscripcion_clase(alumno, datos_del_alumno['clases'])
         if datos_del_alumno['clase_actual'] is not None:
             datos_del_alumno['actividades'] = datos_del_alumno['clase_actual'].actividad_set.all() \
                 .order_by('-fecha_de_creacion')
