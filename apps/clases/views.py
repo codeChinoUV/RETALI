@@ -5,7 +5,8 @@ from django.http import JsonResponse, Http404
 from django.shortcuts import render, redirect
 from .forms import ClaseForm
 from .models import Clase, Inscripcion
-from ..usuarios.views import obtener_informacion_de_clases_de_maestro
+from ..usuarios.views import obtener_informacion_de_clases_de_maestro, obtener_informacion_de_clases_del_alumno, \
+    colocar_estado_inscripcion_clase
 
 
 @login_required
@@ -145,7 +146,7 @@ def _registrar_inscripcion_alumno(id_alumno, codigo_clase):
     :return: None
     """
     clase = Clase.objects.filter(codigo=codigo_clase, abierta=True).first()
-    inscripcion = Inscripcion(clase_id=clase.pk, alumno_id=id_alumno)
+    inscripcion = Inscripcion(clase_id=clase.pk, alumno_id=id_alumno, aceptado='Aceptado')
     inscripcion.save()
 
 
@@ -179,3 +180,25 @@ def obtener_clase_actual(codigo_clase):
         return clase_actual
     else:
         return render('generales/NoEncontrada.html')
+
+
+@login_required()
+def informacion_clase_alumno(request, codigo_clase):
+    if request.user.es_maestro:
+        return redirect('login')
+    else:
+        alumno = request.user.persona.alumno
+        clase = Clase.objects.filter(codigo=codigo_clase).first()
+        inscripcion = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.id).first()
+        clase_actual = inscripcion.clase
+        clases_alumno = obtener_informacion_de_clases_del_alumno(request.user.persona.alumno)
+        datos = {
+            'clases': clases_alumno['clases']
+        }
+        colocar_estado_inscripcion_clase(alumno, clases_alumno['clases'])
+        if clase_actual is not None:
+            datos['clase_actual'] = clase_actual
+            return render(request, 'clases/informacion-clase/InformacionClaseAlumno.html', datos)
+        else:
+            return render(request, 'generales/NoEncontrada.html', datos)
+

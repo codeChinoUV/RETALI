@@ -61,3 +61,34 @@ hr{
     float: left;
     color: white;
 }
+
+/*
+    Taejeta informacion clase
+ */
+
+#tarjeta-informacion-profesor{
+    width: 45%;
+    display: block;
+    float: left;
+    background-color: var(--bgcolor);
+    padding: 1%;
+    margin: 2.5%;
+    border-radius: 1rem;
+}
+
+#tarjeta-informacion-profesor img{
+    width: 30%;
+    height: 10px;
+    display: block;
+    float: left;
+    object-fit: cover;
+    margin-right: 2%;
+    border-radius: 1rem;
+}
+
+#tarjeta-informacion-profesor div{
+    width: 65%;
+    color: white;
+    display: block;
+    float: right;
+}

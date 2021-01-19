@@ -22,13 +22,13 @@
     {% block datosPerfil %}
         <div id="perfil">
             <div id="foto">
-                {% if user.persona.maestro.foto_de_perfil %}
-                    <img src="{{ user.persona.maestro.foto_de_perfil.url }}" alt="foto de perfil">
+                {% if user.persona.alumno.foto_de_perfil %}
+                    <img src="{{ user.persona.alumno.foto_de_perfil.url }}" alt="foto de perfil">
                 {% else %}
                     <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
                 {% endif %}
             </div>
-            <div id="nombre">{{ user.persona.maestro.nombre }} {{ user.persona.maestro.apellidos }}</div>
+            <div id="nombre">{{ user.persona.alumno.nombre }} {{ user.persona.maestro.apellidos }}</div>
         </div>
     {% endblock %}
         <div id="elementos-menu">
@@ -38,11 +38,12 @@
                     <div class="titulo">Clases</div>
                 </a>
             </div>
+        {% block clasesDeAlumno %}
             <div id="clases">
                 {% for clase in clases %}
                     {% if clase.estado_inscipcion == 'Aceptado' %}
                     <div class="elemento elemento-clase">
-                        <a href="{% url 'ver_materia' clase.codigo %}">
+                        <a href="{% url 'ver_materia_alumno' clase.codigo %}">
                             <div class="icono">
                                 {% if clase.foto %}
                                     <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
@@ -56,6 +57,7 @@
                     {% endif %}
                 {% endfor %}
             </div>
+            {% endblock %}
         </div>
     </div>
 {% endblock %}

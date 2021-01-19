@@ -10,7 +10,8 @@ from apps.actividades.forms import ActividadForm, ActividadDisableForm
 from apps.actividades.models import Actividad, Entrega, Archivo, Revision
 from apps.clases.models import Clase
 from apps.clases.views import obtener_cantidad_de_alumnos_inscritos_a_clase
-from apps.usuarios.views import obtener_informacion_de_clases_de_maestro
+from apps.usuarios.views import obtener_informacion_de_clases_de_maestro, obtener_informacion_de_clases_del_alumno\
+    , colocar_estado_inscripcion_clase
 
 
 @login_required
@@ -40,6 +41,37 @@ def consultar_actividades_de_clase(request, codigo_clase):
                 _obtener_cantidad_de_actividades_abiertas(datos_del_maestro['actividades'])
             return render(request, 'actividades/consultar-actividades-maestro/ConsultarActividadesMaestro.html',
                           datos_del_maestro)
+
+
+@login_required
+def consultar_actividades_de_clase_alumno(request, codigo_clase):
+    """
+    Obtiene las actividades de una clase para el alumno
+    :param request: El request del cliente
+    :param codigo_clase: El codigo de la clase de la cual se quiere obtener las actividades
+    :return: Una template con sus datos o un redirect a la pagina correcta
+    """
+    if request.user.es_maestro:
+        return redirect('paginaInicio')
+    else:
+        alumno = request.user.persona.alumno
+        clase = Clase.objects.filter(codigo=codigo_clase).first()
+        inscripcion = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.id).first()
+        datos_del_alumno = obtener_informacion_de_clases_del_alumno(request.user.persona.alumno)
+        datos_del_alumno['clase_actual'] = inscripcion.clase
+        colocar_estado_inscripcion_clase(alumno, datos_del_alumno['clases'])
+        if datos_del_alumno['clase_actual'] is not None:
+            datos_del_alumno['actividades'] = datos_del_alumno['clase_actual'].actividad_set.all() \
+                .order_by('-fecha_de_creacion')
+            _actualizar_estado_actividades(datos_del_alumno['actividades'])
+            datos_del_alumno['total_de_actividades'] = \
+                obtener_cantidad_total_de_actividades(datos_del_alumno['clase_actual'])
+            datos_del_alumno['cantidad_actividades_abiertas'] = \
+                _obtener_cantidad_de_actividades_abiertas(datos_del_alumno['actividades'])
+            return render(request, 'actividades/consultar-actividades-alumno/ConsultarActividadesAlumno.html',
+                          datos_del_alumno)
+
+
 
 
 @login_required()
