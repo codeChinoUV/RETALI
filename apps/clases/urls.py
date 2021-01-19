@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from apps.usuarios.views import pagina_inicio
+from apps.usuarios.views import pagina_inicio, consultar_alumnos_de_clases, cambiar_estado_inscripcion_alumno
 from apps.clases.views import registrar_clase, informacion_clase, obtener_informacion_clase, unir_alumno_a_clase, \
     informacion_clase_alumno
 

@@ -7,16 +7,30 @@
 {% endblock %}
 {% block links %}
     <li>
+    {% if user.es_maestro %}
         <a href="{% url 'ver_materia' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
             <div class="titulo">Inicio</div>
         </a>
+        {% else %}
+        <a href="{% url 'ver_materia_alumno' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    {% endif %}
     </li>
     <li>
-        <a href="{% url 'actividades' clase_actual.codigo %}">
+    {% if user.es_maestro %}
+         <a href="{% url 'actividades' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
             <div class="titulo">Actividades</div>
         </a>
+        {% else %}
+         <a href="{% url 'actividades_alumno' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    {% endif %}
     </li>
     <li class="link-actual">
         <a href="">
@@ -24,12 +38,83 @@
             <div class="titulo">Foros</div>
         </a>
     </li>
+     <li>
+        <a href="{% url 'avisos' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/alertas.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Avisos</div>
+        </a>
+    </li>
     <li>
-        <a href="">
+    {% if user.es_maestro %}
+    <a href="">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
             <div class="titulo">Grupos</div>
         </a>
+    {% endif %}
     </li>
+
+{% endblock %}
+{% block datosPerfil %}
+    <div id="perfil">
+        {% if user.es_maestro %}
+            <div id="foto">
+                {% if user.persona.maestro.foto_de_perfil %}
+                    <img src="{{ user.persona.maestro.foto_de_perfil.url }}" alt="foto de perfil">
+                {% else %}
+                    <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
+                {% endif %}
+            </div>
+                <div id="nombre">{{ user.persona.maestro.nombre }} {{ user.persona.maestro.apellidos }}</div>
+        {% else %}
+            <div id="foto">
+                {% if user.persona.alumno.foto_de_perfil %}
+                    <img src="{{ user.persona.alumno.foto_de_perfil.url }}" alt="foto de perfil">
+                {% else %}
+                    <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
+                {% endif %}
+            </div>
+            <div id="nombre">{{ user.persona.alumno.nombre }} {{ user.persona.maestro.apellidos }}</div>
+        {% endif %}
+    </div>
+{% endblock %}
+{% block listaDeClases %}
+    <div id="clases">
+    {% if user.es_maestro %}
+         {% for clase in clases %}
+            <div class="elemento elemento-clase">
+                <a href="{% url 'ver_materia' clase.codigo %}">
+                    <div class="icono">
+                        {% if clase.foto %}
+                            <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
+                        {% else %}
+                            <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
+                        {% endif %}
+                    </div>
+                    <div class="titulo">{{ clase.nombre }}</div>
+                </a>
+            </div>
+
+        {% endfor %}
+    {% else %}
+        {% for clase in clases %}
+            {% if clase.estado_inscipcion == 'Aceptado' %}
+            <div class="elemento elemento-clase">
+                <a href="{% url 'ver_materia_alumno' clase.codigo %}">
+                    <div class="icono">
+                        {% if clase.foto %}
+                            <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
+                        {% else %}
+                            <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
+                        {% endif %}
+                    </div>
+                    <div class="titulo">{{ clase.nombre }}</div>
+                </a>
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    </div>
 {% endblock %}
 {% block contenido %}
     <h1 id="titulo-foro">Foro: {{ foro.nombre }} </h1>
@@ -44,12 +129,14 @@
         </div>
         <p id="titulo-descripcion">Descripción:</p>
         <p>{{ foro.descripcion }}</p>
+        {% if user.es_maestro %}
         <div id="seccion-modificar">
             <a id="boton-editar" href="{% url 'editar_foro' clase_actual.codigo foro.pk %}">
                 <div>Editar foro</div>
                 <img id="imagen-boton-editar" src="{% static 'actividades/consultar-actividad-maestro/imagenes/editar.svg' %}" alt="icono editar">
             </a>
         </div>
+        {% endif %}
     </div>
     {% if foro.estado == 'Abierta' %}
     <div id="participa-en-foro">
