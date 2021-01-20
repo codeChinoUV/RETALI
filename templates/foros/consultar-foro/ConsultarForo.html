@@ -33,10 +33,18 @@
     {% endif %}
     </li>
     <li class="link-actual">
+    {% if user.es_maestro %}
         <a href="">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
             <div class="titulo">Foros</div>
         </a>
+        {% else %}
+          <a href="{% url 'foros_alumno' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    {% endif %}
+
     </li>
      <li>
         <a href="{% url 'avisos' clase_actual.codigo %}">
