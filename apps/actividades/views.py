@@ -10,7 +10,7 @@ from apps.actividades.forms import ActividadForm, ActividadDisableForm
 from apps.actividades.models import Actividad, Entrega, Archivo, Revision
 from apps.clases.models import Clase
 from apps.clases.views import obtener_cantidad_de_alumnos_inscritos_a_clase
-from apps.usuarios.views import obtener_informacion_de_clases_de_maestro, obtener_informacion_de_clases_del_alumno\
+from apps.usuarios.views import obtener_informacion_de_clases_de_maestro, obtener_informacion_de_clases_del_alumno \
     , colocar_estado_inscripcion_clase
 
 
@@ -38,7 +38,7 @@ def consultar_actividades_de_clase(request, codigo_clase):
             datos_del_maestro['total_de_actividades'] = \
                 obtener_cantidad_total_de_actividades(datos_del_maestro['clase_actual'])
             datos_del_maestro['cantidad_actividades_abiertas'] = \
-                _obtener_cantidad_de_actividades_abiertas(datos_del_maestro['actividades'])
+                obtener_cantidad_de_actividades_abiertas(datos_del_maestro['actividades'])
             return render(request, 'actividades/consultar-actividades-maestro/ConsultarActividadesMaestro.html',
                           datos_del_maestro)
 
@@ -67,11 +67,9 @@ def consultar_actividades_de_clase_alumno(request, codigo_clase):
             datos_del_alumno['total_de_actividades'] = \
                 obtener_cantidad_total_de_actividades(datos_del_alumno['clase_actual'])
             datos_del_alumno['cantidad_actividades_abiertas'] = \
-                _obtener_cantidad_de_actividades_abiertas(datos_del_alumno['actividades'])
+                obtener_cantidad_de_actividades_abiertas(datos_del_alumno['actividades'])
             return render(request, 'actividades/consultar-actividades-alumno/ConsultarActividadesAlumno.html',
                           datos_del_alumno)
-
-
 
 
 @login_required()
@@ -95,7 +93,7 @@ def registrar_actividad(request, codigo_clase):
                 if formulario.is_valid():
                     datos_de_la_actividad = formulario.cleaned_data
                     if validar_fecha_cierre_mayor_a_fecha_apertura(datos_de_la_actividad["fecha_inicio"],
-                                                                    datos_de_la_actividad["fecha_cierre"]):
+                                                                   datos_de_la_actividad["fecha_cierre"]):
                         actividad = Actividad(nombre=datos_de_la_actividad['nombre'],
                                               descripcion=datos_de_la_actividad['descripcion'],
                                               fecha_de_inicio=datos_de_la_actividad['fecha_inicio'],
@@ -116,6 +114,12 @@ def registrar_actividad(request, codigo_clase):
 
 @login_required()
 def editar_actividad(request, codigo_clase, id_actividad):
+    """
+    Edita una actividad
+    :param request: La solicitud realizada por el cliente
+    :param codigo_clase: El codigo de la clase a la que pertence la actividad a editar
+    :return: Un render o un redirect
+    """
     if request.user.es_maestro:
         datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
         datos_del_maestro["clase_actual"] = request.user.persona.maestro.clase_set.filter(codigo=codigo_clase).first()
@@ -225,7 +229,7 @@ def _colocar_cantidad_de_entregas_de_actividad(actividades):
             actividad.cantidad_entregas = actividad.entrega_set.count()
 
 
-def _obtener_cantidad_de_actividades_abiertas(actividades):
+def obtener_cantidad_de_actividades_abiertas(actividades):
     """
     Cuenta la cantidad de actividades que su fecha de entrega es despues de la fecha actual
     :param actividades: Las actividades a checar
@@ -250,6 +254,13 @@ def obtener_cantidad_total_de_actividades(clase):
 
 @login_required()
 def consultar_actividad(request, codigo_clase, id_actividad):
+    """
+    Muestra la informacion de la actividad con sus entregas
+    :param request: La solicitud del cliente
+    :param codigo_clase: El codigo de la clase a la que pertenece la actividad
+    :param id_actividad: El id de la activdad a editar
+    :return: un redirect o un render
+    """
     if not request.user.es_maestro:
         return redirect('paginaInicio')
     else:
@@ -284,6 +295,14 @@ def _validar_existe_actividad(codigo_clase, id_actividad, maestro):
 
 @login_required()
 def revisar_entrega_actividad(request, codigo_clase, id_actividad, id_entrega):
+    """
+    Muestra un formulario para revisar la entrega a una actividad de un alumno
+    :param request: La solicitud del cliente
+    :param codigo_clase: El codigo de la clase a la que pertenece la actividad a revisar la entrega
+    :param id_actividad: El id de la actividad a revisar la entrega
+    :param id_entrega: El id de la entrega a revisar
+    :return: Un redirec o un render
+    """
     if not request.user.es_maestro:
         return redirect('paginaInicio')
     else:
@@ -386,6 +405,13 @@ def _validar_existe_entrega(codigo_clase, id_actividad, id_entrega, maestro):
 
 @login_required()
 def entregar_actividad_alumno(request, codigo_clase, id_actividad):
+    """
+    Muestra una pagina para que el alumno pueda realizar una entrega a una actividad
+    :param request: La solicitud del cliente
+    :param codigo_clase: El codigo de la clase a la que pertenece la actividad a realizar la entrega
+    :param id_actividad: El id de la actividad a entregar
+    :return: un HttpResponse o un redirect o un render
+    """
     if request.method == "POST":
         if request.user.es_maestro:
             return HttpResponse(status=500)

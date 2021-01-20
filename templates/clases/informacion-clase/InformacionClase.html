@@ -50,22 +50,22 @@
         <div class="tarjeta-estadistica">
             <img src="{% static 'generales/imagenes/portapapeles.png' %}" alt="imagen actividades">
             <div class="estadistica">
-                <p>Total de actividades: </p>
-                <p>Actividades abiertas: </p>
+                <p>Total de actividades: {{ total_de_actividades }}</p>
+                <p>Actividades abiertas: {{ actividades_abiertas }}</p>
             </div>
         </div>
         <div class="tarjeta-estadistica">
             <img src="{% static 'generales/imagenes/charlando.png' %}" alt="imagen foros">
             <div class="estadistica">
-                <p>Total de foros: </p>
-                <p>Foros activos: </p>
+                <p>Total de foros: {{ total_de_foros }}</p>
+                <p>Foros activos: {{ foros_abiertos }}</p>
             </div>
         </div>
         <div class="tarjeta-estadistica">
             <img src="{% static 'generales/imagenes/graduado.png' %}" alt="imagen alumno">
             <div class="estadistica">
-                <p>Alumnos aceptados: </p>
-                <p>Alumnos pendientes de aceptar: </p>
+                <p>Alumnos aceptados: {{ alumnos_aceptados }}</p>
+                <p>Alumnos pendientes de aceptar: {{ alumnos_en_espera }} </p>
             </div>
         </div>
     </div>

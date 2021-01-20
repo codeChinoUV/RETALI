@@ -20,6 +20,11 @@ def redireccion_path_vacio(request):
 
 
 def iniciar_sesion(request):
+    """
+    Inicia la sesion de un usuario
+    :param request: La solicitud del usuario
+    :return: un render o un redirect
+    """
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -64,8 +69,6 @@ def colocar_estado_inscripcion_clase(alumno, clases):
     if clases is not None:
         for clase in clases:
             clase.estado_inscipcion = alumno.inscripcion_set.filter(clase_id=clase.pk).first().aceptado
-
-
 
 
 def _contar_cantidad_estado_de_clases(clases, datos_del_alumno):
@@ -139,6 +142,11 @@ def cerrar_sesion(request):
 
 
 def registrar_usuario(request):
+    """
+    Registra un nuevo usuario
+    :param request: La solicitud del usuario
+    :return: Un render o un redirect
+    """
     if request.method == 'POST':
         username = request.POST.get('correoElectronico')
         password = request.POST.get('password')
@@ -172,20 +180,34 @@ def registrar_usuario(request):
 
 
 def validar_contrasena(password, confirmPassword):
-    if password == confirmPassword:
-        return True
-    else:
-        return False
+    """
+    Valida si las dos contraseñas coinciden
+    :param password: La contraseña
+    :param confirmPassword: La confirmacion de la contraseña
+    :return si las contraseñas con iguales
+    """
+    return password == confirmPassword
 
 
 def validar_tipo_usuario(tipoUsuario):
-    if tipoUsuario == 'Maestro':
-        return True
-    else:
-        return False
+    """
+    Valida si el tipo de usuario es Maestro
+    :param tipoUsuario: El tipo de usuario
+    :return: True si el tipo de usuario es Maestro o False si no
+    """
+    return tipoUsuario == 'Maestro'
 
 
 def crear_tipo_usuario(nombre, apellidos, telefono, user, esMaestro):
+    """
+    Crea un usuario dependiendo de si es maestro o no
+    :param nombre: El nombre del usuario
+    :param apellidos: Los apellidos del usuario
+    :param telefono: El numero telefonico del maestro
+    :param user: La cuenta asociada a la persona
+    :param esMaestro: Indica si el usuario es un maestro o no
+    :return: None
+    """
     if esMaestro:
         maestro = Maestro(nombre=nombre, apellidos=apellidos, numero_telefonico=telefono, foto_de_perfil="",
                           usuario=user)
@@ -197,6 +219,11 @@ def crear_tipo_usuario(nombre, apellidos, telefono, user, esMaestro):
 
 
 def es_correo_valido(correo):
+    """
+    Valida si un correo cumple con el regex para correos
+    :param correo: El correo a validar
+    :return: True si cumple o false si no
+    """
     if re.match('^[(a-z0-9\_\-\.)]+@[(a-z0-9\_\-\.)]+\.[(a-z)]{2,15}$', correo):
         return True
     else:
@@ -204,6 +231,15 @@ def es_correo_valido(correo):
 
 
 def validar_campos_no_vacios(username, password, nombre, apellidos, telefono):
+    """
+    Valida que no existan campos vacios en el formulario de registro de un usuario
+    :param username: El nombre de usuario
+    :param password: La contrasela
+    :param nombre: El nombre del usuario
+    :param apellidos: Los apellidos del usuario
+    :param telefono: El telefono del usuario
+    :return:True si no existen campos vacios o False si si
+    """
     if not username:
         return False
     elif not password:
@@ -219,28 +255,38 @@ def validar_campos_no_vacios(username, password, nombre, apellidos, telefono):
 
 
 def validar_correo_no_registrado(correo):
+    """
+    Valida que no exista un correo igual
+    :param correo: El correo a validar
+    :return: True si el correo aun no se encuentra registrado o False si si
+    """
     Usuario = get_user_model()
-    if Usuario.objects.filter(email = correo).count() <=0:
+    if Usuario.objects.filter(email=correo).count() <= 0:
         return True
-
     return False
 
 
 @login_required()
 def consultar_alumnos_de_clases(request, codigo_clase):
+    """
+    Muestra la informacion de los alumnos que se encuentran inscritos a una clase
+    :param request: La solicitud del usuario
+    :param codigo_clase: El codigo de la clase a mostrar sus inscripciones
+    :return: Un render
+    """
     if request.method == "GET":
         datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
         if _validar_existe_clase_maestro(request.user.persona.maestro, codigo_clase):
             datos_del_maestro["clase_actual"] = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()
-            datos_del_maestro["alumnos"] = _obtener_alumnos_inscritos_a_clase(datos_del_maestro["clase_actual"])
-            _contar_estados_inscripciones_de_alumnos(datos_del_maestro["alumnos"], datos_del_maestro)
+            datos_del_maestro["alumnos"] = obtener_alumnos_inscritos_a_clase(datos_del_maestro["clase_actual"])
+            contar_estados_inscripciones_de_alumnos(datos_del_maestro["alumnos"], datos_del_maestro)
             return render(request, 'usuarios/consultar-alumnos-de-clase/ConsultarAlumnosDeClase.html',
                           datos_del_maestro)
         return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
     raise Http404
 
 
-def _obtener_alumnos_inscritos_a_clase(clase):
+def obtener_alumnos_inscritos_a_clase(clase):
     """
     Recupera los alumnos de una clase y los devuelve con el estado de su inscripcion
     :param clase: La clase de donde se tomaran los alumnos
@@ -257,7 +303,7 @@ def _obtener_alumnos_inscritos_a_clase(clase):
     return alumnos
 
 
-def _contar_estados_inscripciones_de_alumnos(alumnos, datos_del_maestro):
+def contar_estados_inscripciones_de_alumnos(alumnos, datos_del_maestro):
     """
     Cuenta la cantidad de alumnos dependiendo del estado de la inscripcion del alumno
     :param alumnos: Los alumnos a contar
@@ -294,6 +340,13 @@ def _validar_existe_clase_maestro(maestro, codigo_clase):
 
 @login_required()
 def cambiar_estado_inscripcion_alumno(request, codigo_clase, id_alumno):
+    """
+    Cambia el estado de una inscripcion de un alumno
+    :param request: La solicitud del usuario
+    :param codigo_clase: El codigo de la clase de la inscripcion del alumno
+    :param id_alumno: El id del alumno a cambiar el estado de su inscripcion
+    :return: Un redirect
+    """
     if request.method == "POST":
         if request.user.es_maestro:
             if _validar_existe_inscripcion(id_alumno, codigo_clase):

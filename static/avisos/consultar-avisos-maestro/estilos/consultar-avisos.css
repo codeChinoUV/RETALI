@@ -36,6 +36,20 @@
 }
 
 /*
+    Aviso no hay anuncios
+ */
+
+#informacion-sin-avisos{
+    background-color: var(--bgcolor);
+    color: white;
+    padding: 20px;
+    font-size: 1.8rem;
+    text-align: center;
+    margin: 2% 10%;
+    border-radius: 1rem;
+}
+
+/*
     Tarjetas de aviso
  */
 

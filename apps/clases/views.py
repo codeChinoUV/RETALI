@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from .forms import ClaseForm
 from .models import Clase, Inscripcion
 from ..usuarios.views import obtener_informacion_de_clases_de_maestro, obtener_informacion_de_clases_del_alumno, \
-    colocar_estado_inscripcion_clase
+    colocar_estado_inscripcion_clase, obtener_alumnos_inscritos_a_clase, contar_estados_inscripciones_de_alumnos
 
 
 @login_required
@@ -69,6 +69,12 @@ def _obtener_codigo_unico():
 
 @login_required()
 def informacion_clase(request, codigo_clase):
+    """
+    Recupera la información de la clase de un maestro
+    :param request: La solicitud del cliente
+    :param codigo_clase: El codigo de la clase a obtener la informacion
+    :return: Un redirect o un render
+    """
     if not request.user.es_maestro:
         return redirect('login')
     else:
@@ -80,6 +86,7 @@ def informacion_clase(request, codigo_clase):
         }
         if clase_actual is not None:
             datos['clase_actual'] = clase_actual
+            _colocar_informacion_clase(datos, datos['clase_actual'])
             return render(request, 'clases/informacion-clase/InformacionClase.html', datos)
         else:
             return render(request, 'generales/NoEncontrada.html', datos)
@@ -96,6 +103,12 @@ def obtener_cantidad_de_alumnos_inscritos_a_clase(id_clase):
 
 @login_required()
 def obtener_informacion_clase(request, codigo_clase):
+    """
+    Responde a una solicitud AJAX con la información de una clase
+    :param request: La solicitud del usuario
+    :param codigo_clase: El codigo de la clase de la cual se devolvera la informacion
+    :return: Un JSON con la informacion del maestro
+    """
     if request.is_ajax and request.method == "GET":
         clase_con_codigo = Clase.objects.filter(codigo=codigo_clase, abierta=True).first()
         if clase_con_codigo is not None:
@@ -127,6 +140,12 @@ def _crearJSONClase(clase):
 
 @login_required()
 def unir_alumno_a_clase(request, codigo_clase):
+    """
+    Une un alumno a una clase al crear una inscripcion
+    :param request: La solicitud del usuario
+    :param codigo_clase: El codigo de la clase a la que el alumno se quiere unir
+    :return: Un JSON
+    """
     if not request.user.es_maestro:
         if request.is_ajax and request.method == 'GET':
             mensaje_error = _validar_inscripcion_a_clase(request.user.persona.alumno, codigo_clase)
@@ -173,17 +192,14 @@ def _validar_inscripcion_a_clase(alumno, codigo_clase):
     return mensaje_error
 
 
-def obtener_clase_actual(codigo_clase):
-    clase_actual = Clase.objects.filter(codigo_clase=codigo_clase).first()
-    print(clase_actual)
-    if clase_actual is not None:
-        return clase_actual
-    else:
-        return render('generales/NoEncontrada.html')
-
-
 @login_required()
 def informacion_clase_alumno(request, codigo_clase):
+    """
+    Muestra la informacion de una clase para el usuario alumno
+    :param request: La solicitud del usuario
+    :param codigo_clase: El codigo de la clase a mostrar la informacion
+    :return: Un render o un redirect
+    """
     if request.user.es_maestro:
         return redirect('login')
     else:
@@ -202,3 +218,22 @@ def informacion_clase_alumno(request, codigo_clase):
         else:
             return render(request, 'generales/NoEncontrada.html', datos)
 
+
+def _colocar_informacion_clase(datos, clase):
+    """
+    Coloca la información importante sobre las actividades, los foros y los alumnos de la clase
+    :param datos: Los datos en donde se agregaran los nuevos datos sobre la clase
+    :param clase: La clase de donde se obtendran los datos
+    :return: None
+    """
+    from ..actividades.views import obtener_cantidad_total_de_actividades, obtener_cantidad_de_actividades_abiertas
+    from ..foros.views import contar_foros_activos
+    datos['total_de_actividades'] = obtener_cantidad_total_de_actividades(clase)
+    datos['actividades_abiertas'] = obtener_cantidad_de_actividades_abiertas(clase.actividad_set.all())
+    datos['total_de_foros'] = len(datos['clase_actual'].foro_set.all())
+    datos['foros_abiertos'] = contar_foros_activos(datos['clase_actual'].foro_set.all())
+    alumnos_de_la_clase = obtener_alumnos_inscritos_a_clase(clase)
+    datos_cantidad_alumnos = {}
+    contar_estados_inscripciones_de_alumnos(alumnos_de_la_clase, datos_cantidad_alumnos)
+    datos['alumnos_aceptados'] = datos_cantidad_alumnos['cantidad_alumnos_aceptados']
+    datos['alumnos_en_espera'] = datos_cantidad_alumnos['cantidad_alumnos_en_espera']

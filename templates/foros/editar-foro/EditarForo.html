@@ -25,9 +25,15 @@
         </a>
     </li>
     <li>
-        <a href="">
+        <a href="{% url 'avisos' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/alertas.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Avisos</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'grupo' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
-            <div class="titulo">Grupos</div>
+            <div class="titulo">Grupo</div>
         </a>
     </li>
 {% endblock %}
