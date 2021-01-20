@@ -259,8 +259,10 @@ def consultar_foro(request, codigo_clase, id_foro):
                     return render(request, 'foros/consultar-foro/ConsultarForo.html', datos_del_maestro)
             return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
         else:
+            alumno = request.user.persona.alumno
             datos_del_alumno = obtener_informacion_de_clases_del_alumno(request.user.persona.alumno)
             clase = Clase.objects.filter(codigo=codigo_clase).first()
+            colocar_estado_inscripcion_clase(alumno, datos_del_alumno['clases'])
             if clase is not None:
                 inscripcion = request.user.persona.alumno.inscripcion_set. \
                     filter(aceptado='Aceptado', clase_id=clase.pk).first()

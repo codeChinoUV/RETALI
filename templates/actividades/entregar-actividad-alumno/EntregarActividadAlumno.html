@@ -8,30 +8,62 @@
 {% endblock %}
 {% block links %}
     <li>
-        <a href="">
+         <a href="{% url 'ver_materia_alumno' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
             <div class="titulo">Inicio</div>
         </a>
     </li>
     <li class="link-actual">
-        <a href="#hoola" id="link-redireccion">
+        <a href="{% url 'actividades_alumno' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
             <div class="titulo">Actividades</div>
         </a>
     </li>
     <li>
-        <a href="">
+        <a href="{% url 'foros_alumno' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
             <div class="titulo">Foros</div>
         </a>
     </li>
     <li>
-        <a href="">
-            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
-            <div class="titulo">Anuncios</div>
+         <a href="{% url 'avisos' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/alertas.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Avisos</div>
         </a>
     </li>
 {% endblock %}
+{% block datosPerfil %}
+    <div id="perfil">
+        <div id="foto">
+            {% if user.persona.alumno.foto_de_perfil %}
+                <img src="{{ user.persona.alumno.foto_de_perfil.url }}" alt="foto de perfil">
+            {% else %}
+                <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
+            {% endif %}
+        </div>
+        <div id="nombre">{{ user.persona.alumno.nombre }} {{ user.persona.maestro.apellidos }}</div>
+    </div>
+{% endblock %}
+{% block listaDeClases %}
+     <div id="clases">
+        {% for clase in clases %}
+            {% if clase.estado_inscipcion == 'Aceptado' %}
+            <div class="elemento elemento-clase">
+                <a href="{% url 'ver_materia_alumno' clase.codigo %}">
+                    <div class="icono">
+                        {% if clase.foto %}
+                            <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
+                        {% else %}
+                            <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
+                        {% endif %}
+                    </div>
+                    <div class="titulo">{{ clase.nombre }}</div>
+                </a>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+ {% endblock %}
 {% block contenido %}
     <h1 class="titulo-seccion">Entregar actividad</h1>
     <hr>

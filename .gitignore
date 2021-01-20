@@ -93,3 +93,37 @@ ipython_config.py
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow
 __pypackages__/
+venv/Scripts/activate
+.idea/misc.xml
+apps/clases/migrations/0001_initial.py
+.idea/dataSources.local.xml
+.idea/dataSources.xml
+.idea/dataSources/a2968a33-c5de-4100-9864-945a8c027576.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/modules.xml
+.idea/RETALI.iml
+.idea/vcs.xml
+.idea/workspace.xml
+apps/actividades/migrations/0001_initial.py
+apps/actividades/migrations/__init__.py
+apps/avisos/migrations/0001_initial.py
+apps/avisos/migrations/__init__.py
+apps/clases/migrations/__init__.py
+apps/foros/migrations/0001_initial.py
+apps/foros/migrations/__init__.py
+apps/usuarios/migrations/0001_initial.py
+apps/usuarios/migrations/__init__.py
+venv/pyvenv.cfg
+venv/Scripts/activate.bat
+venv/Scripts/Activate.ps1
+venv/Scripts/sqlformat.exe
+venv/Scripts/pip3.exe
+venv/Scripts/easy_install-3.8.exe
+venv/Scripts/django-admin.exe
+venv/Scripts/deactivate.bat
+venv/Scripts/pip3.8.exe
+venv/Scripts/pip.exe
+venv/Scripts/easy_install.exe
+venv/Scripts/django-admin.py
+venv/Scripts/python.exe
+venv/Scripts/pythonw.exe
