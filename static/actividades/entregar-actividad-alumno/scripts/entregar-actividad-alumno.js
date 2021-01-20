@@ -336,7 +336,8 @@ function enviarFormulario(e){
 
 function redireccionarActividades(){
   const linkActual = document.querySelector("#link-redireccion");
-  //window.location.href = linkActual.href;
+  console.log(linkActual.href);
+  window.location.href = linkActual.href;
 }
 
 /**

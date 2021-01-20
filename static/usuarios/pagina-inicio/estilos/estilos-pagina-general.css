@@ -50,12 +50,25 @@ body{
     border-radius: 16px;
     border: none;
     transition: all 0.3s ease 0s;
+    color: white;
 }
 
 #btn-cerrar-sesion:hover{
     background-color: #92041f;
+    color: white;
+    text-decoration: none;
 }
 
+
+#btn-cerrar-sesion a{
+    text-decoration: none;
+    color: white;
+}
+
+#btn-cerrar-sesion a:hover{
+    text-decoration: none;
+    color: white;
+}
 /*
     Header
  */

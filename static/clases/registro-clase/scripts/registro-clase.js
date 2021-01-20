@@ -25,7 +25,7 @@ function validar_tamanio_campo(tamanio_minimo, tamanio_maximo, id, mensajeNoVali
 }
 
 function validarCampoNombre(){
-    let tamanio_maximo = 120;
+    let tamanio_maximo = 50;
     let tamanio_minimo = 1;
     let id = "id_nombre";
     let mensajeNovalido = "El nombre no puede estar vacio y debe de tener menos de " + tamanio_maximo.toString() +

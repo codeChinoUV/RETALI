@@ -1,6 +1,9 @@
-{% extends 'foros/consultar-foros-maestro/ConsultarForosMaestro.html' %}
+{% extends 'usuarios/pagina-inicio-alumno/PaginaInicioAlumno.html' %}
 {% load static %}
 {% load tz %}
+{% block estilos-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static 'foros/consultar-foros-maestro/estilos/consultar-foros-maestro.css' %}">
+{% endblock %}
 {% block links %}
     <li >
         <a href="{% url 'ver_materia_alumno' clase_actual.codigo %}">
@@ -27,38 +30,6 @@
         </a>
     </li>
 {% endblock %}
-{% block datosPerfil %}
-    <div id="perfil">
-        <div id="foto">
-            {% if user.persona.alumno.foto_de_perfil %}
-                <img src="{{ user.persona.alumno.foto_de_perfil.url }}" alt="foto de perfil">
-            {% else %}
-                <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
-            {% endif %}
-        </div>
-        <div id="nombre">{{ user.persona.alumno.nombre }} {{ user.persona.maestro.apellidos }}</div>
-    </div>
-{% endblock %}
-{% block listaDeClases %}
-     <div id="clases">
-        {% for clase in clases %}
-            {% if clase.estado_inscipcion == 'Aceptado' %}
-            <div class="elemento elemento-clase">
-                <a href="{% url 'ver_materia_alumno' clase.codigo %}">
-                    <div class="icono">
-                        {% if clase.foto %}
-                            <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
-                        {% else %}
-                            <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
-                        {% endif %}
-                    </div>
-                    <div class="titulo">{{ clase.nombre }}</div>
-                </a>
-            </div>
-            {% endif %}
-        {% endfor %}
-    </div>
- {% endblock %}
 {% block contenido %}
     <h1 class="titulo-seccion">Foros</h1>
     <hr>

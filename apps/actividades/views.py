@@ -438,6 +438,9 @@ def entregar_actividad_alumno(request, codigo_clase, id_actividad):
                                                                                     clase_id=clase.pk).first().clase)
                 datos_del_alumno['actividad_actual'] = datos_del_alumno['clase_actual'].actividad_set.filter(
                     pk=id_actividad).first()
+                datos_del_alumno['clases'] = obtener_informacion_de_clases_del_alumno(request.
+                                                                                      user.persona.alumno)['clases']
+                colocar_estado_inscripcion_clase(request.user.persona.alumno, datos_del_alumno['clases'])
                 if _validar_existe_entrega_previa(request.user.persona.alumno, codigo_clase, id_actividad):
                     datos_del_alumno['entrega'] = Entrega.objects.filter(alumno_id=request.user.persona.alumno.pk,
                                                                          actvidad_id=id_actividad).first()

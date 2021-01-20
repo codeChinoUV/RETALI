@@ -5,6 +5,32 @@
 {% block estilos-extra %}
     <link rel="stylesheet" type="text/css" href="{% static 'avisos/consultar-avisos-maestro/estilos/consultar-avisos.css' %}">
 {% endblock %}
+{% block links %}
+    <li>
+        <a href="{% url 'ver_materia_alumno' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    </li>
+    <li class="link-actual">
+        <a href="{% url 'actividades_alumno' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'foros_alumno' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'avisos' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/alertas.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Avisos</div>
+        </a>
+    </li>
+{% endblock %}
 {% block contenido %}
     <h1 class="titulo-seccion">Avisos</h1>
     <hr>

@@ -15,8 +15,8 @@ class Clase(models.Model):
     Contiene la información de la clase, asi como el codigo para unirse a la clase
     """
     codigo = models.CharField(max_length=10, db_index=True)
-    escuela = models.CharField(max_length=100, null=False)
-    nombre = models.CharField(max_length=120, null=False)
+    escuela = models.CharField(max_length=50, null=False)
+    nombre = models.CharField(max_length=70, null=False)
     abierta = models.BooleanField(default=True)
     foto = models.ImageField(upload_to='clases')
     maestro = models.ForeignKey(Maestro, on_delete=models.RESTRICT)

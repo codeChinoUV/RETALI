@@ -34,7 +34,7 @@
     </li>
     <li class="link-actual">
     {% if user.es_maestro %}
-        <a href="">
+        <a href="{% url 'foros' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
             <div class="titulo">Foros</div>
         </a>
@@ -54,9 +54,9 @@
     </li>
     <li>
     {% if user.es_maestro %}
-    <a href="">
+    <a href="{% url 'grupo' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
-            <div class="titulo">Grupos</div>
+            <div class="titulo">Grupo</div>
         </a>
     {% endif %}
     </li>
@@ -81,7 +81,7 @@
                     <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
                 {% endif %}
             </div>
-            <div id="nombre">{{ user.persona.alumno.nombre }} {{ user.persona.maestro.apellidos }}</div>
+            <div id="nombre">{{ user.persona.alumno.nombre }} {{ user.persona.alumno.apellidos }}</div>
         {% endif %}
     </div>
 {% endblock %}
@@ -98,7 +98,11 @@
                             <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
                         {% endif %}
                     </div>
-                    <div class="titulo">{{ clase.nombre }}</div>
+                    {% if clase.nombre|length > 30 %}
+                    <div class="titulo"> {{ clase.nombre|slice:"0:25" }}...</div>
+                    {% else %}
+                    <div class="titulo"> {{ clase.nombre }}</div>
+                    {% endif %}
                 </a>
             </div>
 
@@ -115,7 +119,11 @@
                             <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
                         {% endif %}
                     </div>
-                    <div class="titulo">{{ clase.nombre }}</div>
+                    {% if clase.nombre|length > 30 %}
+                    <div class="titulo"> {{ clase.nombre|slice:"0:25" }}...</div>
+                    {% else %}
+                    <div class="titulo"> {{ clase.nombre }}</div>
+                    {% endif %}
                 </a>
             </div>
             {% endif %}

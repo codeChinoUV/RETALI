@@ -64,6 +64,16 @@
     color: white;
 }
 
+.link-revision{
+    text-decoration: none;
+    color: white;
+}
+
+.link-revision:hover{
+    text-decoration: none;
+    color: var(--hovercolor);
+}
+
 #lista-entregas .tarjeta-entrega img{
     height: calc(var(--heigh-tarjeta-entrega) - 30px );
     width: calc(var(--heigh-tarjeta-entrega) - 30px );

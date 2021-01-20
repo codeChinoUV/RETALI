@@ -1,4 +1,4 @@
-{%  extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
+{%  extends 'usuarios/pagina-inicio-alumno/PaginaInicioAlumno.html' %}
 {% load static %}
 {% load tz %}
 {% load file_extras  %}
@@ -14,7 +14,7 @@
         </a>
     </li>
     <li class="link-actual">
-        <a href="{% url 'actividades_alumno' clase_actual.codigo %}">
+        <a id="link-redireccion" href="{% url 'actividades_alumno' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
             <div class="titulo">Actividades</div>
         </a>

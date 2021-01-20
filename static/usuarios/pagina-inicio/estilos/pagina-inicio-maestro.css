@@ -95,7 +95,7 @@ h2{
 #boton-registro-clase{
     margin: 2% 15% 0 15%;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
 }
 
 div a.boton-primario{

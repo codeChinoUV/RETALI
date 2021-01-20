@@ -82,7 +82,7 @@
                     <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
                 {% endif %}
                 <div class="informacion-tarjeta-entrega">
-                    <h3><a href="{% url 'revisar_entrega' clase_actual.codigo actividad_actual.pk entrega.pk %}">{{ entrega.alumno.nombre }} {{ entrega.alumno.apellidos }}</a></h3>
+                    <h3><a class="link-revision" href="{% url 'revisar_entrega' clase_actual.codigo actividad_actual.pk entrega.pk %}">{{ entrega.alumno.nombre }} {{ entrega.alumno.apellidos }}</a></h3>
                     {% timezone 'America/Mexico_City' %}
                         <p><b>Fecha de entrega:</b> {{ entrega.fecha_de_entrega }}</p>
                     {% endtimezone %}

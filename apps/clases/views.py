@@ -165,7 +165,7 @@ def _registrar_inscripcion_alumno(id_alumno, codigo_clase):
     :return: None
     """
     clase = Clase.objects.filter(codigo=codigo_clase, abierta=True).first()
-    inscripcion = Inscripcion(clase_id=clase.pk, alumno_id=id_alumno, aceptado='Aceptado')
+    inscripcion = Inscripcion(clase_id=clase.pk, alumno_id=id_alumno)
     inscripcion.save()
 
 
