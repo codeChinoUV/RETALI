@@ -1,7 +1,7 @@
 {% extends 'Login.html' %}
 {% load static %}
 {% block nombrePagina %}Registro{% endblock %}
-{% block estilos %} 
+{% block estilos %}
     <link rel="stylesheet" type="text/css" href="{% static 'generales/bootstrap-4/css/bootstrap.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'usuarios/registro/estilos/registro.css' %}">
 {% endblock %}
@@ -10,52 +10,55 @@
         <h1>Registrate</h1>
         <form method="POST">
             {% csrf_token %}
-             {% for message in messages %}
-                  <div class="alert alert-warning">
-                        {{ message }}
-                  </div>
-            {% endfor %}
             <div class="form-group">
-                <label for="nombre">Nombre</label>
-                <input type="text"  class="form-control" name="nombre" id="nombre" placeholder="Ingresa tu nombre">
+                <label for="id_nombre">{{ formulario_persona.nombre.label }}</label>
+                {{ formulario_persona.nombre }}
             </div>
             <div class="form-group">
-                <label for="apellidos">Apellidos</label>
-                <input type="text" class="form-control" name="apellidos" id="apellidos" placeholder="Ingresa tus apellidos">
+                <label for="id_apellidos">{{ formulario_persona.apellidos.label }}</label>
+                {{ formulario_persona.apellidos}}
             </div>
             <div class="form-group">
-                <label for="correoElectronico">Correo electronico</label>
-                <input type="text" class="form-control" name="correoElectronico" id="correoElectronico" placeholder="nombre@ejemplo.com">
+                <label for="id_email">{{ formulario_usuario.email.label }}</label>
+                {{ formulario_usuario.email }}
             </div>
             <div class="form-group">
-                <label for="contraseña">Contraseña</label>
+                <label for="id_password">{{ formulario_usuario.password.label }}</label>
                 <div class="button-inside">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Ingresa tu contraseña">
+                    {{ formulario_usuario.password }}
                     <button type="button" class="btn btn-default btn-sm" id="showPassword">
-                        <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-eye-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-eye-fill" fill="currentColor"
+                             xmlns="http://www.w3.org/2000/svg">
                             <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"></path>
-                            <path fill-rule="evenodd" d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
-                          </svg>
+                            <path fill-rule="evenodd"
+                                  d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
+                        </svg>
                     </button>
                 </div>
             </div>
             <div class="form-group">
-                <label for="confirmarContraseña">Confirmar contraseña</label>
+                <label for="id_repeticion_contrasenia">{{ formulario_usuario.repeticion_contrasenia.label }}</label>
                 <div class="button-inside">
-                    <input type="password" class="form-control" id="confirmPassword" name="confirmarContraseña" placeholder="Ingresa nuevamente tu contraseña">
+                    {{ formulario_usuario.repeticion_contrasenia }}
+                    <button type="button" class="btn btn-default btn-sm" id="showPassword">
+                        <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-eye-fill" fill="currentColor"
+                             xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"></path>
+                            <path fill-rule="evenodd"
+                                  d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
             <div class="form-group">
-                <label for="tipoUsuario">¿Qué eres?</label>
-                <select class="form-control" id="tipoUsuario" name="tipoUsuario">
-                    <option value="Maestro">Maestro</option>
-                    <option value="Alumno">Alumno</option>
-                </select>
+                <label for="id_numero_telefonico">{{ formulario_persona.numero_telefonico.label }}</label>
+                {{ formulario_persona.numero_telefonico }}
             </div>
             <div class="form-group">
-                <label for="telefono">Teléfono</label>
-                <input type="text" class="form-control" name="telefono" id="telefono" placeholder="Ingresa un número de telefono">
+                <label for="id_es_maestro">{{ formulario_usuario.es_maestro.label }}</label>
+                {{ formulario_usuario.es_maestro }}
             </div>
+
             <div id="btnRegistro">
                 <button type="submit" class="btn btn-primary">Registrarse</button>
             </div>
@@ -71,4 +74,3 @@
         </form>
     </div>
 {% endblock %}
-

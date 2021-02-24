@@ -6,6 +6,9 @@ from django.contrib import messages
 from apps.clases.models import Inscripcion, Alumno, Maestro, Clase
 import re
 
+from apps.usuarios.forms import UsuarioForm, PersonaForm
+from apps.usuarios.models import Usuario, Persona
+
 
 def redireccion_path_vacio(request):
     """
@@ -147,123 +150,26 @@ def registrar_usuario(request):
     :param request: La solicitud del usuario
     :return: Un render o un redirect
     """
-    if request.method == 'POST':
-        username = request.POST.get('correoElectronico')
-        password = request.POST.get('password')
-        confirmPassword = request.POST.get('confirmarContraseña')
-        nombre = request.POST.get('nombre')
-        apellidos = request.POST.get('apellidos')
-        telefono = request.POST.get('telefono')
-        tipoUsuario = request.POST.get('tipoUsuario')
-        es_maestro = validar_tipo_usuario(tipoUsuario)
-        if validar_campos_no_vacios(username, password, nombre, apellidos, telefono):
-            if es_correo_valido(username):
-                if validar_correo_no_registrado(username):
-                    if validar_contrasena(password, confirmPassword):
-                        Usuario = get_user_model()
-                        user = Usuario.objects.create_user(email=username, password=password, es_maestro=es_maestro)
-                        crear_tipo_usuario(nombre, apellidos, telefono, user, es_maestro)
-                        return redirect('login')
-                    else:
-                        messages.error(request, 'Las contraseñas no coinciden')
-                        return redirect('registro')
-                else:
-                    messages.error(request, 'El correo ingresado ya está registrado')
-                    return redirect('registro')
-            else:
-                messages.error(request, 'El correo ingresado es inválido')
-                return redirect('registro')
-        else:
-            messages.error(request, 'Favor de ingresar información en todos los campos')
-            return redirect('registro')
-    return render(request, 'RegistroUsuario.html')
-
-
-def validar_contrasena(password, confirmPassword):
-    """
-    Valida si las dos contraseñas coinciden
-    :param password: La contraseña
-    :param confirmPassword: La confirmacion de la contraseña
-    :return si las contraseñas con iguales
-    """
-    return password == confirmPassword
-
-
-def validar_tipo_usuario(tipoUsuario):
-    """
-    Valida si el tipo de usuario es Maestro
-    :param tipoUsuario: El tipo de usuario
-    :return: True si el tipo de usuario es Maestro o False si no
-    """
-    return tipoUsuario == 'Maestro'
-
-
-def crear_tipo_usuario(nombre, apellidos, telefono, user, esMaestro):
-    """
-    Crea un usuario dependiendo de si es maestro o no
-    :param nombre: El nombre del usuario
-    :param apellidos: Los apellidos del usuario
-    :param telefono: El numero telefonico del maestro
-    :param user: La cuenta asociada a la persona
-    :param esMaestro: Indica si el usuario es un maestro o no
-    :return: None
-    """
-    if esMaestro:
-        maestro = Maestro(nombre=nombre, apellidos=apellidos, numero_telefonico=telefono, foto_de_perfil="",
-                          usuario=user)
-        maestro.save()
-    else:
-        alumno = Alumno(nombre=nombre, apellidos=apellidos, numero_telefonico=telefono, foto_de_perfil="",
-                        usuario=user)
-        alumno.save()
-
-
-def es_correo_valido(correo):
-    """
-    Valida si un correo cumple con el regex para correos
-    :param correo: El correo a validar
-    :return: True si cumple o false si no
-    """
-    if re.match('^[(a-z0-9\_\-\.)]+@[(a-z0-9\_\-\.)]+\.[(a-z)]{2,15}$', correo):
-        return True
-    else:
-        return False
-
-
-def validar_campos_no_vacios(username, password, nombre, apellidos, telefono):
-    """
-    Valida que no existan campos vacios en el formulario de registro de un usuario
-    :param username: El nombre de usuario
-    :param password: La contrasela
-    :param nombre: El nombre del usuario
-    :param apellidos: Los apellidos del usuario
-    :param telefono: El telefono del usuario
-    :return:True si no existen campos vacios o False si si
-    """
-    if not username:
-        return False
-    elif not password:
-        return False
-    elif not nombre:
-        return False
-    elif not apellidos:
-        return False
-    elif not telefono:
-        return False
-    else:
-        return True
-
-
-def validar_correo_no_registrado(correo):
-    """
-    Valida que no exista un correo igual
-    :param correo: El correo a validar
-    :return: True si el correo aun no se encuentra registrado o False si si
-    """
-    Usuario = get_user_model()
-    if Usuario.objects.filter(email=correo).count() <= 0:
-        return True
-    return False
+    if request.method == 'GET':
+        datos = {
+            'formulario_usuario': UsuarioForm(),
+            'formulario_persona': PersonaForm()
+        }
+        return render(request, 'RegistroUsuario.html', datos)
+    elif request.method == "POST":
+        formulario_persona = PersonaForm(request.POST)
+        formulario_usuario = UsuarioForm(request.POST)
+        if formulario_persona.is_valid() and formulario_usuario.is_valid():
+            usuario = formulario_usuario.save()
+            persona = Persona(usuario=usuario)
+            formulario_persona.instance = persona
+            formulario_persona.save()
+            return redirect('login')
+        datos = {
+            'formulario_usuario': formulario_usuario,
+            'formulario_persona': formulario_persona
+        }
+        return render(request, 'RegistroUsuario.html', datos)
 
 
 @login_required()

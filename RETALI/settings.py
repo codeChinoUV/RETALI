@@ -19,14 +19,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY") if os.environ.get("SECRET_KEY") is not None else "asdfgsds"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.environ.get("DEBUG", default=0))
+DEBUG = int(os.environ.get("DEBUG", default=True))
 
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ") if os.environ.get("DJANGO_ALLOWED_HOSTS") is not None else "*"
 
 INSTALLED_APPS = [
     'django_cleanup',
@@ -96,16 +96,6 @@ DATABASES = {  # Base de datos producción
     }
 }
 
-
-#DATABASES = { # Base de datos producción
- #   'default': {
-  #      'ENGINE': 'django.db.backends.postgresql_psycopg2',
-   #    'USER': 'retali',
-   #     'PASSWORD': 'retali123456789.0',
-   #     'HOST': 'localhost',
-   #     'PORT': '5432',
-   # }
-#}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
