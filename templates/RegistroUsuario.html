@@ -13,20 +13,29 @@
             <div class="form-group">
                 <label for="id_nombre">{{ formulario_persona.nombre.label }}</label>
                 {{ formulario_persona.nombre }}
+                {% if formulario_persona.errors.nombre %}
+                    <div id="id_nombre-invalido-mensaje" class="invalid-feedback">{{ formulario_persona.errors.nombre }}</div>
+                {% endif %}
             </div>
             <div class="form-group">
                 <label for="id_apellidos">{{ formulario_persona.apellidos.label }}</label>
                 {{ formulario_persona.apellidos}}
+                {% if formulario_persona.errors.apellidos %}
+                    <div id="id_apellidos-invalido-mensaje" class="invalid-feedback">{{ formulario_persona.errors.apellidos }} </div>
+                {% endif %}
             </div>
             <div class="form-group">
                 <label for="id_email">{{ formulario_usuario.email.label }}</label>
                 {{ formulario_usuario.email }}
+                {% if formulario_usuario.errors.email %}
+                    <div id="id_email-invalido-mensaje" class="invalid-feedback">{{ formulario_usuario.errors.email }} </div>
+                {% endif %}
             </div>
             <div class="form-group">
                 <label for="id_password">{{ formulario_usuario.password.label }}</label>
                 <div class="button-inside">
                     {{ formulario_usuario.password }}
-                    <button type="button" class="btn btn-default btn-sm" id="showPassword">
+                    <button type="button" class="btn btn-default btn-sm" id="mostrar_contrasenia">
                         <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-eye-fill" fill="currentColor"
                              xmlns="http://www.w3.org/2000/svg">
                             <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"></path>
@@ -34,13 +43,22 @@
                                   d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
                         </svg>
                     </button>
+                    <div id="message">
+                        <p id="letter" class="invalid">Una letra <b>minuscula</b></p>
+                        <p id="capital" class="invalid">Una letra <b>mayuscula</b></p>
+                        <p id="number" class="invalid">Un <b>numero</b></p>
+                        <p id="length" class="invalid">Minimo <b>8 letras</b></p>
+                    </div>
+                    {% if formulario_usuario.errors.password %}
+                        <div id="id_password-invalido-mensaje" class="invalid-feedback">{{ formulario_usuario.errors.password }} </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="form-group">
                 <label for="id_repeticion_contrasenia">{{ formulario_usuario.repeticion_contrasenia.label }}</label>
                 <div class="button-inside">
                     {{ formulario_usuario.repeticion_contrasenia }}
-                    <button type="button" class="btn btn-default btn-sm" id="showPassword">
+                    <button type="button" class="btn btn-default btn-sm" id="mostrar_repeticion_contrasenia">
                         <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-eye-fill" fill="currentColor"
                              xmlns="http://www.w3.org/2000/svg">
                             <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"></path>
@@ -48,11 +66,17 @@
                                   d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
                         </svg>
                     </button>
+                    {% if formulario_usuario.errors.repeticion_contrasenia %}
+                        <div id="id_repeticion_contrasenia-invalido-mensaje" class="invalid-feedback">{{ formulario_usuario.errors.repeticion_contrasenia }} </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="form-group">
                 <label for="id_numero_telefonico">{{ formulario_persona.numero_telefonico.label }}</label>
                 {{ formulario_persona.numero_telefonico }}
+                {% if formulario_persona.errors.numero_telefonico %}
+                    <div id="id_numero_telefonico-invalido-mensaje" class="invalid-feedback">{{ formulario_persona.errors.numero_telefonico }} </div>
+                {% endif %}
             </div>
             <div class="form-group">
                 <label for="id_es_maestro">{{ formulario_usuario.es_maestro.label }}</label>
@@ -73,4 +97,8 @@
             </div>
         </form>
     </div>
+{% endblock %}
+{% block scripts-adicionales %}
+    <script src="{% static 'scripts/validaciones.js'%}"></script>
+    <script src="{% static 'usuarios/registro/scripts/registro.js'%}"></script>
 {% endblock %}

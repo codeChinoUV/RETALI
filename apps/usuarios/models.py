@@ -28,5 +28,5 @@ class Persona(models.Model):
     nombre = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=120)
     numero_telefonico = models.CharField(max_length=13)
-    foto_de_perfil = models.ImageField(upload_to='personas')
+    foto_de_perfil = models.ImageField(upload_to='fotos_de_perfil')
     usuario = models.OneToOneField(Usuario, on_delete=models.RESTRICT, primary_key=True)

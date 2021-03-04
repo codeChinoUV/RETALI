@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
@@ -37,7 +36,7 @@ class UsuarioForm(forms.ModelForm):
 
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@ejemplo.com'}),
-            'password': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Introduce tu contraseña'}),
+            'password': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Introduce tu contraseña'}),
         }
 
     def clean_repeticion_contrasenia(self):
@@ -62,13 +61,14 @@ class PersonaForm(forms.ModelForm):
             'nombre',
             'apellidos',
             'numero_telefonico',
+            'foto_de_perfil'
         ]
 
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Introduce tu nombre'}),
             'apellidos': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Introduce tus apellidos'}),
             'numero_telefonico': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Introduce tus apllidos'}),
+                attrs={'class': 'form-control', 'placeholder': 'Introduce tu numero telefonico'}),
         }
 
     def save(self, commit=True):

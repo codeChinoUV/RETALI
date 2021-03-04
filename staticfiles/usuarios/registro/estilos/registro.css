@@ -3,8 +3,8 @@
     --padding: 10px;
     --heigh-nav: 70px;
     --bgcolor: #2E3034;
-    --hovercolor: #f09a26;
-    --hovercolor-hover: #e6890b;
+    --hovercolor: #2659ab;
+    --hovercolor-hover: #134894;
     --width-collapsed: 45px;
     --primary-color: #4b4b4b;
     --secondary-color: #0f4c81;
@@ -63,7 +63,7 @@ h1{
 }
 
 
-#showPassword{
+#mostrar_contrasenia, #mostrar_repeticion_contrasenia{
     position:absolute;
     color: white;
     right: 0;
@@ -165,4 +165,50 @@ p{
 .btn-secondary{
     background-color: #F59600;
     border-color: #F59600;
+}
+
+.invalid-feedback{
+    display: block;
+}
+
+/*
+    Mensaje contraseña
+ */
+
+#message {
+    display:none;
+    background: var(--primary-color);
+    color: white;
+    position: relative;
+    padding: 10px 0;
+    margin-top: 10px;
+    border-radius: 6px;
+}
+
+#message p {
+    text-align: left;
+    margin-left: 50px;
+    margin-top: 5px;
+}
+
+/* Add a green text color and a checkmark when the requirements are right */
+.valid {
+  color: var(--hovercolor-hover);
+}
+
+.valid:before {
+  position: relative;
+  left: -35px;
+  content: "✔";
+}
+
+/* Add a red text color and an "x" when the requirements are wrong */
+.invalid {
+  color: var(--danger);
+}
+
+.invalid:before {
+  position: relative;
+  left: -15px;
+  content: "✖";
 }

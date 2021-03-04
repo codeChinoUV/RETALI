@@ -3,11 +3,11 @@ import { validar_tamanio_campo } from "../../../scripts/validaciones.js";
 /**
  * Valida que el campo nombre no este vacio y no sobre pase el tamaño maximo
  */
-function validarCampoNombre(){
-    let tamanio_maximo = 50;
+const validarCampoNombre = () => {
+    let tamanio_maximo = 100;
     let tamanio_minimo = 1;
     let id = "id_nombre";
-    let mensajeNovalido = "El titlo del aviso no puede estar vacio y debe de tener menos de " + tamanio_maximo.toString() +
+    let mensajeNovalido = "El titulo del aviso no puede estar vacio y debe de tener menos de " + tamanio_maximo.toString() +
             " letras";
     validar_tamanio_campo(tamanio_minimo, tamanio_maximo, id, mensajeNovalido);
 }

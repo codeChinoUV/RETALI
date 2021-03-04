@@ -53,7 +53,9 @@
     </div>
     {% endblock %}
     <script src="{% static 'bootstrap-4/js/bootstrap.js' %}"></script>
-    <script src="{% static 'usuarios/inicioSesion/scripts/inicioSesion.js'%}"></script>
+    {% block scripts-adicionales %}
+        <script src="{% static 'usuarios/inicioSesion/scripts/inicioSesion.js'%}"></script>
+    {% endblock %}
 {% endblock %}
 </body>
 </html>
