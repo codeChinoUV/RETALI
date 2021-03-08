@@ -1,10 +1,14 @@
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.db import transaction, DatabaseError
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from apps.clases.models import Inscripcion, Alumno, Maestro, Clase
-import re
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+from django.views.generic.base import View
+
+from apps.clases.models import Inscripcion, Clase
 
 from apps.usuarios.forms import UsuarioForm, PersonaForm
 from apps.usuarios.models import Usuario, Persona
@@ -19,30 +23,65 @@ def redireccion_path_vacio(request):
     if request.user.is_authenticated:
         return redirect('paginaInicio')
     else:
-        return redirect('login')
+        return redirect('inicio_sesion')
 
 
-def iniciar_sesion(request):
-    """
-    Inicia la sesion de un usuario
-    :param request: La solicitud del usuario
-    :return: un render o un redirect
-    """
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('paginaInicio')
+class RegistroView(CreateView):
+    model = Usuario
+    template_name = 'usuarios/registro-usuario/RegistroUsuario.html'
+    form_class = UsuarioForm
+    second_form_class = PersonaForm
+    success_url = reverse_lazy('inicio_sesion')
+
+    def get_context_data(self, **kwargs):
+        context = super(RegistroView, self).get_context_data(**kwargs)
+        if 'formulario_usuario' not in context:
+            context['formulario_usuario'] = UsuarioForm
+        if 'formulario_persona' not in context:
+            context['formulario_persona'] = PersonaForm
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object
+        formulario_usuario = self.form_class(request.POST)
+        formulario_persona = self.second_form_class(request.POST)
+        if formulario_usuario.is_valid() and formulario_persona.is_valid():
+            try:
+                with transaction.atomic():
+                    usuario = formulario_usuario.save()
+                    formulario_persona.instance = Persona(usuario=usuario)
+                    formulario_persona.save()
+                    messages.info(request, 'Se ha enviado un correo de verificación a ' + usuario.email)
+                    return HttpResponseRedirect(self.success_url)
+            except DatabaseError:
+                messages.error(request, 'Algo salio mal y no se ha registrado el usuario, intentalo nuevamente')
+                return self.render_to_response(self.get_context_data(form=formulario_usuario, form2=formulario_persona))
         else:
-            messages.error(request, 'El correo electronico o la contraseña son incorrectos')
-            return redirect('login')
-    else:
+            return self.render_to_response(self.get_context_data(form=formulario_usuario, form2=formulario_persona))
+
+
+class InicioSesionView(View):
+    def get(self, request):
         if request.user.is_authenticated:
             return redirect('paginaInicio')
+        return render(request, 'usuarios/iniciar-sesion/Login.html')
+
+    def post(self, request):
+        correo = request.POST['username']
+        contrasenia = request.POST['password']
+        usuario = authenticate(request, username=correo, password=contrasenia)
+        if usuario is not None:
+            login(request, usuario)
+            return redirect('paginaInicio')
         else:
-            return render(request, 'Login.html')
+            messages.warning(request, 'El correo electronico o la contraseña son incorrectos')
+            return render(request, 'usuarios/iniciar-sesion/Login.html')
+
+
+class CierreSesionView(View):
+    def get(self, request):
+        logout(request)
+        return redirect('paginaInicio')
 
 
 @login_required
@@ -131,45 +170,6 @@ def obtener_informacion_de_clases_del_alumno(alumno):
             'cantidad_clases': len(clases)
         }
     return datos
-
-
-def cerrar_sesion(request):
-    """
-    Cierra la sesion del usuario actual
-    :param request: La solicitud
-    :return: Redirect hacia el login
-    """
-    if request.user.is_authenticated:
-        logout(request)
-    return redirect('login')
-
-
-def registrar_usuario(request):
-    """
-    Registra un nuevo usuario
-    :param request: La solicitud del usuario
-    :return: Un render o un redirect
-    """
-    if request.method == 'GET':
-        datos = {
-            'formulario_usuario': UsuarioForm(),
-            'formulario_persona': PersonaForm()
-        }
-        return render(request, 'RegistroUsuario.html', datos)
-    elif request.method == "POST":
-        formulario_persona = PersonaForm(request.POST)
-        formulario_usuario = UsuarioForm(request.POST)
-        if formulario_persona.is_valid() and formulario_usuario.is_valid():
-            usuario = formulario_usuario.save()
-            persona = Persona(usuario=usuario)
-            formulario_persona.instance = persona
-            formulario_persona.save()
-            return redirect('login')
-        datos = {
-            'formulario_usuario': formulario_usuario,
-            'formulario_persona': formulario_persona
-        }
-        return render(request, 'RegistroUsuario.html', datos)
 
 
 @login_required()

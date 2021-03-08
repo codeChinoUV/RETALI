@@ -55,8 +55,11 @@ class UsuarioForm(forms.ModelForm):
 
 
 class PersonaForm(forms.ModelForm):
+    foto_de_perfil = forms.ImageField(required=False)
+
     class Meta:
         model = Persona
+
         fields = [
             'nombre',
             'apellidos',
@@ -75,10 +78,10 @@ class PersonaForm(forms.ModelForm):
         datos = self.cleaned_data
         if self.instance.usuario.es_maestro:
             usuario_registrado = Maestro(nombre=datos['nombre'], apellidos=datos['apellidos'],
-                                         numero_telefonico=datos['numero_telefonico'], usuario=self.instance.usuario)
+                                         numero_telefonico=datos['numero_telefonico'])
             usuario_registrado.save()
         else:
             usuario_registrado = Alumno(nombre=datos['nombre'], apellidos=datos['apellidos'],
-                                        numero_telefonico=datos['numero_telefonico'], usuario=self.instance.usuario)
+                                        numero_telefonico=datos['numero_telefonico'])
             usuario_registrado.save()
         return usuario_registrado

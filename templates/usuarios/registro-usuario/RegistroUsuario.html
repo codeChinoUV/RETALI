@@ -1,4 +1,4 @@
-{% extends 'Login.html' %}
+{% extends 'usuarios/iniciar-sesion/Login.html' %}
 {% load static %}
 {% block nombrePagina %}Registro{% endblock %}
 {% block estilos %}
@@ -93,7 +93,7 @@
             </div>
             <p>¿Ya tienes una cuenta?</p>
             <div id="btnInicioSesion">
-                <a href="{% url 'login' %}">Iniciar sesión</a>
+                <a href="{% url 'inicio_sesion' %}">Iniciar sesión</a>
             </div>
         </form>
     </div>

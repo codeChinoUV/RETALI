@@ -24,6 +24,6 @@ const validar_tamanio_campo = (tamanio_minimo, tamanio_maximo, id, mensajeNoVali
         if(mensajeNombreInvalido != null){
             campo.parentElement.removeChild(mensajeNombreInvalido);
         }
-        campo.value = campo.value.trim();
+        //campo.value = campo.value.trim();
     }
 }
