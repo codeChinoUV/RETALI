@@ -8,9 +8,9 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.views.generic.base import View
 
-from apps.clases.models import Inscripcion, Clase
+from apps.clases.models import Inscripcion, Clase, Maestro, Alumno
 
-from apps.usuarios.forms import UsuarioForm, PersonaForm
+from apps.usuarios.forms import UsuarioForm, PersonaForm, MaestroForm, AlumnoForm
 from apps.usuarios.models import Usuario, Persona
 
 
@@ -26,38 +26,46 @@ def redireccion_path_vacio(request):
         return redirect('inicio_sesion')
 
 
-class RegistroView(CreateView):
+class RegistroView(View):
     model = Usuario
     template_name = 'usuarios/registro-usuario/RegistroUsuario.html'
     form_class = UsuarioForm
     second_form_class = PersonaForm
     success_url = reverse_lazy('inicio_sesion')
 
-    def get_context_data(self, **kwargs):
-        context = super(RegistroView, self).get_context_data(**kwargs)
+    def get(self, request, *args, **kwargs):
+        context = {}
         if 'formulario_usuario' not in context:
             context['formulario_usuario'] = UsuarioForm
         if 'formulario_persona' not in context:
             context['formulario_persona'] = PersonaForm
-        return context
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object
         formulario_usuario = self.form_class(request.POST)
         formulario_persona = self.second_form_class(request.POST)
+        context = {'formulario_usuario': formulario_usuario, 'formulario_persona': formulario_persona}
         if formulario_usuario.is_valid() and formulario_persona.is_valid():
             try:
                 with transaction.atomic():
                     usuario = formulario_usuario.save()
-                    formulario_persona.instance = Persona(usuario=usuario)
-                    formulario_persona.save()
+                    if usuario.es_maestro:
+                        persona = Maestro(usuario=usuario)
+                        formulario_maestro = MaestroForm(request.POST, instance=persona)
+                        formulario_maestro.is_valid()
+                        formulario_maestro.save()
+                    else:
+                        persona = Alumno(usuario=usuario)
+                        formulario_alumno = AlumnoForm(request.POST, instance=persona)
+                        formulario_alumno.is_valid()
+                        formulario_alumno.save()
                     messages.info(request, 'Se ha enviado un correo de verificación a ' + usuario.email)
                     return HttpResponseRedirect(self.success_url)
             except DatabaseError:
-                messages.error(request, 'Algo salio mal y no se ha registrado el usuario, intentalo nuevamente')
-                return self.render_to_response(self.get_context_data(form=formulario_usuario, form2=formulario_persona))
+                messages.warning('Ocurrio un error y no se registro el usuario, intentelo nuevamente')
+                return render(request, self.template_name, context)
         else:
-            return self.render_to_response(self.get_context_data(form=formulario_usuario, form2=formulario_persona))
+            return render(request, self.template_name, context)
 
 
 class InicioSesionView(View):
@@ -92,84 +100,10 @@ def pagina_inicio(request):
     :return: Un render de la pagina adecuada
     """
     if request.user.es_maestro:
-        datos = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
-        return render(request, 'usuarios/paginaInicio/PaginaInicioMaestro.html', datos)
+        return render(request, 'usuarios/paginaInicio/PaginaInicioMaestro.html')
     else:
-        datos_del_alumno = obtener_informacion_de_clases_del_alumno(request.user.persona.alumno)
-        colocar_estado_inscripcion_clase(request.user.persona.alumno, datos_del_alumno['clases'])
-        _contar_cantidad_estado_de_clases(datos_del_alumno['clases'], datos_del_alumno)
-        return render(request, 'usuarios/pagina-inicio-alumno/PaginaInicioAlumno.html', datos_del_alumno)
+        return render(request, 'usuarios/pagina-inicio-alumno/PaginaInicioAlumno.html')
 
-
-def colocar_estado_inscripcion_clase(alumno, clases):
-    """
-    Coloca la informacion del estado de la inscripcion de la clase
-    :param alumno: El alumno
-    :param clases: Las clases a colocar el estado
-    :return: None
-    """
-    if clases is not None:
-        for clase in clases:
-            clase.estado_inscipcion = alumno.inscripcion_set.filter(clase_id=clase.pk).first().aceptado
-
-
-def _contar_cantidad_estado_de_clases(clases, datos_del_alumno):
-    """
-    Cuenta la cantidad de clases que se encuentran en cada estado posible de la inscripcion
-    :param clases: Las clases en donde se verificara el estado
-    :param datos_del_alumno: Los datos del alumno en donde se guardaran las cantidades
-    :return: None
-    """
-    datos_del_alumno['cantidad_clases_aceptado'] = 0
-    datos_del_alumno['cantidad_clases_rechazado'] = 0
-    datos_del_alumno['cantidad_clases_en_espera'] = 0
-    if clases is not None:
-        for clase in clases:
-            if clase.estado_inscipcion == 'Aceptado' and clase.abierta:
-                datos_del_alumno['cantidad_clases_aceptado'] += 1
-            elif clase.estado_inscipcion == 'Rechazado' and clase.abierta:
-                datos_del_alumno['cantidad_clases_rechazado'] += 1
-            elif clase.estado_inscipcion == 'En espera' and clase.abierta:
-                datos_del_alumno['cantidad_clases_en_espera'] += 1
-
-
-def obtener_informacion_de_clases_de_maestro(maestro):
-    """
-    Recupera la información de las clases del maestro
-    :param maestro: El maestro del cual se recuperaran las clases
-    :return: Un diccionario con las clases y la cantidad de clases
-    """
-    datos = {
-        'cantidad_clases': 0,
-        'clases': None
-    }
-    if maestro.clase_set.exists():
-        datos = {
-            'clases': maestro.clase_set.filter(abierta=True),
-            'cantidad_clases': maestro.clase_set.filter(abierta=True).count()
-        }
-    return datos
-
-
-def obtener_informacion_de_clases_del_alumno(alumno):
-    """
-    Recuoera la información de las clases del alumno
-    :param alumno: El alumno a recuperar sus clases
-    :return: Un diccionario con las clases del alumno en las que se encuentra inscrito y la cantidad de clases
-    """
-    datos = {
-        'clases': None,
-        'cantidad_clases': 0
-    }
-    if alumno.inscripcion_set.exists():
-        clases = []
-        for inscripcion in alumno.inscripcion_set.all():
-            clases.append(inscripcion.clase)
-        datos = {
-            'clases': clases,
-            'cantidad_clases': len(clases)
-        }
-    return datos
 
 
 @login_required()
@@ -181,7 +115,7 @@ def consultar_alumnos_de_clases(request, codigo_clase):
     :return: Un render
     """
     if request.method == "GET":
-        datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
+        datos_del_maestro = {}
         if _validar_existe_clase_maestro(request.user.persona.maestro, codigo_clase):
             datos_del_maestro["clase_actual"] = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()
             datos_del_maestro["alumnos"] = obtener_alumnos_inscritos_a_clase(datos_del_maestro["clase_actual"])
@@ -207,26 +141,6 @@ def obtener_alumnos_inscritos_a_clase(clase):
             alumnos.append(alumno)
         alumnos.sort(key=lambda x: x.apellidos)
     return alumnos
-
-
-def contar_estados_inscripciones_de_alumnos(alumnos, datos_del_maestro):
-    """
-    Cuenta la cantidad de alumnos dependiendo del estado de la inscripcion del alumno
-    :param alumnos: Los alumnos a contar
-    :param datos_del_maestro: Los datos en donde se agregara la informacion
-    :return: None
-    """
-    datos_del_maestro["cantidad_alumnos_aceptados"] = 0
-    datos_del_maestro["cantidad_alumnos_rechazados"] = 0
-    datos_del_maestro["cantidad_alumnos_en_espera"] = 0
-    if alumnos is not None:
-        for alumno in alumnos:
-            if alumno.estado_inscripcion == 'En espera':
-                datos_del_maestro["cantidad_alumnos_en_espera"] += 1
-            elif alumno.estado_inscripcion == 'Aceptado':
-                datos_del_maestro["cantidad_alumnos_aceptados"] += 1
-            elif alumno.estado_inscripcion == 'Rechazado':
-                datos_del_maestro["cantidad_alumnos_rechazados"] += 1
 
 
 def _validar_existe_clase_maestro(maestro, codigo_clase):

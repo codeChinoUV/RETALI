@@ -74,14 +74,57 @@ class PersonaForm(forms.ModelForm):
                 attrs={'class': 'form-control', 'placeholder': 'Introduce tu numero telefonico'}),
         }
 
+
+class AlumnoForm(forms.ModelForm):
+    foto_de_perfil = forms.ImageField(required=False)
+
+    class Meta:
+        model = Alumno
+
+        fields = [
+            'nombre',
+            'apellidos',
+            'numero_telefonico',
+            'foto_de_perfil'
+        ]
+
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Introduce tu nombre'}),
+            'apellidos': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Introduce tus apellidos'}),
+            'numero_telefonico': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Introduce tu numero telefonico'}),
+        }
+
     def save(self, commit=True):
         datos = self.cleaned_data
-        if self.instance.usuario.es_maestro:
-            usuario_registrado = Maestro(nombre=datos['nombre'], apellidos=datos['apellidos'],
-                                         numero_telefonico=datos['numero_telefonico'])
-            usuario_registrado.save()
-        else:
-            usuario_registrado = Alumno(nombre=datos['nombre'], apellidos=datos['apellidos'],
-                                        numero_telefonico=datos['numero_telefonico'])
-            usuario_registrado.save()
+        usuario_registrado = Alumno(nombre=datos['nombre'], apellidos=datos['apellidos'],
+                                    numero_telefonico=datos['numero_telefonico'], usuario=self.instance.usuario)
+        usuario_registrado.save()
         return usuario_registrado
+
+
+class MaestroForm(PersonaForm):
+    foto_de_perfil = forms.ImageField(required=False)
+
+    class Meta:
+        model = Maestro
+
+        fields = [
+            'nombre',
+            'apellidos',
+            'numero_telefonico',
+            'foto_de_perfil'
+        ]
+
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Introduce tu nombre'}),
+            'apellidos': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Introduce tus apellidos'}),
+            'numero_telefonico': forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Introduce tu numero telefonico'}),
+        }
+
+    def save(self, commit=True):
+        datos = self.cleaned_data
+        usuario_registrado = Maestro(nombre=datos['nombre'], apellidos=datos['apellidos'],
+                                     numero_telefonico=datos['numero_telefonico'], usuario=self.instance.usuario)
+        usuario_registrado.save()

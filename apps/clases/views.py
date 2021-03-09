@@ -5,8 +5,7 @@ from django.http import JsonResponse, Http404
 from django.shortcuts import render, redirect
 from .forms import ClaseForm
 from .models import Clase, Inscripcion
-from ..usuarios.views import obtener_informacion_de_clases_de_maestro, obtener_informacion_de_clases_del_alumno, \
-    colocar_estado_inscripcion_clase, obtener_alumnos_inscritos_a_clase, contar_estados_inscripciones_de_alumnos
+from ..usuarios.views import obtener_alumnos_inscritos_a_clase
 
 
 @login_required
@@ -18,11 +17,7 @@ def registrar_clase(request):
     """
     if not request.user.es_maestro:
         return redirect('paginaInicio')
-    clases_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
-    datos = {
-        'clases': clases_maestro['clases'],
-        'cantidad_clases': clases_maestro['cantidad_clases']
-    }
+    datos = {}
     if request.method == 'GET':
         datos['form'] = ClaseForm()
         return render(request, 'clases/registro-clase/RegistroClase.html', datos)
@@ -80,10 +75,7 @@ def informacion_clase(request, codigo_clase):
     else:
         maestro = request.user.persona.maestro
         clase_actual = maestro.clase_set.filter(abierta=True, codigo=codigo_clase).first()
-        clases_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
-        datos = {
-            'clases': clases_maestro['clases']
-        }
+        datos = {}
         if clase_actual is not None:
             datos['clase_actual'] = clase_actual
             _colocar_informacion_clase(datos, datos['clase_actual'])
@@ -207,16 +199,16 @@ def informacion_clase_alumno(request, codigo_clase):
         clase = Clase.objects.filter(codigo=codigo_clase).first()
         inscripcion = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.id).first()
         clase_actual = inscripcion.clase
-        clases_alumno = obtener_informacion_de_clases_del_alumno(request.user.persona.alumno)
-        datos = {
-            'clases': clases_alumno['clases']
-        }
-        colocar_estado_inscripcion_clase(alumno, clases_alumno['clases'])
+        datos = {}
         if clase_actual is not None:
             datos['clase_actual'] = clase_actual
             return render(request, 'clases/informacion-clase/InformacionClaseAlumno.html', datos)
         else:
             return render(request, 'generales/NoEncontrada.html', datos)
+
+
+def contar_estados_inscripciones_de_alumnos(alumnos_de_la_clase, datos_cantidad_alumnos):
+    pass
 
 
 def _colocar_informacion_clase(datos, clase):
@@ -235,5 +227,5 @@ def _colocar_informacion_clase(datos, clase):
     alumnos_de_la_clase = obtener_alumnos_inscritos_a_clase(clase)
     datos_cantidad_alumnos = {}
     contar_estados_inscripciones_de_alumnos(alumnos_de_la_clase, datos_cantidad_alumnos)
-    datos['alumnos_aceptados'] = datos_cantidad_alumnos['cantidad_alumnos_aceptados']
-    datos['alumnos_en_espera'] = datos_cantidad_alumnos['cantidad_alumnos_en_espera']
+    # datos['alumnos_aceptados'] = datos_cantidad_alumnos['cantidad_alumnos_aceptados']
+    # datos['alumnos_en_espera'] = datos_cantidad_alumnos['cantidad_alumnos_en_espera']

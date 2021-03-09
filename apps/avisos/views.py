@@ -5,8 +5,6 @@ from django.shortcuts import render, redirect
 from apps.avisos.forms import AvisoForm
 from apps.avisos.models import Aviso
 from apps.clases.models import Clase
-from apps.usuarios.views import obtener_informacion_de_clases_de_maestro, obtener_informacion_de_clases_del_alumno, \
-    colocar_estado_inscripcion_clase
 
 
 @login_required()
@@ -19,7 +17,7 @@ def consultar_avisos(request, codigo_clase):
     """
     if request.method == "GET":
         if request.user.es_maestro:
-            datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
+            datos_del_maestro = {}
             if _validar_existe_clase(request.user.persona.maestro, codigo_clase):
                 datos_del_maestro["clase_actual"] = Clase.objects.filter(codigo=codigo_clase).first()
                 datos_del_maestro["avisos"] = datos_del_maestro["clase_actual"].aviso_set.all() \
@@ -27,8 +25,7 @@ def consultar_avisos(request, codigo_clase):
                 return render(request, 'avisos/consultar-avisos/ConsultarAvisos.html', datos_del_maestro)
             return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
         else:
-            datos_del_alumno = obtener_informacion_de_clases_del_alumno(request.user.persona.alumno)
-            colocar_estado_inscripcion_clase(request.user.persona.alumno, datos_del_alumno['clases'])
+            datos_del_alumno = {}
             if _validar_existe_clase_alumno(request.user.persona.alumno, codigo_clase):
                 datos_del_alumno["clase_actual"] = Clase.objects.filter(codigo=codigo_clase).first()
                 datos_del_alumno["avisos"] = datos_del_alumno["clase_actual"].aviso_set.all() \
@@ -78,7 +75,7 @@ def crear_aviso(request, codigo_clase):
     :return: un rendero un redirect
     """
     if request.user.es_maestro:
-        datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
+        datos_del_maestro = {}
         if request.method == "GET":
             if _validar_existe_clase(request.user.persona.maestro, codigo_clase):
                 datos_del_maestro["clase_actual"] = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()

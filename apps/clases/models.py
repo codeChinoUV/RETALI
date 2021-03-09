@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from apps.usuarios.models import Persona
 
@@ -7,7 +8,9 @@ class Maestro(Persona):
     """
     Representa al usuario Maestro
     """
-    informacion = models.TextField()
+
+    def obtener_clases_activas(self):
+        return self.clase_set.filter(abierta=True).order_by('creada_en')
 
 
 class Clase(models.Model):
@@ -20,6 +23,7 @@ class Clase(models.Model):
     abierta = models.BooleanField(default=True)
     foto = models.ImageField(upload_to='clases')
     maestro = models.ForeignKey(Maestro, on_delete=models.RESTRICT)
+    creada_en = models.DateField(default=timezone.now)
 
 
 class Alumno(Persona):
@@ -27,6 +31,39 @@ class Alumno(Persona):
     Representa un alumno en el sistema
     """
     inscripciones = models.ManyToManyField(Clase, through='Inscripcion')
+
+    def obtener_clases_inscrito(self):
+        clases = []
+        for inscripcion in self.inscripcion_set.all():
+            clase = inscripcion.clase
+            if clase.abierta:
+                clase.estado_inscipcion = inscripcion.aceptado
+                clases.append(inscripcion.clase)
+        return clases
+
+    def obtener_cantidad_de_clases_aceptado(self):
+        clases = self.obtener_clases_inscrito()
+        cantidad_de_clases_aceptadas = 0
+        for clase in clases:
+            if clase.estado_inscipcion == 'Aceptado' and clase.abierta:
+                cantidad_de_clases_aceptadas += 1
+        return cantidad_de_clases_aceptadas
+
+    def obtener_cantidad_de_clases_en_espera(self):
+        clases = self.obtener_clases_inscrito()
+        cantidad_de_clases_en_espera = 0
+        for clase in clases:
+            if clase.estado_inscipcion == 'En espera' and clase.abierta:
+                cantidad_de_clases_en_espera += 1
+        return cantidad_de_clases_en_espera
+
+    def obtener_cantidad_de_clases_rechazado(self):
+        clases = self.obtener_clases_inscrito()
+        cantidad_de_clases_rechazado = 0
+        for clase in clases:
+            if clase.estado_inscipcion == 'Rechazado' and clase.abierta:
+                cantidad_de_clases_rechazado += 1
+        return cantidad_de_clases_rechazado
 
 
 class Inscripcion(models.Model):

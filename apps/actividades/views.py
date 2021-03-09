@@ -10,8 +10,6 @@ from apps.actividades.forms import ActividadForm, ActividadDisableForm
 from apps.actividades.models import Actividad, Entrega, Archivo, Revision
 from apps.clases.models import Clase
 from apps.clases.views import obtener_cantidad_de_alumnos_inscritos_a_clase
-from apps.usuarios.views import obtener_informacion_de_clases_de_maestro, obtener_informacion_de_clases_del_alumno \
-    , colocar_estado_inscripcion_clase
 
 
 @login_required
@@ -25,7 +23,7 @@ def consultar_actividades_de_clase(request, codigo_clase):
     if not request.user.es_maestro:
         return redirect('paginaInicio')
     else:
-        datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
+        datos_del_maestro = {}
         datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set.filter(abierta=True,
                                                                                           codigo=codigo_clase).first()
         if datos_del_maestro['clase_actual'] is not None:
@@ -57,9 +55,8 @@ def consultar_actividades_de_clase_alumno(request, codigo_clase):
         alumno = request.user.persona.alumno
         clase = Clase.objects.filter(codigo=codigo_clase).first()
         inscripcion = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.id).first()
-        datos_del_alumno = obtener_informacion_de_clases_del_alumno(request.user.persona.alumno)
+        datos_del_alumno = {}
         datos_del_alumno['clase_actual'] = inscripcion.clase
-        colocar_estado_inscripcion_clase(alumno, datos_del_alumno['clases'])
         if datos_del_alumno['clase_actual'] is not None:
             datos_del_alumno['actividades'] = datos_del_alumno['clase_actual'].actividad_set.all() \
                 .order_by('-fecha_de_creacion')
@@ -83,7 +80,7 @@ def registrar_actividad(request, codigo_clase):
     if not request.user.es_maestro:
         return redirect('paginaInicio')
     else:
-        datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
+        datos_del_maestro = {}
         datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set. \
             filter(abierta=True, codigo=codigo_clase).first()
         if datos_del_maestro['clase_actual'] is not None:
@@ -121,7 +118,7 @@ def editar_actividad(request, codigo_clase, id_actividad):
     :return: Un render o un redirect
     """
     if request.user.es_maestro:
-        datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
+        datos_del_maestro = {}
         datos_del_maestro["clase_actual"] = request.user.persona.maestro.clase_set.filter(codigo=codigo_clase).first()
         if request.method == "GET":
             if datos_del_maestro["clase_actual"] is not None:
@@ -264,7 +261,7 @@ def consultar_actividad(request, codigo_clase, id_actividad):
     if not request.user.es_maestro:
         return redirect('paginaInicio')
     else:
-        datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
+        datos_del_maestro = {}
         datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set. \
             filter(codigo=codigo_clase, abierta=True).first()
         if _validar_existe_actividad(codigo_clase, id_actividad, request.user.persona.maestro):
@@ -306,7 +303,7 @@ def revisar_entrega_actividad(request, codigo_clase, id_actividad, id_entrega):
     if not request.user.es_maestro:
         return redirect('paginaInicio')
     else:
-        datos_del_maestro = obtener_informacion_de_clases_de_maestro(request.user.persona.maestro)
+        datos_del_maestro = {}
         datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set. \
             filter(codigo=codigo_clase, abierta=True).first()
         if _validar_existe_entrega(codigo_clase, id_actividad, id_entrega, request.user.persona.maestro):
@@ -438,9 +435,6 @@ def entregar_actividad_alumno(request, codigo_clase, id_actividad):
                                                                                     clase_id=clase.pk).first().clase)
                 datos_del_alumno['actividad_actual'] = datos_del_alumno['clase_actual'].actividad_set.filter(
                     pk=id_actividad).first()
-                datos_del_alumno['clases'] = obtener_informacion_de_clases_del_alumno(request.
-                                                                                      user.persona.alumno)['clases']
-                colocar_estado_inscripcion_clase(request.user.persona.alumno, datos_del_alumno['clases'])
                 if _validar_existe_entrega_previa(request.user.persona.alumno, codigo_clase, id_actividad):
                     datos_del_alumno['entrega'] = Entrega.objects.filter(alumno_id=request.user.persona.alumno.pk,
                                                                          actvidad_id=id_actividad).first()
