@@ -45,26 +45,26 @@
         <p>Alumnos rechazados: {{ cantidad_alumnos_rechazados }}</p>
         <p>Alumnos en espera de aceptación: {{ cantidad_alumnos_en_espera }}</p>
     </div>
-    {% for alumno in alumnos %}
+    {% for inscripcion in inscripcion_list %}
         <div class="alumno">
             <div class="cabecera-alumno">
-                {% if alumno.foto_de_perfil %}
-                <img class="foto-alumno" src="{{ alumno.foto_de_perfil.url }}" alt="foto de perfil">
+                {% if inscripcion.alumno.foto_de_perfil %}
+                <img class="foto-alumno" src="{{ inscripcion.alumno.foto_de_perfil.url }}" alt="foto de perfil">
                 {% else %}
                 <img class="foto-alumno" src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
                 {% endif %}
                 <div class="informacion-alumno">
-                    <h3 class="nombre-alumno">{{ alumno.nombre }} {{ alumno.apellidos }}</h3>
-                    <p>Correo: {{ alumno.usuario.email }} </p>
-                    <p>Telefono: {{ alumno.numero_telefonico }}</p>
+                    <h3 class="nombre-alumno">{{ inscripcion.alumno.nombre }} {{ inscripcion.alumno.apellidos }}</h3>
+                    <p>Correo: {{ inscripcion.alumno.usuario.email }} </p>
+                    <p>Telefono: {{ inscripcion.alumno.numero_telefonico }}</p>
                 </div>
                 <div>
-                    <form method="POST" action="alumno/{{ alumno.pk }}/cambiar_estado_inscripcion">
+                    <form method="POST" action="alumno/{{ inscripcion.alumno.pk }}/cambiar_estado_inscripcion">
                         {% csrf_token %}
                         <select class="estado-inscripcion select-css" name="estado">
-                            <option value="En espera" {% if alumno.estado_inscripcion == 'En espera' %}selected="selected" {% endif %} >En espera</option>
-                            <option value="Aceptado" {% if alumno.estado_inscripcion == 'Aceptado' %}selected="selected" {% endif %} >Aceptado</option>
-                            <option value="Rechazado" {% if alumno.estado_inscripcion == 'Rechazado' %}selected="selected" {% endif %} >Rechazado</option>
+                            <option value="En espera" {% if inscripcion.aceptado == 'En espera' %}selected="selected" {% endif %} >En espera</option>
+                            <option value="Aceptado" {% if inscripcion.aceptado == 'Aceptado' %}selected="selected" {% endif %} >Aceptado</option>
+                            <option value="Rechazado" {% if inscripcion.aceptado == 'Rechazado' %}selected="selected" {% endif %} >Rechazado</option>
                         </select>
                         <button type="submit" class="btn-ver-detalles">Guardar</button>
                     </form>

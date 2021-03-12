@@ -92,7 +92,7 @@ def crear_aviso(request, codigo_clase):
                 datos_del_maestro["clase_actual"] = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()
                 datos_del_maestro["form"] = formulario
                 return render(request, 'avisos/registrar-aviso/RegistrarAviso.html', datos_del_maestro)
-    return redirect('paginaInicio')
+    return redirect('inicio')
 
 
 def _registrar_aviso(codigo_clase, nombre, descripcion):

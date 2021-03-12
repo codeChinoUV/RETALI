@@ -1,65 +1,35 @@
 import random
 
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, Http404
-from django.shortcuts import render, redirect
+from django.http import JsonResponse, Http404, HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.generic import ListView, CreateView
+from django.views.generic.base import View
+
 from .forms import ClaseForm
-from .models import Clase, Inscripcion
-from ..usuarios.views import obtener_alumnos_inscritos_a_clase
+from .models import Clase, Inscripcion, EstadoSolicitudUnirse
 
 
-@login_required
-def registrar_clase(request):
-    """
-    Maneja las peticiones realizadas a la ruta 'registro_clase'
-    :param request: Contiene la información de la petición
-    :return: Un redirect a la pagina adecuada o un render de un Template
-    """
-    if not request.user.es_maestro:
-        return redirect('paginaInicio')
-    datos = {}
-    if request.method == 'GET':
-        datos['form'] = ClaseForm()
-        return render(request, 'clases/registro-clase/RegistroClase.html', datos)
-    elif request.method == "POST":
-        form = ClaseForm(request.POST, request.FILES)
-        if form.is_valid():
-            datos = form.cleaned_data
-            codigo_generado = _obtener_codigo_unico()
-            datos['foto'].name = codigo_generado + "." + datos['foto'].name.split('.')[-1]
-            clase = Clase(nombre=datos['nombre'], abierta=True, escuela=datos['escuela'],
-                          maestro=request.user.persona.maestro, codigo=codigo_generado, foto=datos['foto'])
+@method_decorator(login_required, name='dispatch')
+class RegistroClaseView(CreateView):
+    model = Clase
+    form_class = ClaseForm
+    success_url = reverse_lazy('inicio')
+    template_name = 'clases/registro-clase/RegistroClase.html'
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object
+        formulario = self.form_class(request.POST, request.FILES)
+        if formulario.is_valid():
+            clase = formulario.save(commit=False)
+            clase.maestro_id = request.user.persona.maestro.pk
+            clase.codigo = Clase.obtener_codigo_unico()
             clase.save()
-            return redirect('paginaInicio')
+            return HttpResponseRedirect(self.success_url)
         else:
-            datos['form'] = form
-            return render(request, 'clases/registro-clase/RegistroClase.html', datos)
-
-
-def _generar_codigo_alfebetico():
-    """
-    Genera un codigo aleatorio de 10 letras
-    :return: Una cadena de 10 letras
-    """
-    frase = ""
-    lista = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
-    for i in range(0, 10):
-        p = lista[random.randint(0, 25)]
-        frase += p
-    return frase
-
-
-def _obtener_codigo_unico():
-    """
-    Obtiene un codigo de 10 letras que no se encuentre registrado
-    :return: Un codigo unico de 10 letras
-    """
-    while True:
-        codigo_generado = _generar_codigo_alfebetico()
-        cantidad_de_clases_con_el_mismo_codigo = Clase.objects.filter(codigo=codigo_generado).count()
-        if cantidad_de_clases_con_el_mismo_codigo == 0:
-            break
-    return codigo_generado
+            return self.render_to_response(self.get_context_data(form=formulario))
 
 
 @login_required()
@@ -77,8 +47,6 @@ def informacion_clase(request, codigo_clase):
         clase_actual = maestro.clase_set.filter(abierta=True, codigo=codigo_clase).first()
         datos = {}
         if clase_actual is not None:
-            datos['clase_actual'] = clase_actual
-            _colocar_informacion_clase(datos, datos['clase_actual'])
             return render(request, 'clases/informacion-clase/InformacionClase.html', datos)
         else:
             return render(request, 'generales/NoEncontrada.html', datos)
@@ -128,6 +96,42 @@ def _crearJSONClase(clase):
         'foto_maestro': url_foto_maeestro
     }
     return datos_clase
+
+
+# Falta protección a la ruta
+@method_decorator(login_required, name='dispatch')
+class ListarAlumnosDeClase(ListView):
+    model = Inscripcion
+    template_name = 'usuarios/consultar-alumnos-de-clase/ConsultarAlumnosDeClase.html'
+    queryset = Inscripcion.objects.select_related('alumno')
+    ordering = 'alumno__nombre'
+
+    def get_queryset(self):
+        clase_actual = self.kwargs['codigo_clase']
+        return Inscripcion.objects.filter(clase__codigo=clase_actual).select_related('alumno')
+
+
+# Falta proteccion de la ruta
+@method_decorator(login_required, name='dispatch')
+class ModificarEstadoInscriocionAlumno(View):
+
+    def post(self, request, codigo_clase, id_alumno):
+        queryset = request.user.persona.maestro.clase_set.filter(abierta=True)
+        clase_actual = get_object_or_404(queryset, codigo=codigo_clase)
+        if _validar_opcion_existente_inscripcion(request.POST['estado']):
+            clase_actual.modificar_estado_inscripcion_alumno(id_alumno, request.POST['estado'])
+            return redirect('grupo', codigo_clase=codigo_clase)
+        raise Http404
+
+
+def _validar_opcion_existente_inscripcion(estado):
+    """
+    Valida si el estado se encuentra en la lista de estados validos
+    :param estado: El estado a validar
+    :return: True si se encuentra o False si no
+    """
+    estados = EstadoSolicitudUnirse.values
+    return estado in estados
 
 
 @login_required()
@@ -210,22 +214,3 @@ def informacion_clase_alumno(request, codigo_clase):
 def contar_estados_inscripciones_de_alumnos(alumnos_de_la_clase, datos_cantidad_alumnos):
     pass
 
-
-def _colocar_informacion_clase(datos, clase):
-    """
-    Coloca la información importante sobre las actividades, los foros y los alumnos de la clase
-    :param datos: Los datos en donde se agregaran los nuevos datos sobre la clase
-    :param clase: La clase de donde se obtendran los datos
-    :return: None
-    """
-    from ..actividades.views import obtener_cantidad_total_de_actividades, obtener_cantidad_de_actividades_abiertas
-    from ..foros.views import contar_foros_activos
-    datos['total_de_actividades'] = obtener_cantidad_total_de_actividades(clase)
-    datos['actividades_abiertas'] = obtener_cantidad_de_actividades_abiertas(clase.actividad_set.all())
-    datos['total_de_foros'] = len(datos['clase_actual'].foro_set.all())
-    datos['foros_abiertos'] = contar_foros_activos(datos['clase_actual'].foro_set.all())
-    alumnos_de_la_clase = obtener_alumnos_inscritos_a_clase(clase)
-    datos_cantidad_alumnos = {}
-    contar_estados_inscripciones_de_alumnos(alumnos_de_la_clase, datos_cantidad_alumnos)
-    # datos['alumnos_aceptados'] = datos_cantidad_alumnos['cantidad_alumnos_aceptados']
-    # datos['alumnos_en_espera'] = datos_cantidad_alumnos['cantidad_alumnos_en_espera']

@@ -186,7 +186,7 @@ def editar_foro(request, codigo_clase, id_foro):
                     return render(request, 'foros/editar-foro/EditarForo.html', datos_del_maestro)
         raise Http404
     else:
-        return redirect('paginaInicio')
+        return redirect('inicio')
 
 
 def _crear_formulario_con_informacion_de_foro(foro):

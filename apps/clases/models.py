@@ -1,3 +1,5 @@
+import random
+
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -24,6 +26,35 @@ class Clase(models.Model):
     foto = models.ImageField(upload_to='clases')
     maestro = models.ForeignKey(Maestro, on_delete=models.RESTRICT)
     creada_en = models.DateField(default=timezone.now)
+
+    def modificar_estado_inscripcion_alumno(self, id_alumno, nuevo_estado):
+        self.inscripcion_set.filter(alumno_id=id_alumno).update(aceptado=nuevo_estado)
+
+    @classmethod
+    def obtener_codigo_unico(cls):
+        """
+        Obtiene un codigo de 10 letras que no se encuentre registrado
+        :return: Un codigo unico de 10 letras
+        """
+        while True:
+            codigo_generado = Clase._generar_codigo_alfebetico()
+            cantidad_de_clases_con_el_mismo_codigo = Clase.objects.filter(codigo=codigo_generado).count()
+            if cantidad_de_clases_con_el_mismo_codigo == 0:
+                break
+        return codigo_generado
+
+    @classmethod
+    def _generar_codigo_alfebetico(cls):
+        """
+        Genera un codigo aleatorio de 10 letras
+        :return: Una cadena de 10 letras
+        """
+        frase = ""
+        lista = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        for i in range(0, 10):
+            p = lista[random.randint(0, 25)]
+            frase += p
+        return frase
 
 
 class Alumno(Persona):
@@ -66,14 +97,16 @@ class Alumno(Persona):
         return cantidad_de_clases_rechazado
 
 
+class EstadoSolicitudUnirse(models.TextChoices):
+    ACEPTADO = 'Aceptado', _('Aceptado')
+    RECHAZADO = 'Rechazado', _('Rechazado')
+    EN_ESPERA = 'En espera', _('En espera')
+
+
 class Inscripcion(models.Model):
     """
     Representa la inscripción de un alumno a una clase
     """
-    class EstadoSolicitudUnirse(models.TextChoices):
-        ACEPTADO = 'Aceptado', _('Aceptado')
-        RECHAZADO = 'Rechazado', _('Rechazado')
-        EN_ESPERA = 'En espera', _('En espera')
     aceptado = models.CharField(max_length=9, choices=EstadoSolicitudUnirse.choices,
                                 default=EstadoSolicitudUnirse.EN_ESPERA)
     alumno = models.ForeignKey(Alumno, on_delete=models.RESTRICT)

@@ -21,7 +21,7 @@ def consultar_actividades_de_clase(request, codigo_clase):
     :return: Una template con sus datos o un redirect a la pagina correcta
     """
     if not request.user.es_maestro:
-        return redirect('paginaInicio')
+        return redirect('inicio')
     else:
         datos_del_maestro = {}
         datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set.filter(abierta=True,
@@ -50,7 +50,7 @@ def consultar_actividades_de_clase_alumno(request, codigo_clase):
     :return: Una template con sus datos o un redirect a la pagina correcta
     """
     if request.user.es_maestro:
-        return redirect('paginaInicio')
+        return redirect('inicio')
     else:
         alumno = request.user.persona.alumno
         clase = Clase.objects.filter(codigo=codigo_clase).first()
@@ -78,7 +78,7 @@ def registrar_actividad(request, codigo_clase):
     :return: Una templete con los datos
     """
     if not request.user.es_maestro:
-        return redirect('paginaInicio')
+        return redirect('inicio')
     else:
         datos_del_maestro = {}
         datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set. \
@@ -145,7 +145,7 @@ def editar_actividad(request, codigo_clase, id_actividad):
                     return render(request, 'actividades/editar_actividad/EditarActividad.html', datos_del_maestro)
         raise Http404
     else:
-        return redirect('paginaInicio')
+        return redirect('inicio')
 
 
 def validar_fecha_cierre_mayor_a_fecha_apertura(fecha_inicio, fecha_cierre):
@@ -259,7 +259,7 @@ def consultar_actividad(request, codigo_clase, id_actividad):
     :return: un redirect o un render
     """
     if not request.user.es_maestro:
-        return redirect('paginaInicio')
+        return redirect('inicio')
     else:
         datos_del_maestro = {}
         datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set. \
@@ -301,7 +301,7 @@ def revisar_entrega_actividad(request, codigo_clase, id_actividad, id_entrega):
     :return: Un redirec o un render
     """
     if not request.user.es_maestro:
-        return redirect('paginaInicio')
+        return redirect('inicio')
     else:
         datos_del_maestro = {}
         datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set. \
@@ -426,7 +426,7 @@ def entregar_actividad_alumno(request, codigo_clase, id_actividad):
             return HttpResponse(status=codigo_revision_entrega)
     elif request.method == "GET":
         if request.user.es_maestro:
-            return redirect('paginaInicio')
+            return redirect('inicio')
         else:
             if _validar_existe_actividad_de_alumno(codigo_clase, id_actividad, request.user.persona.alumno):
                 clase = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()

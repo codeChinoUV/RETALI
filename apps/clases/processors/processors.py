@@ -1,3 +1,5 @@
+from django.http import Http404
+
 from apps.clases.models import Alumno, Clase
 
 
@@ -28,9 +30,21 @@ def colocar_clase_actual(request):
     :param request: La solicitud del usuario
     :return: un diccionario
     """
+    clase_actual_processor = {}
     if 'codigo_clase' in request.resolver_match.kwargs.keys():
-        clase_actual = Clase.objects.filter(codigo=request.resolver_match.kwargs['codigo_clase'],
-                                            abierta=True).first()
-        if clase_actual is not None:
-            return {'clase_actual': clase_actual}
-    return {}
+        codigo_clase = request.resolver_match.kwargs['codigo_clase']
+        if request.user.es_maestro:
+            clase_actual = request.user.persona.maestro.clase_set.filter(codigo=codigo_clase, abierta=True).first()
+            if clase_actual is not None:
+                clase_actual_processor['clase_actual'] = clase_actual
+            else:
+                raise Http404
+        else:
+            clase_actual = request.user.alumno.inscripcion_set.filer(clase__codigo=codigo_clase, aceptado='Aceptado'). \
+                select_related('clase')
+            if clase_actual is not None:
+                clase_actual_processor['clase_actual'] = clase_actual.clase
+            else:
+                raise Http404
+    return clase_actual_processor
+
