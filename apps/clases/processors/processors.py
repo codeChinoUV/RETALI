@@ -40,11 +40,10 @@ def colocar_clase_actual(request):
             else:
                 raise Http404
         else:
-            clase_actual = request.user.alumno.inscripcion_set.filer(clase__codigo=codigo_clase, aceptado='Aceptado'). \
-                select_related('clase')
+            clase_actual = request.user.persona.alumno.inscripcion_set.\
+                filter(clase__codigo=codigo_clase, aceptado='Aceptado').select_related('clase').first()
             if clase_actual is not None:
                 clase_actual_processor['clase_actual'] = clase_actual.clase
             else:
                 raise Http404
     return clase_actual_processor
-
