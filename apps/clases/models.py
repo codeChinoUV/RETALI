@@ -56,6 +56,46 @@ class Clase(models.Model):
             frase += p
         return frase
 
+    def obtener_cantidad_de_alumnos_aceptados(self):
+        """
+        Obtiene la cantidad de alumnos aceptados a una clase
+        :return: La cantidad de alumnos aceptados en la clase
+        """
+        return self.inscripcion_set.filter(aceptado='Aceptado').count()
+
+    def obtener_cantidad_de_alumnos_pendientes_de_aceptar(self):
+        """
+        Obtiene la cantidad de alumnos pendientes de aceptar en una clase
+        :return: La cantidad de alumnos pendientes de aceptar
+        """
+        return self.inscripcion_set.filter(aceptado=EstadoSolicitudUnirse.EN_ESPERA).count()
+
+    def registrar_inscripcion_alumno(self, id_alumno):
+        """
+        Registra un alumno en una clase
+        :param id_alumno: El id del alumno a inscribir en una clase
+        :return: None
+        """
+        inscripcion = Inscripcion(clase_id=self.pk, alumno_id=id_alumno)
+        inscripcion.save()
+
+    def obtener_json(self):
+        """
+        Crea un Diccionario con los datos de la clase
+        :return: Un diccionario con la información de la clase
+        """
+        url_foto_maeestro = ''
+        if self.maestro.foto_de_perfil:
+            url_foto_maeestro = self.maestro.foto_de_perfil.url
+        datos_clase = {
+            'nombre': self.nombre,
+            'escuela': self.escuela,
+            'foto': self.foto.url,
+            'maestro': self.maestro.nombre + ' ' + self.maestro.apellidos,
+            'foto_maestro': url_foto_maeestro
+        }
+        return datos_clase
+
 
 class Alumno(Persona):
     """

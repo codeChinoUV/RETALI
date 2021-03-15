@@ -1,6 +1,4 @@
-import datetime
 import os
-import pytz
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect, HttpResponse
@@ -9,7 +7,6 @@ from RETALI import settings
 from apps.actividades.forms import ActividadForm, ActividadDisableForm
 from apps.actividades.models import Actividad, Entrega, Archivo, Revision
 from apps.clases.models import Clase
-from apps.clases.views import obtener_cantidad_de_alumnos_inscritos_a_clase
 
 
 @login_required
@@ -32,7 +29,7 @@ def consultar_actividades_de_clase(request, codigo_clase):
             _actualizar_estado_actividades(datos_del_maestro['actividades'])
             _colocar_cantidad_de_entregas_de_actividad(datos_del_maestro['actividades'])
             datos_del_maestro['total_alumnos'] = \
-                obtener_cantidad_de_alumnos_inscritos_a_clase(datos_del_maestro['clase_actual'].id)
+                datos_del_maestro['clase_actual'].obtener_cantidad_de_alumnos_inscritos()
             datos_del_maestro['total_de_actividades'] = \
                 obtener_cantidad_total_de_actividades(datos_del_maestro['clase_actual'])
             datos_del_maestro['cantidad_actividades_abiertas'] = \

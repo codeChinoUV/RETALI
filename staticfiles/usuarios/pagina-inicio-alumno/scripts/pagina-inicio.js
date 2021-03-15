@@ -83,7 +83,7 @@ document.querySelector("#btn-solicitar-unirse").addEventListener("click", (e) =>
                 })
                 e.target.disabled = false;
             }
-            if(this.readyState === 4 && this.status === 200){
+            if(this.readyState === 4 && this.status === 400){
                 respuesta = JSON.parse(this.responseText);
                 if(respuesta["error"]){
                     Swal.fire({
@@ -91,14 +91,16 @@ document.querySelector("#btn-solicitar-unirse").addEventListener("click", (e) =>
                     title: 'Algo salio mal...',
                     text: respuesta["error"],
                   })
-                }else{
-                    Swal.fire({
-                    icon: 'success',
-                    title: '¡Genial!',
-                    text: 'Se ha enviado tu solicitud correctamente, ahora solo es necesario que tu maestro te acepte',
-                    willClose: redireccionarPaginaInicio
-                  })
                 }
+                e.target.disabled = false;
+            }
+            if(this.readyState === 4 && this.status === 200){
+                Swal.fire({
+                icon: 'success',
+                title: '¡Genial!',
+                text: 'Se ha enviado tu solicitud correctamente, ahora solo es necesario que tu maestro te acepte',
+                willClose: redireccionarPaginaInicio
+                });
                 e.target.disabled = false;
             }
         }

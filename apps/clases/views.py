@@ -1,19 +1,17 @@
-import random
-
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse, Http404, HttpResponseRedirect, HttpResponse
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView
-from django.views.generic.base import View
+from django.views.generic.base import View, TemplateView
 
 from .forms import ClaseForm
 from .models import Clase, Inscripcion, EstadoSolicitudUnirse
+from ..usuarios.mixins import MaestroMixin, AlumnoMixin
 
 
-@method_decorator(login_required, name='dispatch')
-class RegistroClaseView(CreateView):
+class RegistroClaseView(MaestroMixin, CreateView):
+    """Vista para registrar una clase"""
     model = Clase
     form_class = ClaseForm
     success_url = reverse_lazy('inicio')
@@ -32,33 +30,17 @@ class RegistroClaseView(CreateView):
             return self.render_to_response(self.get_context_data(form=formulario))
 
 
-@login_required()
-def informacion_clase(request, codigo_clase):
-    """
-    Recupera la información de la clase de un maestro
-    :param request: La solicitud del cliente
-    :param codigo_clase: El codigo de la clase a obtener la informacion
-    :return: Un redirect o un render
-    """
-    if not request.user.es_maestro:
-        return redirect('login')
-    else:
-        maestro = request.user.persona.maestro
-        clase_actual = maestro.clase_set.filter(abierta=True, codigo=codigo_clase).first()
-        datos = {}
-        if clase_actual is not None:
-            return render(request, 'clases/informacion-clase/InformacionClase.html', datos)
-        else:
-            return render(request, 'generales/NoEncontrada.html', datos)
+class ConsultarClaseView(MaestroMixin, TemplateView):
+    """Vista para consultar la información de una clase"""
+    template_name = 'clases/informacion-clase/InformacionClase.html'
 
-
-def obtener_cantidad_de_alumnos_inscritos_a_clase(id_clase):
-    """
-    Obtiene la cantidad de alumnos inscritos a una clase
-    :param id_clase: El id de la clase
-    :return: La cantidad de alumnos aceptados en la clase
-    """
-    return Clase.objects.filter(pk=id_clase).first().inscripcion_set.filter(aceptado='Aceptado').count()
+    def get_context_data(self, **kwargs):
+        context = super(ConsultarClaseView, self).get_context_data(**kwargs)
+        query_set = Clase.objects.filter(abierta=True)
+        clase_actual = get_object_or_404(query_set, codigo=kwargs['codigo_clase'])
+        context['alumnos_aceptados'] = clase_actual.obtener_cantidad_de_alumnos_aceptados()
+        context['alumnos_en_espera'] = clase_actual.obtener_cantidad_de_alumnos_pendientes_de_aceptar()
+        return context
 
 
 @login_required()
@@ -72,35 +54,15 @@ def obtener_informacion_clase(request, codigo_clase):
     if request.is_ajax and request.method == "GET":
         clase_con_codigo = Clase.objects.filter(codigo=codigo_clase, abierta=True).first()
         if clase_con_codigo is not None:
-            datos = _crearJSONClase(clase_con_codigo)
+            datos = clase_con_codigo.obtener_json()
             return JsonResponse(datos)
         else:
             return JsonResponse({'error': 'No exite ninguna clase con el codigo indicado'})
     raise Http404
 
 
-def _crearJSONClase(clase):
-    """
-    Crea un Diccionario con los datos de una clase
-    :param clase: La clase de la cual se creara la clase
-    :return: Un diccionario con la información de la clase
-    """
-    url_foto_maeestro = ''
-    if clase.maestro.foto_de_perfil:
-        url_foto_maeestro = clase.maestro.foto_de_perfil.url
-    datos_clase = {
-        'nombre': clase.nombre,
-        'escuela': clase.escuela,
-        'foto': clase.foto.url,
-        'maestro': clase.maestro.nombre + ' ' + clase.maestro.apellidos,
-        'foto_maestro': url_foto_maeestro
-    }
-    return datos_clase
-
-
-# Falta protección a la ruta
-@method_decorator(login_required, name='dispatch')
-class ListarAlumnosDeClase(ListView):
+class ListarAlumnosDeClase(MaestroMixin, ListView):
+    """Vista para consultar los alumnos de una clase"""
     model = Inscripcion
     template_name = 'usuarios/consultar-alumnos-de-clase/ConsultarAlumnosDeClase.html'
     queryset = Inscripcion.objects.select_related('alumno')
@@ -111,10 +73,8 @@ class ListarAlumnosDeClase(ListView):
         return Inscripcion.objects.filter(clase__codigo=clase_actual).select_related('alumno')
 
 
-# Falta proteccion de la ruta
-@method_decorator(login_required, name='dispatch')
-class ModificarEstadoInscriocionAlumno(View):
-
+class ModificarEstadoInscriocionAlumno(MaestroMixin, View):
+    """Visra para modificar el estado de una inscripcion de un alumno"""
     def post(self, request, codigo_clase, id_alumno):
         queryset = request.user.persona.maestro.clase_set.filter(abierta=True)
         clase_actual = get_object_or_404(queryset, codigo=codigo_clase)
@@ -134,35 +94,16 @@ def _validar_opcion_existente_inscripcion(estado):
     return estado in estados
 
 
-@login_required()
-def unir_alumno_a_clase(request, codigo_clase):
-    """
-    Une un alumno a una clase al crear una inscripcion
-    :param request: La solicitud del usuario
-    :param codigo_clase: El codigo de la clase a la que el alumno se quiere unir
-    :return: Un JSON
-    """
-    if not request.user.es_maestro:
-        if request.is_ajax and request.method == 'GET':
-            mensaje_error = _validar_inscripcion_a_clase(request.user.persona.alumno, codigo_clase)
-            if mensaje_error == "":
-                _registrar_inscripcion_alumno(request.user.persona.alumno.pk, codigo_clase)
-                return JsonResponse({})
-            else:
-                return JsonResponse({'error': mensaje_error})
-    raise Http404
-
-
-def _registrar_inscripcion_alumno(id_alumno, codigo_clase):
-    """
-    Registra un alumno en una clase
-    :param id_alumno: El id del alumno a inscribir en una clase
-    :param codigo_clase: El codigo de la clase en la cual el alumno se va a unir
-    :return: None
-    """
-    clase = Clase.objects.filter(codigo=codigo_clase, abierta=True).first()
-    inscripcion = Inscripcion(clase_id=clase.pk, alumno_id=id_alumno)
-    inscripcion.save()
+class SolicitarUnirseAClaseView(AlumnoMixin, View):
+    """Vista para solicitar unirse a una clase"""
+    def get(self, request, codigo_clase):
+        mensaje_error = _validar_inscripcion_a_clase(request.user.persona.alumno, codigo_clase)
+        if mensaje_error == "":
+            clase = Clase.objects.filter(codigo=codigo_clase).first()
+            clase.registrar_inscripcion_alumno(request.user.persona.alumno.pk)
+            return HttpResponse(status=200)
+        else:
+            return JsonResponse({'error': mensaje_error}, status=400)
 
 
 def _validar_inscripcion_a_clase(alumno, codigo_clase):
@@ -188,29 +129,6 @@ def _validar_inscripcion_a_clase(alumno, codigo_clase):
     return mensaje_error
 
 
-@login_required()
-def informacion_clase_alumno(request, codigo_clase):
-    """
-    Muestra la informacion de una clase para el usuario alumno
-    :param request: La solicitud del usuario
-    :param codigo_clase: El codigo de la clase a mostrar la informacion
-    :return: Un render o un redirect
-    """
-    if request.user.es_maestro:
-        return redirect('login')
-    else:
-        alumno = request.user.persona.alumno
-        clase = Clase.objects.filter(codigo=codigo_clase).first()
-        inscripcion = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.id).first()
-        clase_actual = inscripcion.clase
-        datos = {}
-        if clase_actual is not None:
-            datos['clase_actual'] = clase_actual
-            return render(request, 'clases/informacion-clase/InformacionClaseAlumno.html', datos)
-        else:
-            return render(request, 'generales/NoEncontrada.html', datos)
-
-
-def contar_estados_inscripciones_de_alumnos(alumnos_de_la_clase, datos_cantidad_alumnos):
-    pass
-
+class ConsultarClaseAlumnoView(AlumnoMixin, TemplateView):
+    """Vista para consultar la clase"""
+    template_name = 'clases/informacion-clase/InformacionClaseAlumno.html'
