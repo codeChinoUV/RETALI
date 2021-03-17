@@ -25,6 +25,7 @@ class Actividad(models.Model):
         """ Cuenta la cantidad de entregas realizadas"""
         return self.entrega_set.count()
 
+
 class Revision(models.Model):
     """
     Representa la revisión realizada por el maestro de la entrega de una Actividad de un Alumno
