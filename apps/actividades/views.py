@@ -1,9 +1,11 @@
 import os
+
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
-from django.utils import timezone
-from django.views.generic import ListView
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView
 
 from RETALI import settings
 from apps.actividades.forms import ActividadForm, ActividadDisableForm
@@ -13,13 +15,13 @@ from apps.usuarios.mixins import MaestroMixin, AlumnoMixin
 
 
 class ConsultarActividadesDeClaseView(MaestroMixin, ListView):
+    """Muestra las actividades de una clase para la vista del maestro"""
     template_name = 'actividades/consultar-actividades-maestro/ConsultarActividadesMaestro.html'
     model = Actividad
-    ordering = '-fecha_de_creacion'
 
     def get_queryset(self):
         clase_actual = self.kwargs['codigo_clase']
-        return Actividad.objects.filter(clase__codigo=clase_actual, clase__abierta=True)
+        return Actividad.objects.filter(clase__codigo=clase_actual, clase__abierta=True).order_by('-fecha_de_creacion')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(ConsultarActividadesDeClaseView, self).get_context_data(**kwargs)
@@ -33,13 +35,13 @@ class ConsultarActividadesDeClaseView(MaestroMixin, ListView):
 
 
 class ConsultarActividadesDelAlumnoView(AlumnoMixin, ListView):
+    """Muestra las actividades de una clase para la vista del alumno"""
     model = Actividad
     template_name = 'actividades/consultar-actividades-alumno/ConsultarActividadesAlumno.html'
-    ordering = '-fecha_de_creacion'
 
     def get_queryset(self):
         clase_actual = self.kwargs['codigo_clase']
-        return Actividad.objects.filter(clase__codigo=clase_actual, clase__abierta=True)
+        return Actividad.objects.filter(clase__codigo=clase_actual, clase__abierta=True).order_by('-fecha_de_creacion')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(ConsultarActividadesDelAlumnoView, self).get_context_data(**kwargs)
@@ -50,44 +52,25 @@ class ConsultarActividadesDelAlumnoView(AlumnoMixin, ListView):
         context['cantidad_actividades_abiertas'] = clase_actual.cantidad_de_actividades_abiertas()
         return context
 
-@login_required()
-def registrar_actividad(request, codigo_clase):
-    """
-    Registra una actividad a la clase actual
-    :param request: La solicitud realizada por el cliente
-    :param codigo_clase: El codigo de la clase a la que se le registrara la actividad
-    :return: Una templete con los datos
-    """
-    if not request.user.es_maestro:
-        return redirect('inicio')
-    else:
-        datos_del_maestro = {}
-        datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set. \
-            filter(abierta=True, codigo=codigo_clase).first()
-        if datos_del_maestro['clase_actual'] is not None:
-            datos_del_maestro['form'] = ActividadForm()
-            if request.method == "POST":
-                formulario = ActividadForm(request.POST)
-                if formulario.is_valid():
-                    datos_de_la_actividad = formulario.cleaned_data
-                    if validar_fecha_cierre_mayor_a_fecha_apertura(datos_de_la_actividad["fecha_inicio"],
-                                                                   datos_de_la_actividad["fecha_cierre"]):
-                        actividad = Actividad(nombre=datos_de_la_actividad['nombre'],
-                                              descripcion=datos_de_la_actividad['descripcion'],
-                                              fecha_de_inicio=datos_de_la_actividad['fecha_inicio'],
-                                              fecha_de_cierre=datos_de_la_actividad['fecha_cierre'],
-                                              clase_id=datos_del_maestro['clase_actual'].id)
-                        actividad.save()
-                        return redirect('actividades', codigo_clase=codigo_clase)
-                    else:
-                        formulario.errors["fecha_inicio"] = "La fecha de inicio no puede ser antes que la fecha " \
-                                                            "de cierre"
-                    datos_del_maestro['form'] = formulario
-                    return render(request, 'actividades/registrar-actividad/RegistrarActividad.html', datos_del_maestro)
-            else:
-                return render(request, 'actividades/registrar-actividad/RegistrarActividad.html', datos_del_maestro)
+
+class RegistroActividadView(MaestroMixin, CreateView):
+    model = Actividad
+    template_name = 'actividades/registrar-actividad/RegistrarActividad.html'
+    form_class = ActividadForm
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object
+        formulario = self.form_class(request.POST)
+        if formulario.is_valid():
+            query_clase = Clase.objects.filter(abierta=True)
+            clase = get_object_or_404(query_clase, codigo=kwargs['codigo_clase'])
+            actividad = formulario.save(commit=False)
+            actividad.clase = clase
+            actividad.save()
+            messages.info(request, 'La actividad se ha registrado correctamente')
+            return redirect('actividades', codigo_clase=kwargs['codigo_clase'])
         else:
-            return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
+            return self.render_to_response(self.get_context_data(form=formulario))
 
 
 @login_required()
