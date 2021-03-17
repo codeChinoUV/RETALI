@@ -2,11 +2,11 @@ from django.urls import path
 
 from apps.actividades.views import registrar_actividad, consultar_actividad, \
     revisar_entrega_actividad, entregar_actividad_alumno, descargar_archivo_de_entrega, editar_actividad, \
-    ConsultarActividadesDeClaseListView, consultar_actividades_de_clase_alumno
+    ConsultarActividadesDeClaseView, ConsultarActividadesDelAlumnoView
 
 urlpatterns = [
-    path('<str:codigo_clase>/actividades', ConsultarActividadesDeClaseListView.as_view(), name='actividades'),
-    path('<str:codigo_clase>/actividades/alumno', consultar_actividades_de_clase_alumno, name='actividades_alumno'),
+    path('<str:codigo_clase>/actividades', ConsultarActividadesDeClaseView.as_view(), name='actividades'),
+    path('<str:codigo_clase>/actividades/alumno', ConsultarActividadesDelAlumnoView.as_view(), name='actividades_alumno'),
     path('<str:codigo_clase>/registro_actividad', registrar_actividad, name='registrar_actividad'),
     path('<str:codigo_clase>/actividades/<int:id_actividad>/editar', editar_actividad, name='editar_actividad'),
     path('<str:codigo_clase>/actividades/<int:id_actividad>/', consultar_actividad, name='consultar_actividad_mestro'),

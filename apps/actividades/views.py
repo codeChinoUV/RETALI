@@ -9,10 +9,10 @@ from RETALI import settings
 from apps.actividades.forms import ActividadForm, ActividadDisableForm
 from apps.actividades.models import Actividad, Entrega, Archivo, Revision
 from apps.clases.models import Clase
-from apps.usuarios.mixins import MaestroMixin
+from apps.usuarios.mixins import MaestroMixin, AlumnoMixin
 
 
-class ConsultarActividadesDeClaseListView(MaestroMixin, ListView):
+class ConsultarActividadesDeClaseView(MaestroMixin, ListView):
     template_name = 'actividades/consultar-actividades-maestro/ConsultarActividadesMaestro.html'
     model = Actividad
     ordering = '-fecha_de_creacion'
@@ -22,7 +22,7 @@ class ConsultarActividadesDeClaseListView(MaestroMixin, ListView):
         return Actividad.objects.filter(clase__codigo=clase_actual, clase__abierta=True)
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(ConsultarActividadesDeClaseListView, self).get_context_data(**kwargs)
+        context = super(ConsultarActividadesDeClaseView, self).get_context_data(**kwargs)
         query_set = Clase.objects.filter(abierta=True)
         clase_actual = get_object_or_404(query_set, codigo=self.kwargs['codigo_clase'])
         clase_actual.actualizar_estado_actividades()
@@ -32,33 +32,23 @@ class ConsultarActividadesDeClaseListView(MaestroMixin, ListView):
         return context
 
 
-@login_required
-def consultar_actividades_de_clase_alumno(request, codigo_clase):
-    """
-    Obtiene las actividades de una clase para el alumno
-    :param request: El request del cliente
-    :param codigo_clase: El codigo de la clase de la cual se quiere obtener las actividades
-    :return: Una template con sus datos o un redirect a la pagina correcta
-    """
-    if request.user.es_maestro:
-        return redirect('inicio')
-    else:
-        alumno = request.user.persona.alumno
-        clase = Clase.objects.filter(codigo=codigo_clase).first()
-        inscripcion = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.id).first()
-        datos_del_alumno = {}
-        datos_del_alumno['clase_actual'] = inscripcion.clase
-        if datos_del_alumno['clase_actual'] is not None:
-            datos_del_alumno['actividades'] = datos_del_alumno['clase_actual'].actividad_set.all() \
-                .order_by('-fecha_de_creacion')
-            _actualizar_estado_actividades(datos_del_alumno['actividades'])
-            datos_del_alumno['total_de_actividades'] = \
-                obtener_cantidad_total_de_actividades(datos_del_alumno['clase_actual'])
-            datos_del_alumno['cantidad_actividades_abiertas'] = \
-                obtener_cantidad_de_actividades_abiertas(datos_del_alumno['actividades'])
-            return render(request, 'actividades/consultar-actividades-alumno/ConsultarActividadesAlumno.html',
-                          datos_del_alumno)
+class ConsultarActividadesDelAlumnoView(AlumnoMixin, ListView):
+    model = Actividad
+    template_name = 'actividades/consultar-actividades-alumno/ConsultarActividadesAlumno.html'
+    ordering = '-fecha_de_creacion'
 
+    def get_queryset(self):
+        clase_actual = self.kwargs['codigo_clase']
+        return Actividad.objects.filter(clase__codigo=clase_actual, clase__abierta=True)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(ConsultarActividadesDelAlumnoView, self).get_context_data(**kwargs)
+        query_set = Clase.objects.filter(abierta=True)
+        clase_actual = get_object_or_404(query_set, codigo=self.kwargs['codigo_clase'])
+        clase_actual.actualizar_estado_actividades()
+        context['total_de_actividades'] = clase_actual.cantidad_de_actividades()
+        context['cantidad_actividades_abiertas'] = clase_actual.cantidad_de_actividades_abiertas()
+        return context
 
 @login_required()
 def registrar_actividad(request, codigo_clase):
