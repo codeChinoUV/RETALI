@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, TemplateView
 
 from RETALI import settings
 from apps.actividades.forms import ActividadForm, ActividadDisableForm
@@ -105,30 +105,20 @@ class EditarActividadView(MaestroMixin, UpdateView):
             return self.render_to_response(self.get_context_data(form=formulaio))
 
 
-@login_required()
-def consultar_actividad(request, codigo_clase, id_actividad):
-    """
-    Muestra la informacion de la actividad con sus entregas
-    :param request: La solicitud del cliente
-    :param codigo_clase: El codigo de la clase a la que pertenece la actividad
-    :param id_actividad: El id de la activdad a editar
-    :return: un redirect o un render
-    """
-    if not request.user.es_maestro:
-        return redirect('inicio')
-    else:
-        datos_del_maestro = {}
-        datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set. \
-            filter(codigo=codigo_clase, abierta=True).first()
-        if _validar_existe_actividad(codigo_clase, id_actividad, request.user.persona.maestro):
-            datos_del_maestro['actividad_actual'] = datos_del_maestro['clase_actual']. \
-                actividad_set.filter(pk=id_actividad).first()
-            datos_del_maestro['form'] = ActividadDisableForm()
-            datos_del_maestro['entregas'] = datos_del_maestro['actividad_actual'].entrega_set.all()
-            return render(request, 'actividades/consultar-actividad-maestro/consultarActividadMaestro.html',
-                          datos_del_maestro)
-        else:
-            return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
+class ConsultarActividadView(MaestroMixin, TemplateView):
+    """ Vista para consultar actividad y sus entregas"""
+    template_name = 'actividades/consultar-actividad-maestro/consultarActividadMaestro.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ConsultarActividadView, self).get_context_data(**kwargs)
+        codigo_clase = kwargs['codigo_clase']
+        id_actividad = kwargs['id_actividad']
+        query_set_actividad = Actividad.objects.filter(clase__abierta=True, clase__codigo=codigo_clase)
+        actividad = get_object_or_404(query_set_actividad, pk=id_actividad)
+        context['form'] = ActividadDisableForm(instance=actividad)
+        context['id_actividad'] = id_actividad
+        context['entregas'] = actividad.entrega_set.all()
+        return context
 
 
 def _validar_existe_actividad(codigo_clase, id_actividad, maestro):
@@ -410,7 +400,7 @@ def _validar_actividad_abierta(actividad):
     :return: True si la actividad se encuentra abierta o False si no
     """
     esta_abierta = True
-    _actualizar_estado_actividad(actividad)
+    #_actualizar_estado_actividad(actividad)
     if actividad.estado != 'Abierta':
         esta_abierta = False
     return esta_abierta

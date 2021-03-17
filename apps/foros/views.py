@@ -1,12 +1,7 @@
-import datetime
-
-import pytz
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.utils import timezone
-
-from apps.actividades.views import validar_fecha_cierre_mayor_a_fecha_apertura
 from apps.clases.models import Clase
 from apps.foros.forms import ForoForm
 from apps.foros.models import Foro, Participacion, Respuesta
@@ -174,14 +169,14 @@ def editar_foro(request, codigo_clase, id_foro):
                     formulario = ForoForm(request.POST)
                     if formulario.is_valid():
                         datos = formulario.cleaned_data
-                        if validar_fecha_cierre_mayor_a_fecha_apertura(datos["fecha_inicio"], datos["fecha_cierre"]):
-                            _actualizar_informacion_foro(id_foro, datos["nombre"], datos["descripcion"],
-                                                              datos["fecha_inicio"], datos["fecha_cierre"])
-                            return redirect('consultar_foro', codigo_clase=codigo_clase,
-                                            id_foro=id_foro)
-                        else:
-                            formulario.errors["fecha_inicio"] = "La fecha de inicio no puede ser antes que la fecha " \
-                                                                "de cierre"
+                        #if validar_fecha_cierre_mayor_a_fecha_apertura(datos["fecha_inicio"], datos["fecha_cierre"]):
+                        _actualizar_informacion_foro(id_foro, datos["nombre"], datos["descripcion"],
+                                                          datos["fecha_inicio"], datos["fecha_cierre"])
+                        return redirect('consultar_foro', codigo_clase=codigo_clase,
+                                        id_foro=id_foro)
+                        #else:
+                        #    formulario.errors["fecha_inicio"] = "La fecha de inicio no puede ser antes que la fecha " \
+                        #                                        "de cierre"
                     datos_del_maestro["form"] = formulario
                     return render(request, 'foros/editar-foro/EditarForo.html', datos_del_maestro)
         raise Http404
