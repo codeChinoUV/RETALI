@@ -12,5 +12,5 @@ const configuracion_fecha_cierre = {
     maxDate: new Date().fp_incr(365)
 }
 
-flatpickr("#id_fecha_inicio", configuracion_fecha_inicio);
-flatpickr("#id_fecha_cierre", configuracion_fecha_cierre);
+flatpickr("#id_fecha_de_inicio", configuracion_fecha_inicio);
+flatpickr("#id_fecha_de_cierre", configuracion_fecha_cierre);

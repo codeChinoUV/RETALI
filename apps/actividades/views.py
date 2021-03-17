@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, UpdateView
 
 from RETALI import settings
 from apps.actividades.forms import ActividadForm, ActividadDisableForm
@@ -54,6 +54,7 @@ class ConsultarActividadesDelAlumnoView(AlumnoMixin, ListView):
 
 
 class RegistroActividadView(MaestroMixin, CreateView):
+    """Vista para registrar una actividad"""
     model = Actividad
     template_name = 'actividades/registrar-actividad/RegistrarActividad.html'
     form_class = ActividadForm
@@ -73,82 +74,35 @@ class RegistroActividadView(MaestroMixin, CreateView):
             return self.render_to_response(self.get_context_data(form=formulario))
 
 
-@login_required()
-def editar_actividad(request, codigo_clase, id_actividad):
-    """
-    Edita una actividad
-    :param request: La solicitud realizada por el cliente
-    :param codigo_clase: El codigo de la clase a la que pertence la actividad a editar
-    :return: Un render o un redirect
-    """
-    if request.user.es_maestro:
-        datos_del_maestro = {}
-        datos_del_maestro["clase_actual"] = request.user.persona.maestro.clase_set.filter(codigo=codigo_clase).first()
-        if request.method == "GET":
-            if datos_del_maestro["clase_actual"] is not None:
-                if _validar_existe_actividad(codigo_clase, id_actividad, request.user.persona.maestro):
-                    actividad_actual = Actividad.objects.filter(pk=id_actividad).first()
-                    datos_del_maestro["form"] = _crear_formulario_con_informacion_de_actividad(actividad_actual)
-                    return render(request, 'actividades/editar_actividad/EditarActividad.html', datos_del_maestro)
-            return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
-        elif request.method == "POST":
-            if datos_del_maestro["clase_actual"] is not None:
-                if _validar_existe_actividad(codigo_clase, id_actividad, request.user.persona.maestro):
-                    formulario = ActividadForm(request.POST)
-                    if formulario.is_valid():
-                        datos = formulario.cleaned_data
-                        if validar_fecha_cierre_mayor_a_fecha_apertura(datos["fecha_inicio"], datos["fecha_cierre"]):
-                            _actualizar_informacion_actividad(id_actividad, datos["nombre"], datos["descripcion"],
-                                                              datos["fecha_inicio"], datos["fecha_cierre"])
-                            return redirect('consultar_actividad_mestro', codigo_clase=codigo_clase,
-                                            id_actividad=id_actividad)
-                        else:
-                            formulario.errors["fecha_inicio"] = "La fecha de inicio no puede ser antes que la fecha " \
-                                                                "de cierre"
-                    datos_del_maestro["form"] = formulario
-                    return render(request, 'actividades/editar_actividad/EditarActividad.html', datos_del_maestro)
-        raise Http404
-    else:
-        return redirect('inicio')
+class EditarActividadView(MaestroMixin, UpdateView):
+    """Vista para editar una actividad"""
+    model = Actividad
+    template_name = 'actividades/editar_actividad/EditarActividad.html'
+    form_class = ActividadForm
 
+    def get_context_data(self, **kwargs):
+        context = super(EditarActividadView, self).get_context_data(**kwargs)
+        codigo_clase = self.kwargs['codigo_clase']
+        id_actividad = self.kwargs['pk']
+        query_set_actividad = Actividad.objects.filter(clase__abierta=True, clase__codigo=codigo_clase)
+        actividad = get_object_or_404(query_set_actividad, pk=id_actividad)
+        if 'form' not in context:
+            context['form'] = self.form_class(instance=actividad)
+        return context
 
-def validar_fecha_cierre_mayor_a_fecha_apertura(fecha_inicio, fecha_cierre):
-    """
-    Valida que la fecha de inicio no sea mayor a la fecha de cierre
-    :param fecha_inicio: La fecha de inicio
-    :param fecha_cierre: La fecha de cierre
-    :return: True si la fecha de cierre no es mayor a la fecha de inicio
-    """
-    return fecha_cierre > fecha_inicio
-
-
-def _crear_formulario_con_informacion_de_actividad(actividad):
-    """
-    Crea un formulario de actividad con los datos de la actividad
-    :param actividad: La actividad con la cual se llenaran los campos del formulario
-    :return: Un ActividadForm con la informacion de la actividad
-    """
-    formulario = ActividadForm()
-    formulario.fields["nombre"].initial = actividad.nombre
-    formulario.fields["descripcion"].initial = actividad.descripcion
-    formulario.fields["fecha_inicio"].initial = actividad.fecha_de_inicio
-    formulario.fields["fecha_cierre"].initial = actividad.fecha_de_cierre
-    return formulario
-
-
-def _actualizar_informacion_actividad(id_actividad, nombre, descripcion, fecha_inicio, fecha_cierre):
-    """
-    Actualiza la informacion de la activdad con el id_actividad
-    :param id_actividad: El id de la actividad a actualiazr sus datos
-    :param nombre: El nombre de la actividad
-    :param descripcion: La descripcion de la actividad
-    :param fecha_inicio: La fecha de inicio de la actividad
-    :param fecha_cierre: La fecha de cierre de la actividad
-    :return: None
-    """
-    Actividad.objects.filter(pk=id_actividad).update(nombre=nombre, descripcion=descripcion,
-                                                     fecha_de_inicio=fecha_inicio, fecha_de_cierre=fecha_cierre)
-
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        codigo_clase = kwargs['codigo_clase']
+        id_actividad = kwargs['pk']
+        query_set_actividad = Actividad.objects.filter(clase__abierta=True, clase__codigo=codigo_clase)
+        actividad = get_object_or_404(query_set_actividad, pk=id_actividad)
+        formulaio = self.form_class(request.POST, instance=actividad)
+        if formulaio.is_valid():
+            formulaio.save()
+            messages.info(request, 'Se ha modificado la información de la actividad correctamente')
+            return redirect('consultar_actividad_mestro', codigo_clase=codigo_clase, id_actividad=id_actividad)
+        else:
+            return self.render_to_response(self.get_context_data(form=formulaio))
 
 
 @login_required()
