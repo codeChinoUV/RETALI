@@ -1,41 +1,35 @@
 import os
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.utils import timezone
+from django.views.generic import ListView
+
 from RETALI import settings
 from apps.actividades.forms import ActividadForm, ActividadDisableForm
 from apps.actividades.models import Actividad, Entrega, Archivo, Revision
 from apps.clases.models import Clase
+from apps.usuarios.mixins import MaestroMixin
 
 
-@login_required
-def consultar_actividades_de_clase(request, codigo_clase):
-    """
-    Obtiene las actividades de una clase
-    :param request: El request del cliente
-    :param codigo_clase: El codigo de la clase de la cual se quiere obtener las actividades
-    :return: Una template con sus datos o un redirect a la pagina correcta
-    """
-    if not request.user.es_maestro:
-        return redirect('inicio')
-    else:
-        datos_del_maestro = {}
-        datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set.filter(abierta=True,
-                                                                                          codigo=codigo_clase).first()
-        if datos_del_maestro['clase_actual'] is not None:
-            datos_del_maestro['actividades'] = datos_del_maestro['clase_actual'].actividad_set.all() \
-                .order_by('-fecha_de_creacion')
-            _actualizar_estado_actividades(datos_del_maestro['actividades'])
-            _colocar_cantidad_de_entregas_de_actividad(datos_del_maestro['actividades'])
-            datos_del_maestro['total_alumnos'] = \
-                datos_del_maestro['clase_actual'].obtener_cantidad_de_alumnos_inscritos()
-            datos_del_maestro['total_de_actividades'] = \
-                obtener_cantidad_total_de_actividades(datos_del_maestro['clase_actual'])
-            datos_del_maestro['cantidad_actividades_abiertas'] = \
-                obtener_cantidad_de_actividades_abiertas(datos_del_maestro['actividades'])
-            return render(request, 'actividades/consultar-actividades-maestro/ConsultarActividadesMaestro.html',
-                          datos_del_maestro)
+class ConsultarActividadesDeClaseListView(MaestroMixin, ListView):
+    template_name = 'actividades/consultar-actividades-maestro/ConsultarActividadesMaestro.html'
+    model = Actividad
+    ordering = '-fecha_de_creacion'
+
+    def get_queryset(self):
+        clase_actual = self.kwargs['codigo_clase']
+        return Actividad.objects.filter(clase__codigo=clase_actual, clase__abierta=True)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(ConsultarActividadesDeClaseListView, self).get_context_data(**kwargs)
+        query_set = Clase.objects.filter(abierta=True)
+        clase_actual = get_object_or_404(query_set, codigo=self.kwargs['codigo_clase'])
+        clase_actual.actualizar_estado_actividades()
+        context['total_de_alumnos'] = clase_actual.obtener_cantidad_de_alumnos_aceptados()
+        context['total_de_actividades'] = clase_actual.cantidad_de_actividades()
+        context['cantidad_actividades_abiertas'] = clase_actual.cantidad_de_actividades_abiertas()
+        return context
 
 
 @login_required
@@ -182,68 +176,6 @@ def _actualizar_informacion_actividad(id_actividad, nombre, descripcion, fecha_i
     Actividad.objects.filter(pk=id_actividad).update(nombre=nombre, descripcion=descripcion,
                                                      fecha_de_inicio=fecha_inicio, fecha_de_cierre=fecha_cierre)
 
-
-def _actualizar_estado_actividades(actividades):
-    """
-    Actualiza el estado de las actividades que se le pasan, verificando si esta abierta o no
-    :param actividades: Las actividades a las que se le actualizara el estado
-    :return: None
-    """
-    if actividades is not None:
-        for actividad in actividades:
-            _actualizar_estado_actividad(actividad)
-
-
-def _actualizar_estado_actividad(actividad):
-    """
-    Actualiza el estado de una sola actividad dependiendo la fecha de cierre de esta
-    :param actividad: La actividad a la cual se le actualiza el estado
-    :return: None
-    """
-    now = timezone.now()
-    if actividad.fecha_de_inicio > now:
-        Actividad.objects.filter(pk=actividad.pk).update(estado='Por abrir')
-        actividad.estado = 'Por abrir'
-    elif actividad.fecha_de_cierre < now:
-        Actividad.objects.filter(pk=actividad.pk).update(estado='Cerrada')
-        actividad.estado = 'Cerrada'
-    else:
-        Actividad.objects.filter(pk=actividad.pk).update(estado='Abierta')
-        actividad.estado = 'Abierta'
-
-
-def _colocar_cantidad_de_entregas_de_actividad(actividades):
-    """
-    Coloca la cantidad de entregas en la actividad
-    :param actividades: La lista de actividades
-    :return: None
-    """
-    if actividades is not None:
-        for actividad in actividades:
-            actividad.cantidad_entregas = actividad.entrega_set.count()
-
-
-def obtener_cantidad_de_actividades_abiertas(actividades):
-    """
-    Cuenta la cantidad de actividades que su fecha de entrega es despues de la fecha actual
-    :param actividades: Las actividades a checar
-    :return: La cantidad de actividades abiertas
-    """
-    now = timezone.now()
-    cantidad_actividades_abiertas = 0
-    for actividad in actividades:
-        if actividad.fecha_de_cierre > now > actividad.fecha_de_inicio:
-            cantidad_actividades_abiertas += 1
-    return cantidad_actividades_abiertas
-
-
-def obtener_cantidad_total_de_actividades(clase):
-    """
-    Cuenta la cantidad total de actividades de una clase
-    :param clase: La clase de la cual se contaran las actividades
-    :return: EL total de actividades de una clase
-    """
-    return clase.actividad_set.count()
 
 
 @login_required()

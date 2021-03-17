@@ -96,6 +96,50 @@ class Clase(models.Model):
         }
         return datos_clase
 
+    def cantidad_de_actividades(self):
+        """
+        Cuenta la cantidad total de actividades de una clase
+        :return: EL total de actividades de la clase
+        """
+        return self.actividad_set.count()
+
+    def cantidad_de_actividades_abiertas(self):
+        """
+        Cuenta la cantidad de actividades que su fecha de entrega es despues de la fecha actual
+        :return: La cantidad de actividades abiertas
+        """
+        now = timezone.now()
+        cantidad_actividades_abiertas = 0
+        for actividad in self.actividad_set.all():
+            if actividad.fecha_de_cierre > now > actividad.fecha_de_inicio:
+                cantidad_actividades_abiertas += 1
+        return cantidad_actividades_abiertas
+
+    def actualizar_estado_actividades(self):
+        """
+        Actualiza el estado de las actividades que se le pasan, verificando si esta abierta o no
+        :return: None
+        """
+        for actividad in self.actividad_set.all():
+            self._actualizar_estado_actividad(actividad)
+
+    def _actualizar_estado_actividad(self, actividad):
+        """
+        Actualiza el estado de una sola actividad dependiendo la fecha de cierre de esta
+        :param actividad: La actividad a la cual se le actualiza el estado
+        :return: None
+        """
+        now = timezone.now()
+        if actividad.fecha_de_inicio > now:
+            self.actividad_set.filter(pk=actividad.pk).update(estado='Por abrir')
+            actividad.estado = 'Por abrir'
+        elif actividad.fecha_de_cierre < now:
+            self.actividad_set.filter(pk=actividad.pk).update(estado='Cerrada')
+            actividad.estado = 'Cerrada'
+        else:
+            self.actividad_set.filter(pk=actividad.pk).update(estado='Abierta')
+            actividad.estado = 'Abierta'
+
 
 class Alumno(Persona):
     """

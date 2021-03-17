@@ -1,4 +1,3 @@
-import os
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -22,6 +21,9 @@ class Actividad(models.Model):
     fecha_de_creacion = models.DateTimeField(default=timezone.now)
     entregas = models.ManyToManyField(Alumno, through='Entrega')
 
+    def cantidad_de_entregas(self):
+        """ Cuenta la cantidad de entregas realizadas"""
+        return self.entrega_set.count()
 
 class Revision(models.Model):
     """
