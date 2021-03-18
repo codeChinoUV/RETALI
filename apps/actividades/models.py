@@ -25,6 +25,22 @@ class Actividad(models.Model):
         """ Cuenta la cantidad de entregas realizadas"""
         return self.entrega_set.count()
 
+    def actualizar_estado_actividad(self):
+        """Actualiza el estado de la actividad dependiendo de las fechas de apertura y cierre"""
+        now = timezone.now()
+        if self.fecha_de_inicio > now:
+            self.estado = 'Por abrir'
+        elif self.fecha_de_cierre < now:
+            self.estado = 'Cerrada'
+        else:
+            self.estado = 'Abierta'
+        self.save()
+
+    def esta_abierta(self):
+        """Valida si la actividad se encuentra en estado Abierta"""
+        self.actualizar_estado_actividad()
+        return self.estado != 'Cerrada'
+
 
 class Revision(models.Model):
     """
@@ -32,6 +48,9 @@ class Revision(models.Model):
     """
     calificacion = models.FloatField(null=False)
     retroalimentacion = models.TextField()
+
+    def calificacion_entero(self):
+        return int(self.calificacion)
 
 
 class Entrega(models.Model):
@@ -43,6 +62,12 @@ class Entrega(models.Model):
     revision = models.OneToOneField(Revision, on_delete=models.RESTRICT, null=True)
     alumno = models.ForeignKey(Alumno, on_delete=models.RESTRICT)
     actvidad = models.ForeignKey(Actividad, on_delete=models.RESTRICT)
+
+    def realizar_revision(self, calificacion, comentarios):
+        revision = Revision(calificacion=calificacion,
+                            retroalimentacion=comentarios)
+        revision.save()
+        Entrega.objects.filter(pk=self.pk).update(revision=revision)
 
 
 class Archivo(models.Model):

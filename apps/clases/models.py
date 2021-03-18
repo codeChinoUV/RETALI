@@ -121,24 +121,7 @@ class Clase(models.Model):
         :return: None
         """
         for actividad in self.actividad_set.all():
-            self._actualizar_estado_actividad(actividad)
-
-    def _actualizar_estado_actividad(self, actividad):
-        """
-        Actualiza el estado de una sola actividad dependiendo la fecha de cierre de esta
-        :param actividad: La actividad a la cual se le actualiza el estado
-        :return: None
-        """
-        now = timezone.now()
-        if actividad.fecha_de_inicio > now:
-            self.actividad_set.filter(pk=actividad.pk).update(estado='Por abrir')
-            actividad.estado = 'Por abrir'
-        elif actividad.fecha_de_cierre < now:
-            self.actividad_set.filter(pk=actividad.pk).update(estado='Cerrada')
-            actividad.estado = 'Cerrada'
-        else:
-            self.actividad_set.filter(pk=actividad.pk).update(estado='Abierta')
-            actividad.estado = 'Abierta'
+            actividad.actualizar_estado_actividad()
 
 
 class Alumno(Persona):

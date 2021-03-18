@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
-from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView, TemplateView
 
 from RETALI import settings
@@ -113,8 +113,10 @@ class ConsultarActividadView(MaestroMixin, TemplateView):
         context = super(ConsultarActividadView, self).get_context_data(**kwargs)
         codigo_clase = kwargs['codigo_clase']
         id_actividad = kwargs['id_actividad']
-        query_set_actividad = Actividad.objects.filter(clase__abierta=True, clase__codigo=codigo_clase)
+        query_set_actividad = Actividad.objects.filter(clase__abierta=True, clase__codigo=codigo_clase,
+                                                       clase__maestro_id=self.request.user.persona.maestro.pk)
         actividad = get_object_or_404(query_set_actividad, pk=id_actividad)
+        actividad.actualizar_estado_actividad()
         context['form'] = ActividadDisableForm(instance=actividad)
         context['id_actividad'] = id_actividad
         context['entregas'] = actividad.entrega_set.all()
@@ -136,97 +138,45 @@ def _validar_existe_actividad(codigo_clase, id_actividad, maestro):
     return False
 
 
-@login_required()
-def revisar_entrega_actividad(request, codigo_clase, id_actividad, id_entrega):
-    """
-    Muestra un formulario para revisar la entrega a una actividad de un alumno
-    :param request: La solicitud del cliente
-    :param codigo_clase: El codigo de la clase a la que pertenece la actividad a revisar la entrega
-    :param id_actividad: El id de la actividad a revisar la entrega
-    :param id_entrega: El id de la entrega a revisar
-    :return: Un redirec o un render
-    """
-    if not request.user.es_maestro:
-        return redirect('inicio')
-    else:
-        datos_del_maestro = {}
-        datos_del_maestro['clase_actual'] = request.user.persona.maestro.clase_set. \
-            filter(codigo=codigo_clase, abierta=True).first()
-        if _validar_existe_entrega(codigo_clase, id_actividad, id_entrega, request.user.persona.maestro):
-            datos_del_maestro = _colocar_informacion_de_la_actividad(datos_del_maestro, id_actividad, id_entrega)
-            if request.method == 'GET':
-                return render(request, 'actividades/revisar-entrega-actividad/RevisarEntregaActividad.html',
-                              datos_del_maestro)
-            elif request.method == 'POST':
-                if not _validar_actividad_abierta(datos_del_maestro['actividad_actual']):
-                    if request.POST.get('calificacion') is None or request.POST.get('calificacion') == '0':
-                        datos_del_maestro['errores'] = {
-                            'calificacion': 'Debe de escoger una calificacion'
-                        }
-                    else:
-                        if datos_del_maestro['entrega_actual'].revision is not None:
-                            _actualizar_revision(datos_del_maestro['revision'].pk,
-                                                 request.POST['calificacion'], request.POST['comentarios'])
-                        else:
-                            _registrar_revision(datos_del_maestro['entrega_actual'], request.POST['calificacion'],
-                                                request.POST['comentarios'], )
-                        return redirect('consultar_actividad_mestro', codigo_clase=codigo_clase,
-                                        id_actividad=id_actividad)
-                else:
-                    datos_del_maestro['errores'] = {
-                        'fecha-cierre': 'No puede guardar su revisión hasta que la activdad se cierre'
-                    }
-                    return render(request, 'actividades/revisar-entrega-actividad/RevisarEntregaActividad.html',
-                                  datos_del_maestro)
+class RevisarEntregaActividadView(MaestroMixin, View):
+    """ Vista para revisar una actividad"""
+    template = 'actividades/revisar-entrega-actividad/RevisarEntregaActividad.html'
+
+    @staticmethod
+    def _validar_informacion_revision_incorrecta(calificacion, comentarios):
+        return comentarios is None or calificacion == '0'
+
+    def get_context_data(self, request, codigo_clase, id_actividad, id_entrega):
+        context = {}
+        query_entrega = Entrega.objects.filter(actvidad__clase__maestro_id=request.user.persona.maestro.pk,
+                                               actvidad_id=id_actividad).select_related('revision')
+        query_actividad = Actividad.objects.filter(clase__maestro_id=request.user.persona.maestro.pk,
+                                                   clase__codigo=codigo_clase,
+                                                   clase__abierta=True)
+        context['actividad_actual'] = get_object_or_404(query_actividad, pk=id_actividad)
+        context['entrega'] = get_object_or_404(query_entrega, pk=id_entrega)
+        context['archivos'] = context['entrega'].archivo_set.all()
+        return context
+
+    def get(self, request, codigo_clase, id_actividad, id_entrega):
+        context = self.get_context_data(request, codigo_clase, id_actividad, id_entrega)
+        return render(request, self.template, context)
+
+    def post(self, request, codigo_clase, id_actividad, id_entrega):
+        context = self.get_context_data(request, codigo_clase, id_actividad, id_entrega)
+        if not context['actividad_actual'].esta_abierta():
+            if not self._validar_informacion_revision_incorrecta(request.POST['calificacion'],
+                                                                 request.POST['comentarios']):
+                context['entrega'].realizar_revision(request.POST['calificacion'], request.POST['comentarios'])
+                messages.info(request, 'Se ha registrado la revisión a la actividad de ' +
+                              context['entrega'].alumno.nombre)
+                return redirect('consultar_actividad_mestro', codigo_clase=codigo_clase, id_actividad=id_actividad)
+            else:
+                messages.warning(request, 'La información de la revisión no es correcta, verifique e '
+                                          'intentelo de nuevo')
         else:
-            return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
-
-
-def _colocar_informacion_de_la_actividad(datos_anteriores, id_actividad, id_entrega):
-    """
-    Coloca la información necesaria para desplegar la pagina de calificar actividad
-    :param datos_anteriores: Los datos anteriores de la actividad
-    :param id_actividad: El id de la actividad a revisar la entrega
-    :param id_entrega: EL id de la entrega a revisar
-    :return: Los datos actualizados
-    """
-    datos_anteriores['actividad_actual'] = datos_anteriores['clase_actual']. \
-        actividad_set.filter(pk=id_actividad).first()
-    datos_anteriores['form'] = ActividadDisableForm()
-    datos_anteriores['entrega_actual'] = datos_anteriores['actividad_actual']. \
-        entrega_set.filter(pk=id_entrega).first()
-    datos_anteriores['archivos'] = datos_anteriores['entrega_actual'].archivo_set.all()
-    if datos_anteriores['entrega_actual'].revision is not None:
-        datos_anteriores['revision'] = datos_anteriores['entrega_actual'].revision
-        datos_anteriores['revision'].calificacion = datos_anteriores['revision'].calificacion = \
-            int(datos_anteriores['revision'].calificacion)
-    return datos_anteriores
-
-
-def _registrar_revision(entrega_actual, calificacion, comentarios):
-    """
-    Registra una revisión de una entrega de una actividad
-    :param entrega_actual: La entrega a revisar
-    :param calificacion: La calificación a guardar
-    :param comentarios: Los comentarios de la actividad
-    :return: None
-    """
-    revision = Revision(calificacion=calificacion,
-                        retroalimentacion=comentarios)
-    revision.save()
-    Entrega.objects.filter(pk=entrega_actual.pk).update(revision=revision)
-
-
-def _actualizar_revision(id_revision_actual, calificacion, comentarios):
-    """
-    Actualiza la infomración de una revisión previa
-    :param id_revision_actual: El id de la revision
-    :param calificacion: La calificación nueva
-    :param comentarios: Los comentarios nuevos
-    :return: None
-    """
-    Revision.objects.filter(pk=id_revision_actual). \
-        update(calificacion=calificacion, retroalimentacion=comentarios)
+            messages.warning(request, 'No puede evaluar una actividad mientras esta siga abierta')
+        return render(request, self.template, context)
 
 
 def _validar_existe_entrega(codigo_clase, id_actividad, id_entrega, maestro):
