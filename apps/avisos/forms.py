@@ -1,11 +1,20 @@
 from django import forms
 
+from apps.avisos.models import Aviso
 
-class AvisoForm(forms.Form):
+
+class AvisoForm(forms.ModelForm):
     """
     Formulario que servira para registrar una actividad, ademas de servir para validar los campos
     """
-    nombre = forms.CharField(max_length=50, required=True, label='Titulo del aviso:',
-                             widget=forms.TextInput(attrs={'class': "form-control"}))
-    descripcion = forms.CharField(required=True, label='Aviso:',
-                                  widget=forms.Textarea(attrs={'class': "form-control"}))
+    class Meta:
+        model = Aviso
+        fields = ['nombre', 'descripcion']
+        labels = {
+            'nombre': 'Titulo del aviso:',
+            'descripcion': 'Aviso:'
+        }
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': "form-control"}),
+            'descripcion': forms.Textarea(attrs={'class': "form-control"})
+        }
