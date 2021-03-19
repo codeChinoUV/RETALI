@@ -1,8 +1,8 @@
 from django.urls import path
 
-from apps.actividades.views import descargar_archivo_de_entrega, \
-    ConsultarActividadesDeClaseView, ConsultarActividadesDelAlumnoView, RegistroActividadView, EditarActividadView, \
-    ConsultarActividadView, RevisarEntregaActividadView, EntregarActividadView
+from apps.actividades.views import ConsultarActividadesDeClaseView, ConsultarActividadesDelAlumnoView, \
+    RegistroActividadView, EditarActividadView, ConsultarActividadView, RevisarEntregaActividadView, \
+    EntregarActividadView, DescargarArchivoView
 
 urlpatterns = [
     path('<str:codigo_clase>/actividades', ConsultarActividadesDeClaseView.as_view(), name='actividades'),
@@ -17,5 +17,5 @@ urlpatterns = [
     path('<str:codigo_clase>/actividades/<int:id_actividad>/entregar_actividad', EntregarActividadView.as_view(),
          name='entregar_actividad'),
     path('<str:codigo_clase>/actividades/<int:id_actividad>/entregas/<int:id_entrega>/descargar/<int:id_archivo>',
-         descargar_archivo_de_entrega, name='descargar_archivo_entrega')
+         DescargarArchivoView.as_view(), name='descargar_archivo_entrega')
 ]

@@ -1,15 +1,15 @@
 import os
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.http import Http404, JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView, TemplateView
 
 from RETALI import settings
 from apps.actividades.forms import ActividadForm, ActividadDisableForm
-from apps.actividades.models import Actividad, Entrega, Archivo, Revision
+from apps.actividades.models import Actividad, Entrega, Archivo
 from apps.clases.models import Clase, Inscripcion
 from apps.usuarios.mixins import MaestroMixin, AlumnoMixin
 
@@ -153,7 +153,7 @@ class RevisarEntregaActividadView(MaestroMixin, View):
         query_actividad = Actividad.objects.filter(clase__maestro_id=request.user.persona.maestro.pk,
                                                    clase__codigo=codigo_clase,
                                                    clase__abierta=True)
-        context['actividad_actual'] = get_object_or_404(query_actividad, pk=id_actividad)
+        context['actividad'] = get_object_or_404(query_actividad, pk=id_actividad)
         context['entrega'] = get_object_or_404(query_entrega, pk=id_entrega)
         context['archivos'] = context['entrega'].archivo_set.all()
         return context
@@ -201,19 +201,36 @@ class EntregarActividadView(AlumnoMixin, View):
 
     @staticmethod
     def _validar_es_maestro(es_maestro):
+        """
+        Valdia si un usuario es maestro
+        :param es_maestro: El parametro que indica si es maestro
+        :return: Un diccionario con un error si el usuario es un Maestro o None si no lo es
+        """
         if es_maestro:
             return {'error': 'Un maestro no puede entregar una actividad'}
 
     @staticmethod
     def _validar_informacion_entrega(comentarios, archivos):
-        if not(comentarios is not None or len(archivos) > 0):
+        """
+        Valida si la información de una entrega es correcta
+        :param comentarios: Los comentarios de la entrega
+        :param archivos: Los archivos de la entrega
+        """
+        if not (comentarios is not None or len(archivos) > 0):
             return {'error': 'Debe de adjuntar por lo menos un archivo o escribir algun comentario'}
 
     @staticmethod
     def _validar_existe_actividad(id_alumno, codigo_clase, id_actividad):
+        """
+        Valida si existe una entrega
+        :param id_alumno: El id del alumno a validar si esta inscrito en la clase
+        :param codigo_clase: El codigo de la clase a la que pertence la actividad
+        :param id_actividad: El id de la actividad a validar si existe
+        :return: None si la actividad existe o un diccionario con el error si no
+        """
         error = {'error': 'No existe la actividad que se desea entregar'}
         inscripcion = Inscripcion.objects.filter(clase__codigo=codigo_clase, alumno_id=id_alumno,
-                                               aceptado='Aceptado').select_related('clase').first()
+                                                 aceptado='Aceptado').select_related('clase').first()
         if inscripcion is None:
             return error
         if inscripcion.clase.actividad_set.filter(pk=id_actividad).count() == 0:
@@ -221,6 +238,11 @@ class EntregarActividadView(AlumnoMixin, View):
 
     @staticmethod
     def _validar_actividad_abierta(id_actividad):
+        """
+        Valida si una actividad se encuentra abierta
+        :param id_actividad: El id de la actividad a validar
+        :return: Un diccionario con un error si no se encuentra abierta o None si se encuentra cerrada
+        """
         actividad = Actividad.objects.filter(pk=id_actividad).first()
         if not actividad.esta_abierta():
             return {'error': 'La actividad ha cerrrado y no se entrego'}
@@ -255,6 +277,15 @@ class EntregarActividadView(AlumnoMixin, View):
 
     @staticmethod
     def _validar_entrega(archivos, comentarios, id_alumno, codigo_clase, id_actividad):
+        """
+        Realiza todas las validaciones de una entrega
+        :param archivos: Los archivos de la entrega
+        :param comentarios: Los comentarios de la entrega
+        :param id_alumno: El id del alumno que realizo la entrega
+        :param codigo_clase: El codigo de la clase al que pertenece la actividad
+        :param id_actividad: El id de la actividad a entregar
+        :return: Un diccionario si hubo un problema en la validación o None si no hubo errores
+        """
         error = EntregarActividadView._validar_existe_actividad(id_alumno, codigo_clase, id_actividad)
         if error is not None:
             return error
@@ -294,58 +325,46 @@ class EntregarActividadView(AlumnoMixin, View):
         return JsonResponse({}, status=200)
 
 
-def _validar_existe_actividad_de_alumno(codigo_clase, id_actividad, alumno):
-    """
-    Valida su existe una actividad para el alumno
-    :param codigo_clase: El codigo de la clase a la cual pertenece la actividad
-    :param id_actividad: El id de la actividad a entregar
-    :param alumno: El alumno que realizara la entrega
-    :return: True si existe la actividad o False si no
-    """
-    existe_actividad = False
-    clase = Clase.objects.filter(abierta=True, codigo=codigo_clase).first()
-    if clase is not None:
-        clase_del_alumno = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.pk).first().clase
-        if clase_del_alumno is not None:
-            if clase_del_alumno.actividad_set.filter(pk=id_actividad).count() > 0:
-                existe_actividad = True
-    return existe_actividad
+class DescargarArchivoView(LoginRequiredMixin, View):
+    """ Vista para descargar un archivo"""
+    @staticmethod
+    def _obtener_archivo(ruta_archivo):
+        """
+        Obtiene el archivo del disco y lo regresa al usuario
+        :param ruta_archivo: La ruta del archivo a obtener
+        :return: HttpResponse
+        """
+        if os.path.exists(ruta_archivo):
+            with open(ruta_archivo, 'rb') as fh:
+                response = HttpResponse(fh.read(), content_type="application/octet-stream")
+                response['Content-Disposition'] = 'inline; filename=' + os.path.basename(ruta_archivo)
+                return response
 
-
-@login_required()
-def descargar_archivo_de_entrega(request, codigo_clase, id_actividad, id_entrega, id_archivo):
-    """
-    Valida si el usuario es el maestro correspondiente de la entrega que contiene el archivo
-    :param request: El request
-    :param codigo_clase: El codigo de la clase de la actividad
-    :param id_actividad: El id de la activdad de la entrega
-    :param id_entrega: El id de la entrega
-    :param id_archivo: El id del archivo a descargar
-    :return: HttpResponse con el archivo
-    """
-    archivo = Archivo.objects.filter(pk=id_archivo).first()
-    if archivo is not None:
-        file_path = os.path.join(settings.MEDIA_ROOT, archivo.archivo.path)
-        if request.user.es_maestro:
-            if _validar_existe_actividad(codigo_clase, id_actividad, request.user.persona.maestro):
-                if Entrega.objects.filter(pk=id_entrega).count() > 0:
-                    return _obtener_archivo(file_path)
-        else:
-            if _validar_existe_actividad_de_alumno(codigo_clase, id_actividad, request.user.persona.alumno):
-                if Entrega.objects.filter(pk=id_entrega).count() > 0:
-                    return _obtener_archivo(file_path)
-
-    raise Http404
-
-
-def _obtener_archivo(ruta_archivo):
-    """
-    Obtiene el archivo del disco y lo regresa al usuario
-    :param ruta_archivo: La ruta del archivo a obtener
-    :return: HttpResponse
-    """
-    if os.path.exists(ruta_archivo):
-        with open(ruta_archivo, 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type="application/octet-stream")
-            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(ruta_archivo)
-            return response
+    def get(self, request, codigo_clase, id_actividad, id_entrega, id_archivo):
+        """
+        Responde una salicitud get al devolver el archivo de la una entrega
+        :param request: La solicitud del usuario
+        :param codigo_clase: El codigo de la clase a la que pertenece la actividad
+        :param id_actividad: El id de la actividad a la que pertenence la entrega
+        :param id_entrega: El id de la entrega a la que pertenence el archivo
+        :param id_archivo: El id del archivo a descargar
+        :return: Un HttpResponse
+        """
+        archivo = Archivo.objects.filter(pk=id_archivo).first()
+        if archivo is not None:
+            file_path = os.path.join(settings.MEDIA_ROOT, archivo.archivo.path)
+            if request.user.es_maestro:
+                query_actividad = Actividad.objects.filter(clase__codigo=codigo_clase, clase__abierta=True,
+                                                           clase__maestro_id=request.user.persona.maestro.pk)
+                actividad = get_object_or_404(query_actividad, pk=id_actividad)
+                query_entrega = actividad.entrega_set
+                get_object_or_404(query_entrega, pk=id_entrega)
+                return self._obtener_archivo(file_path)
+            else:
+                query_inscripcion = Inscripcion.objects.filter(aceptado='Aceptado', clase__codigo=codigo_clase)
+                inscripcion = get_object_or_404(query_inscripcion, alumno_id=request.user.persona.alumno.pk)
+                query_actividad = inscripcion.clase.actividad_set
+                actividad = get_object_or_404(query_actividad, pk=id_actividad)
+                query_entrega = actividad.entrega_set
+                get_object_or_404(query_entrega, pk=id_entrega)
+                return self._obtener_archivo(file_path)

@@ -57,11 +57,11 @@
         <div id="informacion-entrega">
             <div class="form-group">
                 <label for="id_nombre_actividad">Actividad: </label>
-                <input type="text" name="Actividad" id="id_nombre_actividad" class="form-control" disabled value="{{ actividad_actual.nombre }}">
+                <input type="text" name="Actividad" id="id_nombre_actividad" class="form-control" disabled value="{{ actividad.nombre }}">
             </div>
             <div class="form-group" id="alumno">
                 <label for="id_alumno">Alumno: </label>
-                <input type="text" name="Alumno" id="id_nombre_alumno" class="form-control" disabled value="{{ entrega.alumno.nombre }} {{ entrega_actual.alumno.apellidos }}">
+                <input type="text" name="Alumno" id="id_nombre_alumno" class="form-control" disabled value="{{ entrega.alumno.nombre }} {{ entrega.alumno.apellidos }}">
             </div>
             <div class="form-group" id="fecha_entrega">
             <label for="id_fecha_entrega">Fecha de entrega: </label>
@@ -91,7 +91,7 @@
                             <p class="tamano-archivo">{{ archivo.archivo.size|sizify }}</p>
                         </div>
                         <div class="descargar">
-                            <a href="{% url 'descargar_archivo_entrega' clase_actual.codigo actividad_actual.pk entrega_actual.pk archivo.pk %}">
+                            <a href="{% url 'descargar_archivo_entrega' clase_actual.codigo actividad.pk entrega.pk archivo.pk %}">
                                 <img src="{% static 'generales/imagenes/descargar.svg' %}" alt="Descargar">
                             </a>
                         </div>
@@ -131,8 +131,8 @@
                 </select>
             </div>
             <div id="opciones">
-                <a href="{% url 'consultar_actividad_mestro' clase_actual.codigo actividad_actual.id %}" class="regresar">Regresar</a>
-                <button type="submit" estado-activdad="{{ actividad_actual.estado }}" id="btn-registar-evaluacion">
+                <a href="{% url 'consultar_actividad_mestro' clase_actual.codigo actividad.id %}" class="regresar">Regresar</a>
+                <button type="submit" estado-activdad="{{ actividad.estado }}" id="btn-registar-evaluacion">
                     {% if revision %}
                         Actualizar revisión
                     {% else %}

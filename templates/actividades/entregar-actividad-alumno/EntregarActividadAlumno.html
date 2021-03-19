@@ -100,7 +100,9 @@
                             {% if actividad.estado == 'Cerrada' %} disabled {% endif %} cols="40" rows="5">{{ entrega.comentarios }}</textarea>
                 </div>
                 {% if entrega %}
-                    <p>Archivos previamente adjuntos:</p>
+                    {% if archivos|length > 0 %}
+                        <p>Archivos previamente adjuntos:</p>
+                    {% endif %}
                     <div id="archivos-de-entrega-anteriores">
                     {% for archivo in archivos %}
                         <div class="archivo-previo">
@@ -153,7 +155,7 @@
             {% if entrega.revision %}
             <div class="form-group">
                 <label class="titulo-completo" for="comentarios_revision">Comentarios de la revisión: </label>
-                <textarea id="comentarios_revision" name="comentarios" class="form-control" cols="40" rows="5">{{ entrega.revision.retroalimentacion }}</textarea>
+                <textarea id="comentarios_revision" name="comentarios" class="form-control" cols="40" rows="5" disabled>{{ entrega.revision.retroalimentacion }}</textarea>
             </div>
             {% endif %}
         </div>
