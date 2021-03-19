@@ -1,4 +1,3 @@
-import os
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -22,6 +21,69 @@ class Actividad(models.Model):
     fecha_de_creacion = models.DateTimeField(default=timezone.now)
     entregas = models.ManyToManyField(Alumno, through='Entrega')
 
+    def cantidad_de_entregas(self):
+        """ Cuenta la cantidad de entregas realizadas"""
+        return self.entrega_set.count()
+
+    def actualizar_estado_actividad(self):
+        """Actualiza el estado de la actividad dependiendo de las fechas de apertura y cierre"""
+        now = timezone.now()
+        if self.fecha_de_inicio > now:
+            self.estado = 'Por abrir'
+        elif self.fecha_de_cierre < now:
+            self.estado = 'Cerrada'
+        else:
+            self.estado = 'Abierta'
+        self.save()
+
+    def esta_abierta(self):
+        """Valida si la actividad se encuentra en estado Abierta"""
+        self.actualizar_estado_actividad()
+        return self.estado != 'Cerrada'
+
+    def realizar_entrega(self, id_alumno, comentarios, archivos):
+        """
+        Guarda la entrega de la actividad de un Alumno
+        :param id_alumno: El id del alumno al que pertenence la entrega
+        :param comentarios: Los comentarios de la entrega del alumno
+        :param archivos: Los archivos adjuntos a la entrega
+        :return: None
+        """
+        if Entrega.objects.filter(alumno_id=id_alumno, actvidad_id=self.pk).count() == 0:
+            self._registrar_entrega(id_alumno, comentarios, archivos)
+        else:
+            self._actualizar_entrega(id_alumno, comentarios, archivos)
+
+    def _registrar_entrega(self, id_alumno, comentarios, archivos):
+        """
+        Registra una nueva entrega de la actividad de un alumno
+        :param id_alumno: El id del alumno que realiza la entrega
+        :param comentarios: Los comentarios de la entrega
+        :param archivos: Los archivos adjuntos a la entrega
+        :return: None
+        """
+        entrega = Entrega(alumno_id=id_alumno, actvidad_id=self.pk, comentarios=comentarios)
+        entrega.save()
+        for archivo in archivos.values():
+            archivo_entrega = Archivo(entrega_id=entrega.pk, archivo=archivo)
+            archivo_entrega.save()
+
+    def _actualizar_entrega(self, id_alumno, comentarios, archivos):
+        """
+        Actualiza la información de la entrega de la actividad de un alumno
+        :param id_alumno: El id del alumno al que se le actualizara su entrega
+        :param comentarios: Los comentarios de la entrega
+        :param archivos: Los archivos adjuntos a la entrega
+        """
+        entrega = Entrega.objects.filter(alumno_id=id_alumno, actvidad_id=self.pk).first()
+        archivos_entrega_previa = entrega.archivo_set.all()
+        for archivo in archivos_entrega_previa:
+            archivo.delete()
+        Entrega.objects.filter(alumno_id=id_alumno, actvidad_id=self.pk).update(comentarios=comentarios)
+        for archivo in archivos.values():
+            archivo_entrega = Archivo(entrega_id=entrega.pk, archivo=archivo)
+            archivo_entrega.save()
+
 
 class Revision(models.Model):
     """
@@ -29,6 +91,9 @@ class Revision(models.Model):
     """
     calificacion = models.FloatField(null=False)
     retroalimentacion = models.TextField()
+
+    def calificacion_entero(self):
+        return int(self.calificacion)
 
 
 class Entrega(models.Model):
@@ -40,6 +105,12 @@ class Entrega(models.Model):
     revision = models.OneToOneField(Revision, on_delete=models.RESTRICT, null=True)
     alumno = models.ForeignKey(Alumno, on_delete=models.RESTRICT)
     actvidad = models.ForeignKey(Actividad, on_delete=models.RESTRICT)
+
+    def realizar_revision(self, calificacion, comentarios):
+        revision = Revision(calificacion=calificacion,
+                            retroalimentacion=comentarios)
+        revision.save()
+        Entrega.objects.filter(pk=self.pk).update(revision=revision)
 
 
 class Archivo(models.Model):

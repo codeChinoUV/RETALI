@@ -39,6 +39,15 @@
     </li>
 {% endblock %}
 {% block contenido %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                    <div class="alert alert-{{ message.level_tag }}" role="alert">
+                        {{ message.message }}
+                    </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <h1 class="titulo-seccion">Ver actvidad</h1>
     <hr>
     <div id="formulario-registro-actividad">
@@ -46,26 +55,26 @@
             <img src="{% static 'generales/imagenes/portapapeles.png' %}">
             <div id="inputs-registro-actvidad">
                 <div class="form-group" >
-                    <label for="id_nombre">Nombre de la actividad: </label>
-                    <input type="text" name="nombre" class="form-control" maxlength="120" disabled id="id_nombre" value="{{ actividad_actual.nombre }}">
+                    <label for="id_nombre">{{ form.nombre.label }}</label>
+                    {{ form.nombre }}
                 </div>
                 <div class="form-group">
-                    <label for="id_descripcion">Descripción de la actvidad: </label>
-                    <textarea name="descripcion" cols="40" rows="10" class="form-control" disabled id="id_descripcion">{{ actividad_actual.descripcion }}</textarea>
+                    <label for="id_descripcion">{{ form.descripcion.label }}</label>
+                    {{ form.descripcion }}
                 </div>
                 <div class="form-group input-fechas-actividades">
-                    <label for="id_fecha_inicio">Fecha de inicio: </label>
+                    <label for="id_fecha_de_inicio">{{ form.fecha_de_inicio.label }}</label>
                     {% timezone 'America/Mexico_City' %}
-                    <input type="text" name="fecha_inicio" class="form-control" disabled id="id_fecha_inicio" value="{{ actividad_actual.fecha_de_inicio }}">
+                    {{ form.fecha_de_inicio }}
                     {% endtimezone %}
                 </div>
                 <div class="form-group input-fechas-actividades">
-                    <label for="id_fecha_cierre">{{ form.fecha_cierre.label }}</label>
+                    <label for="id_fecha_de_cierre">{{ form.fecha_de_cierre.label }}</label>
                     {% timezone 'America/Mexico_City' %}
-                    <input type="text" name="fecha_cierre" class="form-control" disabled id="id_fecha_cierre" value="{{ actividad_actual.fecha_de_cierre }}">
+                    {{ form.fecha_de_cierre }}
                     {% endtimezone %}
                 </div>
-                <a id="boton-editar" href="{% url 'editar_actividad' clase_actual.codigo actividad_actual.pk %}">
+                <a id="boton-editar" href="{% url 'editar_actividad' clase_actual.codigo id_actividad %}">
                     <div>Editar actividad</div>
                     <img id="imagen-boton-editar" src="{% static 'actividades/consultar-actividad-maestro/imagenes/editar.svg' %}" alt="icono editar">
                 </a>
@@ -82,7 +91,7 @@
                     <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
                 {% endif %}
                 <div class="informacion-tarjeta-entrega">
-                    <h3><a class="link-revision" href="{% url 'revisar_entrega' clase_actual.codigo actividad_actual.pk entrega.pk %}">{{ entrega.alumno.nombre }} {{ entrega.alumno.apellidos }}</a></h3>
+                    <h3><a class="link-revision" href="{% url 'revisar_entrega' clase_actual.codigo id_actividad entrega.pk %}">{{ entrega.alumno.nombre }} {{ entrega.alumno.apellidos }}</a></h3>
                     {% timezone 'America/Mexico_City' %}
                         <p><b>Fecha de entrega:</b> {{ entrega.fecha_de_entrega }}</p>
                     {% endtimezone %}

@@ -57,21 +57,21 @@
         <div id="informacion-entrega">
             <div class="form-group">
                 <label for="id_nombre_actividad">Actividad: </label>
-                <input type="text" name="Actividad" id="id_nombre_actividad" class="form-control" disabled value="{{ actividad_actual.nombre }}">
+                <input type="text" name="Actividad" id="id_nombre_actividad" class="form-control" disabled value="{{ actividad.nombre }}">
             </div>
             <div class="form-group" id="alumno">
                 <label for="id_alumno">Alumno: </label>
-                <input type="text" name="Alumno" id="id_nombre_alumno" class="form-control" disabled value="{{ entrega_actual.alumno.nombre }} {{ entrega_actual.alumno.apellidos }}">
+                <input type="text" name="Alumno" id="id_nombre_alumno" class="form-control" disabled value="{{ entrega.alumno.nombre }} {{ entrega.alumno.apellidos }}">
             </div>
             <div class="form-group" id="fecha_entrega">
             <label for="id_fecha_entrega">Fecha de entrega: </label>
                 {% timezone 'America/Mexico_City' %}
-                    <input type="text" name="Fecha de entrega" id="id_fecha_entrega" class="form-control" disabled value="{{ entrega_actual.fecha_de_entrega }}">
+                    <input type="text" name="Fecha de entrega" id="id_fecha_entrega" class="form-control" disabled value="{{ entrega.fecha_de_entrega }}">
                 {% endtimezone %}
             </div>
             <div class="form-group">
                 <label for="id_descripcion">Entrega del alumno: </label>
-                <textarea name="descripcion" cols="40" rows="10" class="form-control" disabled id="id_descripcion">{{ entrega_actual.comentarios }}</textarea>
+                <textarea name="descripcion" cols="40" rows="10" class="form-control" disabled id="id_descripcion">{{ entrega.comentarios }}</textarea>
             </div>
             <p>Archivos adjuntos de la entrega: </p>
             <div id="archivos-de-entrega">
@@ -91,7 +91,7 @@
                             <p class="tamano-archivo">{{ archivo.archivo.size|sizify }}</p>
                         </div>
                         <div class="descargar">
-                            <a href="{% url 'descargar_archivo_entrega' clase_actual.codigo actividad_actual.pk entrega_actual.pk archivo.pk %}">
+                            <a href="{% url 'descargar_archivo_entrega' clase_actual.codigo actividad.pk entrega.pk archivo.pk %}">
                                 <img src="{% static 'generales/imagenes/descargar.svg' %}" alt="Descargar">
                             </a>
                         </div>
@@ -105,22 +105,22 @@
         {% csrf_token %}
             <div class="form-group">
                 <label for="id_comentarios_de_revision">Comentarios de la revisión: </label>
-                <textarea name="comentarios" cols="40" rows="10" class="form-control"  id="id_comentarios_de_revision">{{ revision.retroalimentacion }}</textarea>
+                <textarea name="comentarios" cols="40" rows="10" class="form-control"  id="id_comentarios_de_revision">{{ entrega.revision.retroalimentacion }}</textarea>
             </div>
             <div class="form-group">
                 <label for="id_calificacion">Calificacion</label>
                 <select class="form-control" id="id_calificacion" name="calificacion">
                     <option value="0">Seleccione una opción</option>
-                    <option value="10" {% if revision.calificacion == 10 %} selected="selected" {% endif %}>10</option>
-                    <option value="9" {% if revision.calificacion == 9 %} selected="selected" {% endif %}>9</option>
-                    <option value="8" {% if revision.calificacion == 8 %} selected="selected" {% endif %}>8</option>
-                    <option value="7" {% if revision.calificacion == 7 %} selected="selected" {% endif %}>7</option>
-                    <option value="6" {% if revision.calificacion == 6 %} selected="selected" {% endif %}>6</option>
-                    <option value="5" {% if revision.calificacion == 5 %} selected="selected" {% endif %}>5</option>
-                    <option value="4" {% if revision.calificacion == 4 %} selected="selected" {% endif %}>4</option>
-                    <option value="3" {% if revision.calificacion == 3 %} selected="selected" {% endif %}>3</option>
-                    <option value="2" {% if revision.calificacion == 2 %} selected="selected" {% endif %}>2</option>
-                    <option value="1" {% if revision.calificacion == 1 %} selected="selected" {% endif %}>1</option>
+                    <option value="10" {% if entrega.revision.calificacion_entero == 10 %} selected="selected" {% endif %}>10</option>
+                    <option value="9" {% if entrega.revision.calificacion_entero == 9 %} selected="selected" {% endif %}>9</option>
+                    <option value="8" {% if entrega.revision.calificacion_entero == 8 %} selected="selected" {% endif %}>8</option>
+                    <option value="7" {% if entrega.revision.calificacion_entero == 7 %} selected="selected" {% endif %}>7</option>
+                    <option value="6" {% if entrega.revision.calificacion_entero == 6 %} selected="selected" {% endif %}>6</option>
+                    <option value="5" {% if entrega.revision.calificacion_entero == 5 %} selected="selected" {% endif %}>5</option>
+                    <option value="4" {% if entrega.revision.calificacion_entero == 4 %} selected="selected" {% endif %}>4</option>
+                    <option value="3" {% if entrega.revision.calificacion_entero == 3 %} selected="selected" {% endif %}>3</option>
+                    <option value="2" {% if entrega.revision.calificacion_entero == 2 %} selected="selected" {% endif %}>2</option>
+                    <option value="1" {% if entrega.revision.calificacion_entero == 1 %} selected="selected" {% endif %}>1</option>
                     {% if errors %}
                         {% for key, value in errores.items %}
                             {% if key == 'calificacion' %}
@@ -131,8 +131,8 @@
                 </select>
             </div>
             <div id="opciones">
-                <a href="{% url 'consultar_actividad_mestro' clase_actual.codigo actividad_actual.id %}" class="regresar">Regresar</a>
-                <button type="submit" estado-activdad="{{ actividad_actual.estado }}" id="btn-registar-evaluacion">
+                <a href="{% url 'consultar_actividad_mestro' clase_actual.codigo actividad.id %}" class="regresar">Regresar</a>
+                <button type="submit" estado-activdad="{{ actividad.estado }}" id="btn-registar-evaluacion">
                     {% if revision %}
                         Actualizar revisión
                     {% else %}

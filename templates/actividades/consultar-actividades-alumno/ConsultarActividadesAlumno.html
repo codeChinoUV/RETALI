@@ -66,7 +66,7 @@
         <p>Actividades abiertas: {{ cantidad_actividades_abiertas }}</p>
         <p>Total de actividades: {{ total_de_actividades }}</p>
     </div>
-    {% for actividad in actividades %}
+    {% for actividad in actividad_list %}
         <div class="actividad">
             <img class="actividad-imagen" src="{% static 'generales/imagenes/portapapeles.png' %}" alt="imagen actividad">
             <div class="informacion-actividad">

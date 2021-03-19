@@ -301,28 +301,16 @@ function enviarFormulario(e){
         Swal.fire({
             icon: 'error',
             title: 'Algo salio mal...',
-            text: 'No puede argar su activdad',
+            text: 'No se registro su entrega',
           })
-      }else if(request.status === 400 && request.readyState === 2){
+      }else if(request.status === 400 && request.readyState === 2) {
+        const error = JSON.parse(request.responseText);
         Swal.fire({
-            icon: 'error',
-            title: 'Lo siento...',
-            text: 'No se puedes entregar una actividad vacia',
-          })
-      }else if(request.status === 401 && request.readyState === 2){
-        Swal.fire({
-            icon: 'error',
-            title: 'Lo siento...',
-            text: 'No puedes entregar la actividad debido a que esta no se encuentra abierta',
-          })
-      }else if(request.status === 402 && request.readyState === 2){
-        Swal.fire({
-            icon: 'error',
-            title: 'Algo salio mal...',
-            text: 'Uno de los archivos adjuntos pesa mas de 50MB por favor eliminalo e intentalo nuevamente',
-          })
-      }
-      else if(request.status === 200 && request.readyState === 2){
+          icon: 'error',
+          title: 'Lo siento...',
+          text: ['error'],
+        })
+      }else if(request.status === 200 && request.readyState === 2){
         Swal.fire({
           icon: 'success',
           title: '¡Genial!',

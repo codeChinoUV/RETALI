@@ -371,7 +371,7 @@ header a .icono img{
  */
 
 .titulo-seccion{
-    margin-top: calc(var(--heigh-nav) + 20px);
+    margin-top: 20px;
     color: white;
     text-align: center;
 }
@@ -379,4 +379,13 @@ header a .icono img{
 hr{
     border-bottom: 2px solid var(--hovercolor);
     margin: 0 5%;
+}
+
+/**
+Alert
+ */
+
+.alert{
+    margin-bottom: 0 !important;
+    position: static !important;
 }

@@ -96,6 +96,33 @@ class Clase(models.Model):
         }
         return datos_clase
 
+    def cantidad_de_actividades(self):
+        """
+        Cuenta la cantidad total de actividades de una clase
+        :return: EL total de actividades de la clase
+        """
+        return self.actividad_set.count()
+
+    def cantidad_de_actividades_abiertas(self):
+        """
+        Cuenta la cantidad de actividades que su fecha de entrega es despues de la fecha actual
+        :return: La cantidad de actividades abiertas
+        """
+        now = timezone.now()
+        cantidad_actividades_abiertas = 0
+        for actividad in self.actividad_set.all():
+            if actividad.fecha_de_cierre > now > actividad.fecha_de_inicio:
+                cantidad_actividades_abiertas += 1
+        return cantidad_actividades_abiertas
+
+    def actualizar_estado_actividades(self):
+        """
+        Actualiza el estado de las actividades que se le pasan, verificando si esta abierta o no
+        :return: None
+        """
+        for actividad in self.actividad_set.all():
+            actividad.actualizar_estado_actividad()
+
 
 class Alumno(Persona):
     """
