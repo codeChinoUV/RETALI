@@ -71,9 +71,9 @@
         <div id="cabecera-actividad">
             <img src="{% static 'generales/imagenes/portapapeles.png' %}" alt="imagen activdad">
             <div id="informacion-actividad">
-                <h2>{{ actividad_actual.nombre }}</h2>
+                <h2>{{ actividad.nombre }}</h2>
                 {% timezone 'America/Mexico_City' %}
-                <p>Del: {{ actividad_actual.fecha_de_inicio }} hasta: {{ actividad_actual.fecha_de_cierre }} </p>
+                <p>Del: {{ actividad.fecha_de_inicio }} hasta: {{ actividad.fecha_de_cierre }} </p>
                 {% endtimezone %}
             </div>
             <div id="calificacion-actividad">
@@ -90,19 +90,19 @@
         <div id="cuerpo-entrega">
             <div class="form-group">
                 <label for="descripcion_actividad">Descripción de la actividad: </label>
-                <textarea id="descripcion_actividad" class="form-control" disabled cols="40" rows="10">{{ actividad_actual.descripcion }}</textarea>
+                <textarea id="descripcion_actividad" class="form-control" disabled cols="40" rows="10">{{ actividad.descripcion }}</textarea>
             </div>
             <form method="post" id="entregaForm">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="comentarios_entrega">Comentarios de la entrega: </label>
                     <textarea id="comentarios_entrega" name="comentarios" class="form-control"
-                            {% if actividad_actual.estado == 'Cerrada' %} disabled {% endif %} cols="40" rows="5">{{ entrega.comentarios }}</textarea>
+                            {% if actividad.estado == 'Cerrada' %} disabled {% endif %} cols="40" rows="5">{{ entrega.comentarios }}</textarea>
                 </div>
                 {% if entrega %}
                     <p>Archivos previamente adjuntos:</p>
                     <div id="archivos-de-entrega-anteriores">
-                    {% for archivo in entrega_archivos %}
+                    {% for archivo in archivos %}
                         <div class="archivo-previo">
                             {% if archivo.extension == 'otro' %}
                                 <img class="img-tipo-archivo" src="{% static 'actividades/revisar-entrega-actividad/imagenes/archivo.svg' %}" alt="archivo">
@@ -118,7 +118,7 @@
                                 <p class="tamano-archivo">{{ archivo.archivo.size|sizify }}</p>
                             </div>
                             <div class="descargar">
-                                <a href="{% url 'descargar_archivo_entrega' clase_actual.codigo actividad_actual.pk entrega.pk archivo.pk %}">
+                                <a href="{% url 'descargar_archivo_entrega' clase_actual.codigo actividad.pk entrega.pk archivo.pk %}">
                                     <img src="{% static 'generales/imagenes/descargar.svg' %}" alt="Descargar">
                                 </a>
                             </div>
@@ -126,7 +126,7 @@
                     {% endfor %}
                     </div>
                 {% endif %}
-                {% if actividad_actual.estado == 'Abierta' %}
+                {% if actividad.estado == 'Abierta' %}
                 <p class="titulo-completo">Archivos adjuntos: </p>
                     <div class="form-group" id="archivos-adjuntos">
                         <div class="drop-zone">
@@ -135,7 +135,7 @@
                         </div>
                     </div>
                 {% endif %}
-                {% if actividad_actual.estado == 'Abierta' %}
+                {% if actividad.estado == 'Abierta' %}
                 <hr id="linea-entrega">
                 <div id="enviar-formulario">
                     <div id="progeso-subida">

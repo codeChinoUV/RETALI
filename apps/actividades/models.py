@@ -41,6 +41,49 @@ class Actividad(models.Model):
         self.actualizar_estado_actividad()
         return self.estado != 'Cerrada'
 
+    def realizar_entrega(self, id_alumno, comentarios, archivos):
+        """
+        Guarda la entrega de la actividad de un Alumno
+        :param id_alumno: El id del alumno al que pertenence la entrega
+        :param comentarios: Los comentarios de la entrega del alumno
+        :param archivos: Los archivos adjuntos a la entrega
+        :return: None
+        """
+        if Entrega.objects.filter(alumno_id=id_alumno, actvidad_id=self.pk).count() == 0:
+            self._registrar_entrega(id_alumno, comentarios, archivos)
+        else:
+            self._actualizar_entrega(id_alumno, comentarios, archivos)
+
+    def _registrar_entrega(self, id_alumno, comentarios, archivos):
+        """
+        Registra una nueva entrega de la actividad de un alumno
+        :param id_alumno: El id del alumno que realiza la entrega
+        :param comentarios: Los comentarios de la entrega
+        :param archivos: Los archivos adjuntos a la entrega
+        :return: None
+        """
+        entrega = Entrega(alumno_id=id_alumno, actvidad_id=self.pk, comentarios=comentarios)
+        entrega.save()
+        for archivo in archivos.values():
+            archivo_entrega = Archivo(entrega_id=entrega.pk, archivo=archivo)
+            archivo_entrega.save()
+
+    def _actualizar_entrega(self, id_alumno, comentarios, archivos):
+        """
+        Actualiza la información de la entrega de la actividad de un alumno
+        :param id_alumno: El id del alumno al que se le actualizara su entrega
+        :param comentarios: Los comentarios de la entrega
+        :param archivos: Los archivos adjuntos a la entrega
+        """
+        entrega = Entrega.objects.filter(alumno_id=id_alumno, actvidad_id=self.pk).first()
+        archivos_entrega_previa = entrega.archivo_set.all()
+        for archivo in archivos_entrega_previa:
+            archivo.delete()
+        Entrega.objects.filter(alumno_id=id_alumno, actvidad_id=self.pk).update(comentarios=comentarios)
+        for archivo in archivos.values():
+            archivo_entrega = Archivo(entrega_id=entrega.pk, archivo=archivo)
+            archivo_entrega.save()
+
 
 class Revision(models.Model):
     """
