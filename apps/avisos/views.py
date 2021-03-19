@@ -1,38 +1,33 @@
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect
+from django.views.generic import ListView, CreateView
 
 from apps.avisos.forms import AvisoForm
 from apps.avisos.models import Aviso
-from apps.clases.models import Clase
+from apps.clases.models import Clase, Inscripcion
+from apps.usuarios.mixins import MaestroMixin, AlumnoMixin
 
 
-@login_required()
-def consultar_avisos(request, codigo_clase):
-    """
-    Muestra la informacion de los avisos realizados en una clase
-    :param request: La solicitud del cliente
-    :param codigo_clase: El codigo de la clase a consultar sus avisos
-    :return: Un render
-    """
-    if request.method == "GET":
-        if request.user.es_maestro:
-            datos_del_maestro = {}
-            if _validar_existe_clase(request.user.persona.maestro, codigo_clase):
-                datos_del_maestro["clase_actual"] = Clase.objects.filter(codigo=codigo_clase).first()
-                datos_del_maestro["avisos"] = datos_del_maestro["clase_actual"].aviso_set.all() \
-                    .order_by('-fecha_publicado')
-                return render(request, 'avisos/consultar-avisos/ConsultarAvisos.html', datos_del_maestro)
-            return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
-        else:
-            datos_del_alumno = {}
-            if _validar_existe_clase_alumno(request.user.persona.alumno, codigo_clase):
-                datos_del_alumno["clase_actual"] = Clase.objects.filter(codigo=codigo_clase).first()
-                datos_del_alumno["avisos"] = datos_del_alumno["clase_actual"].aviso_set.all() \
-                    .order_by('-fecha_publicado')
-                return render(request, 'avisos/consultar-avisos-alumno/ConsultarAvisosAlumno.html', datos_del_alumno)
-            return render(request, 'generales/NoEncontrada.html', datos_del_alumno)
-    raise Http404
+class ListarAvisosMaestroView(MaestroMixin, ListView):
+    template_name = 'avisos/consultar-avisos/ConsultarAvisos.html'
+    model = Aviso
+
+    def get_queryset(self):
+        codigo_clase = self.kwargs['codigo_clase']
+        return Aviso.objects.filter(clase__codigo=codigo_clase,
+                                    clase__maestro_id=self.request.user.persona.maestro.pk)\
+            .order_by('-fecha_publicado')
+
+
+class ListarAvisosAlumnoView(AlumnoMixin, ListView):
+    template_name = 'avisos/consultar-avisos-alumno/ConsultarAvisosAlumno.html'
+    model = Aviso
+
+    def get_queryset(self):
+        codigo_clase = self.kwargs['codigo_clase']
+        inscripcion = Inscripcion.objects.filter(clase__codigo=codigo_clase, aceptado='Aceptado').first()
+        return inscripcion.clase.aviso_set.order_by('-fecha_publicado')
 
 
 def _validar_existe_clase(maestro, codigo_clase):
