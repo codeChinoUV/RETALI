@@ -84,7 +84,8 @@ class EditarActividadView(MaestroMixin, UpdateView):
         context = super(EditarActividadView, self).get_context_data(**kwargs)
         codigo_clase = self.kwargs['codigo_clase']
         id_actividad = self.kwargs['pk']
-        query_set_actividad = Actividad.objects.filter(clase__abierta=True, clase__codigo=codigo_clase)
+        query_set_actividad = Actividad.objects.filter(clase__abierta=True, clase__codigo=codigo_clase,
+                                                       clase__maestro_id=self.request.user.persona.maestro.pk)
         actividad = get_object_or_404(query_set_actividad, pk=id_actividad)
         if 'form' not in context:
             context['form'] = self.form_class(instance=actividad)
@@ -94,12 +95,13 @@ class EditarActividadView(MaestroMixin, UpdateView):
         self.object = self.get_object()
         codigo_clase = kwargs['codigo_clase']
         id_actividad = kwargs['pk']
-        query_set_actividad = Actividad.objects.filter(clase__abierta=True, clase__codigo=codigo_clase)
+        query_set_actividad = Actividad.objects.filter(clase__abierta=True, clase__codigo=codigo_clase,
+                                                       clase__maestro_id=self.request.user.persona.maestro.pk)
         actividad = get_object_or_404(query_set_actividad, pk=id_actividad)
         formulaio = self.form_class(request.POST, instance=actividad)
         if formulaio.is_valid():
             formulaio.save()
-            messages.info(request, 'Se ha modificado la información de la actividad correctamente')
+            messages.info(request, 'Se ha modificado la información correctamente de la actividad ')
             return redirect('consultar_actividad_mestro', codigo_clase=codigo_clase, id_actividad=id_actividad)
         else:
             return self.render_to_response(self.get_context_data(form=formulaio))
