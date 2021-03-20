@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
@@ -49,6 +50,26 @@ class ListarForosAlumnoView(AlumnoMixin, ListView):
         return context
 
 
+class CrearForoView(MaestroMixin, CreateView):
+    model = Foro
+    form_class = ForoForm
+    template_name = 'foros/registro-foro/RegistroForo.html'
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object
+        formulario = self.form_class(request.POST)
+        if formulario.is_valid():
+            query_clase = Clase.objects.filter(abierta=True)
+            clase = get_object_or_404(query_clase, codigo=kwargs['codigo_clase'])
+            formulario = formulario.save(commit=False)
+            formulario.clase = clase
+            formulario.save()
+            messages.info(request, 'El foro se ha registrado correctamente')
+            return redirect('foros', codigo_clase=kwargs['codigo_clase'])
+        else:
+            return self.render_to_response(self.get_context_data(form=formulario))
+
+
 def _actualizar_estado_foro(foro):
     """
     Actualiza el estado de un foro
@@ -75,38 +96,6 @@ def _actualizar_estado_foros(foros):
     """
     for foro in foros:
         _actualizar_estado_foro(foro)
-
-
-@login_required()
-def registrar_foro(request, codigo_clase):
-    """
-    Muestra la plantila para registrar un nuevo foro en una clase
-    :param request: La solcitud del usuario
-    :param codigo_clase: El codigo de la clase en donde se va a registrar el foro
-    :return: un render o un redirect
-    """
-    if request.user.es_maestro:
-        datos_del_maestro = {}
-        datos_del_maestro["clase_actual"] = request.user.persona.maestro.clase_set.filter(
-            codigo=codigo_clase).first()
-        if request.method == "GET":
-            if datos_del_maestro["clase_actual"] is not None:
-                datos_del_maestro["form"] = ForoForm()
-                return render(request, 'foros/registro-foro/RegistroForo.html', datos_del_maestro)
-            else:
-                return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
-        elif request.method == "POST":
-            formulario = ForoForm(request.POST)
-            if formulario.is_valid():
-                foro = formulario.cleaned_data
-                #if validar_fecha_cierre_mayor_a_fecha_apertura(foro["fecha_inicio"], foro["fecha_cierre"]):
-                _registrar_foro(datos_del_maestro["clase_actual"].pk, foro["nombre"], foro["descripcion"],
-                                foro["fecha_de_inicio"], foro["fecha_de_cierre"])
-                return redirect('foros', codigo_clase=codigo_clase)
-                #formulario.errors["fecha_inicio"] = "La fecha de inicio no puede ser antes que la fecha de cierre"
-            datos_del_maestro["form"] = formulario
-            return render(request, 'foros/registro-foro/RegistroForo.html', datos_del_maestro)
-    raise Http404
 
 
 @login_required()
