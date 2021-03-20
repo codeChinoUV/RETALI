@@ -39,6 +39,13 @@ class Foro(models.Model):
             self.estado = 'Abierta'
         self.save()
 
+    def cantidad_de_participaciones(self):
+        """
+        Obtiene la cantidad de participaciones de un foro
+        :return: La cantidad de participaciones
+        """
+        return self.participacion_set.filter(eliminada=False).count()
+
 
 class Participacion(models.Model):
     """

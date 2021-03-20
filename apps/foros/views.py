@@ -2,12 +2,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView
 
-from apps.clases.models import Clase
+from apps.clases.models import Clase, Inscripcion, EstadoSolicitudUnirse
 from apps.foros.forms import ForoForm
 from apps.foros.models import Foro, Participacion, Respuesta
-from apps.usuarios.mixins import MaestroMixin
+from apps.usuarios.mixins import MaestroMixin, AlumnoMixin
 
 
 class ListarForosMaestroView(MaestroMixin, ListView):
@@ -30,42 +30,23 @@ class ListarForosMaestroView(MaestroMixin, ListView):
         return context
 
 
-@login_required
-def consultar_foros_alumno(request, codigo_clase):
-    """
-    Muestra la informacion de los foros que tiene registrada una clase para el usuario alumno
-    :param request: La solicitud del usuario
-    :param codigo_clase: El codigo de la clase a mostrar sus foros
-    :return: un render
-    """
-    if request.method == "GET":
-        if not request.user.es_maestro:
-            alumno = request.user.persona.alumno
-            clase = Clase.objects.filter(codigo=codigo_clase).first()
-            inscripcion = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.id).first()
-            datos_del_alumno = {}
-            datos_del_alumno['clase_actual'] = inscripcion.clase
-            if datos_del_alumno['clase_actual'] is not None:
-                datos_del_alumno["foros"] = datos_del_alumno['clase_actual'].foro_set.filter(eliminado=False).all(). \
-                    order_by('-fecha_de_creacion')
-                _colocar_cantidad_participaciones_de_foro(datos_del_alumno["foros"])
-                datos_del_alumno["cantidad_foros_abiertos"] = contar_foros_activos(datos_del_alumno["foros"])
-                datos_del_alumno["total_de_foros"] = len(datos_del_alumno["foros"])
-                return render(request, 'foros/consultar-foros-alumno/ConsultarForosAlumno.html', datos_del_alumno)
-            else:
-                return render(request, 'generales/NoEncontrada.html', datos_del_alumno)
-    raise Http404
+class ListarForosAlumnoView(AlumnoMixin, ListView):
+    """ Vista para consultar los foros de un alumno"""
+    model = Foro
+    template_name = 'foros/consultar-foros-alumno/ConsultarForosAlumno.html'
 
+    def get_queryset(self):
+        return Foro.objects.filter(clase__codigo=self.kwargs['codigo_clase']).order_by('-fecha_de_creacion')
 
-def _colocar_cantidad_participaciones_de_foro(foros):
-    """
-    Cuenta la cantidad de participaciones en un foro y las coloca en el objeto
-    :param foros: Los foros a colocar la cantidad de particicpaciones
-    :return: None
-    """
-    if foros is not None:
-        for foro in foros:
-            foro.cantidad_participaciones = foro.participacion_set.filter(eliminada=False).count()
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(ListarForosAlumnoView, self).get_context_data(**kwargs)
+        query_inscripcion = Inscripcion.objects.filter(clase__codigo=self.kwargs['codigo_clase'],
+                                                       aceptado=EstadoSolicitudUnirse.ACEPTADO)
+        inscripcion = get_object_or_404(query_inscripcion, alumno_id=self.request.user.persona.alumno.pk)
+        inscripcion.clase.actualizar_estado_foros()
+        context['cantidad_foros_abiertos'] = inscripcion.clase.cantidad_de_foros_abiertos()
+        context['total_de_foros'] = inscripcion.clase.cantidad_de_foros()
+        return context
 
 
 def _actualizar_estado_foro(foro):
@@ -94,20 +75,6 @@ def _actualizar_estado_foros(foros):
     """
     for foro in foros:
         _actualizar_estado_foro(foro)
-
-
-def contar_foros_activos(foros):
-    """
-    Cuenta la cantidad de foros activos
-    :param foros:
-    :return:
-    """
-    _actualizar_estado_foros(foros)
-    cantidad_abiertos = 0
-    for foro in foros:
-        if foro.estado == 'Abierta':
-            cantidad_abiertos += 1
-    return cantidad_abiertos
 
 
 @login_required()

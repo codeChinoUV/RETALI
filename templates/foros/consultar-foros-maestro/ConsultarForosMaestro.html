@@ -54,9 +54,9 @@
             <div class="informacion-foro">
                 <h3><a href="{% url 'consultar_foro' clase_actual.codigo foro.pk %}">{{ foro.nombre }}</a></h3>
                 {% timezone 'America/Mexico_City' %}
-                <p>Del {{ foro.fecha_de_inicio }} hasta las {{ foro.fecha_de_cierre }}</p>
+                <p>Del: <b>{{ foro.fecha_de_inicio }}</b> hasta las: <b>{{ foro.fecha_de_cierre }}</b>
                 {% endtimezone %}
-                <p>{{ foro.cantidad_participaciones }} Alumnos han participado en el foro</p>
+                <p>{{ foro.cantidad_de_participaciones }} Alumnos han participado en el foro</p>
             </div>
             <div class="estado-foro">
                 {% if foro.estado == 'Abierta' %}
