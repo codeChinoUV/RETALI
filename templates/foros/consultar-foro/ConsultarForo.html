@@ -192,7 +192,7 @@
         </form>
     </div>
     {% endif %}
-    {% for participacion in participaciones %}
+    {% for participacion in foro.obtener_participaciones %}
         <div class="participacion">
             <div class="informacion-participacion">
                 {% if participacion.participante.foto_de_perfil %}
@@ -208,7 +208,7 @@
             <hr class="separacion-participacion">
             <p>{{ participacion.participacion }}</p>
             <hr class="separacion-respuestas">
-            {% for respuesta in participacion.respuestas %}
+            {% for respuesta in participacion.obtener_respuestas %}
                 <div class="respuesta">
                     <div class="informacion-respuesta">
                         {% if respuesta.autor.foto_de_perfil %}

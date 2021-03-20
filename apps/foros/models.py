@@ -46,6 +46,13 @@ class Foro(models.Model):
         """
         return self.participacion_set.filter(eliminada=False).count()
 
+    def obtener_participaciones(self):
+        """
+        Obtiene las participaciones del foro que no esten eliminadas
+        :return: Una lista de participaciones
+        """
+        return self.participacion_set.filter(eliminada=False).all()
+
 
 class Participacion(models.Model):
     """
@@ -56,6 +63,12 @@ class Participacion(models.Model):
     fecha = models.DateTimeField(default=timezone.now)
     participacion = models.TextField(null=False)
     eliminada = models.BooleanField(default=False)
+
+    def obtener_respuestas(self):
+        """
+        Obtiene la lista de respuesta de la participación que no esten eliminadas
+        """
+        return self.respuesta_set.filter(eliminada=False).all()
 
 
 class Respuesta(models.Model):

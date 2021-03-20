@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
-from django.shortcuts import render, redirect, get_object_or_404
-from django.utils import timezone
-from django.views.generic import ListView, CreateView, UpdateView
+from django.shortcuts import redirect, get_object_or_404
+from django.views.generic import ListView, CreateView, UpdateView, DetailView
 
 from apps.clases.models import Clase, Inscripcion, EstadoSolicitudUnirse
 from apps.foros.forms import ForoForm
@@ -103,75 +103,15 @@ class ModificarForo(MaestroMixin, UpdateView):
             return self.render_to_response(self.get_context_data(form=formulario))
 
 
-def _actualizar_estado_foro(foro):
-    """
-    Actualiza el estado de un foro
-    :param foro: El foro a actualizar su estado
-    :return: None
-    """
-    now = timezone.now()
-    if foro.fecha_de_inicio > now:
-        Foro.objects.filter(pk=foro.pk).update(estado='Por abrir')
-        foro.estado = 'Por abrir'
-    elif foro.fecha_de_cierre < now:
-        Foro.objects.filter(pk=foro.pk).update(estado='Cerrada')
-        foro.estado = 'Cerrada'
-    else:
-        Foro.objects.filter(pk=foro.pk).update(estado='Abierta')
-        foro.estado = 'Abierta'
+class ConsultarForoView(LoginRequiredMixin, DetailView):
+    """Vista para consultar el foro"""
+    model = Foro
+    template_name = 'foros/consultar-foro/ConsultarForo.html'
 
-
-@login_required()
-def consultar_foro(request, codigo_clase, id_foro):
-    """
-    Muestra la informacion de un foro con sus participaciones y respuestas
-    :param request: La solicitud del usuario
-    :param codigo_clase: El codigo de la clase en donde pertenece el foro a consultar
-    :param id_foro: El id del foro a mostrar
-    :return: Un render
-    """
-    if request.method == "GET":
-        if request.user.es_maestro:
-            datos_del_maestro = {}
-            datos_del_maestro["clase_actual"] = request.user.persona.maestro.clase_set.filter(
-                codigo=codigo_clase).first()
-            if datos_del_maestro["clase_actual"] is not None:
-                datos_del_maestro["foro"] = datos_del_maestro["clase_actual"].foro_set.filter(pk=id_foro).first()
-                if datos_del_maestro["foro"] is not None:
-                    _actualizar_estado_foro(datos_del_maestro["foro"])
-                    datos_del_maestro["participaciones"] = datos_del_maestro["foro"].participacion_set. \
-                        filter(eliminada=False).all()
-                    _colocar_respuetas_de_participaciones(datos_del_maestro["participaciones"])
-                    return render(request, 'foros/consultar-foro/ConsultarForo.html', datos_del_maestro)
-            return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
-        else:
-            alumno = request.user.persona.alumno
-            datos_del_alumno = {}
-            clase = Clase.objects.filter(codigo=codigo_clase).first()
-            if clase is not None:
-                inscripcion = request.user.persona.alumno.inscripcion_set. \
-                    filter(aceptado='Aceptado', clase_id=clase.pk).first()
-                if inscripcion is not None:
-                    datos_del_alumno["clase_actual"] = inscripcion.clase
-                    datos_del_alumno["foro"] = datos_del_alumno["clase_actual"].foro_set.filter(pk=id_foro).first()
-                    if datos_del_alumno["foro"] is not None:
-                        _actualizar_estado_foro(datos_del_alumno["foro"])
-                        datos_del_alumno["participaciones"] = datos_del_alumno["foro"].participacion_set. \
-                            filter(eliminada=False).all()
-                        _colocar_respuetas_de_participaciones(datos_del_alumno["participaciones"])
-                        return render(request, 'foros/consultar-foro/ConsultarForo.html', datos_del_alumno)
-            return render(request, 'generales/NoEncontrada.html', datos_del_alumno)
-    raise Http404
-
-
-def _colocar_respuetas_de_participaciones(participaciones):
-    """
-    Cola en las participaciones sus respuestas
-    :param participaciones: Las participaciones en donde se colocaran las respuestas
-    :return: None
-    """
-    for participacion in participaciones:
-        participacion.respuestas = participacion.respuesta_set.filter(eliminada=False).all()
+    def get_context_data(self, **kwargs):
+        foro = get_object_or_404(Foro.objects, pk=self.kwargs['pk'])
+        foro.actualizar_estado()
+        return super(ConsultarForoView, self).get_context_data(**kwargs)
 
 
 @login_required()
@@ -188,12 +128,12 @@ def participar_en_foro(request, codigo_clase, id_foro):
             if _validar_existe_foro_maestro(request.user.persona.maestro, codigo_clase, id_foro):
                 if request.POST['participacion'] is not None and request.POST['participacion'] != '':
                     _registrar_participacion(request.user.persona.pk, id_foro, request.POST['participacion'])
-                    return redirect('consultar_foro', codigo_clase=codigo_clase, id_foro=id_foro)
+                    return redirect('consultar_foro', codigo_clase=codigo_clase, pk=id_foro)
         else:
             if _validar_existe_foro_alumno(request.user.persona.alumno, codigo_clase, id_foro):
                 if request.POST['participacion'] is not None and request.POST['participacion'] != '':
                     _registrar_participacion(request.user.persona.pk, id_foro, request.POST['participacion'])
-                    return redirect('consultar_foro', codigo_clase=codigo_clase, id_foro=id_foro)
+                    return redirect('consultar_foro', codigo_clase=codigo_clase, pk=id_foro)
     raise Http404
 
 
@@ -261,13 +201,13 @@ def responder_participacion(request, codigo_clase, id_foro, id_participacion):
                                                           id_participacion):
                 if request.POST['respuesta'] is not None and request.POST['respuesta'] != '':
                     _registrar_respuesta(request.user.persona.pk, id_participacion, request.POST['respuesta'])
-                    return redirect('consultar_foro', codigo_clase=codigo_clase, id_foro=id_foro)
+                    return redirect('consultar_foro', codigo_clase=codigo_clase, pk=id_foro)
         else:
             if _validar_existe_participacion_foro_alumno(request.user.persona.alumno, codigo_clase, id_foro,
                                                          id_participacion):
                 if request.POST['respuesta'] is not None and request.POST['respuesta'] != '':
                     _registrar_respuesta(request.user.persona.pk, id_participacion, request.POST['respuesta'])
-                    return redirect('consultar_foro', codigo_clase=codigo_clase, id_foro=id_foro)
+                    return redirect('consultar_foro', codigo_clase=codigo_clase, pk=id_foro)
     raise Http404
 
 
