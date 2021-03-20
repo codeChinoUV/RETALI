@@ -51,7 +51,16 @@ class Foro(models.Model):
         Obtiene las participaciones del foro que no esten eliminadas
         :return: Una lista de participaciones
         """
-        return self.participacion_set.filter(eliminada=False).all()
+        return self.participacion_set.filter(eliminada=False).all().order_by('-fecha')
+
+    def registrar_participacion(self, participacion, creador_id):
+        """
+        Registra una nueva participacion
+        :param participacion: El contenido de la participación
+        :param creador_id: El id del creador de la participación
+        """
+        participacion = Participacion(participacion=participacion, participante_id=creador_id, foro_id=self.pk)
+        participacion.save()
 
 
 class Participacion(models.Model):
@@ -68,7 +77,7 @@ class Participacion(models.Model):
         """
         Obtiene la lista de respuesta de la participación que no esten eliminadas
         """
-        return self.respuesta_set.filter(eliminada=False).all()
+        return self.respuesta_set.filter(eliminada=False).all().order_by('-fecha')
 
 
 class Respuesta(models.Model):
