@@ -117,11 +117,31 @@ class Clase(models.Model):
 
     def actualizar_estado_actividades(self):
         """
-        Actualiza el estado de las actividades que se le pasan, verificando si esta abierta o no
-        :return: None
+        Actualiza el estado de las actividades, verificando si esta abierta o no
         """
         for actividad in self.actividad_set.all():
             actividad.actualizar_estado_actividad()
+
+    def actualizar_estado_foros(self):
+        """
+        Actualiza el estado de los foros, verificando si esta abierto o no
+        """
+        for foro in self.foro_set.all():
+            foro.actualizar_estado()
+
+    def cantidad_de_foros_abiertos(self):
+        """
+        Cuenta los foros que se encuentran abiertos
+        :return: La cantidad de foros abiertos
+        """
+        return self.foro_set.filter(estado='Abierta').count()
+
+    def cantidad_de_foros(self):
+        """
+        Cuenta la cantidad de foros
+        :return: La cantidad de foros
+        """
+        return self.foro_set.all().count()
 
 
 class Alumno(Persona):

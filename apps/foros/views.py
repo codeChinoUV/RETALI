@@ -1,35 +1,33 @@
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
+from django.views.generic import ListView
+
 from apps.clases.models import Clase
 from apps.foros.forms import ForoForm
 from apps.foros.models import Foro, Participacion, Respuesta
+from apps.usuarios.mixins import MaestroMixin
 
 
-@login_required
-def consultar_foros_maestro(request, codigo_clase):
-    """
-    Muestra la informacion de los foros que tiene registrada una clase para el usuario maestro
-    :param request: La solicitud del usuario
-    :param codigo_clase: El codigo de la clase a mostrar sus foros
-    :return: un render
-    """
-    if request.method == "GET":
-        if request.user.es_maestro:
-            datos_del_maestro = {}
-            datos_del_maestro["clase_actual"] = request.user.persona.maestro.clase_set.filter(
-                codigo=codigo_clase).first()
-            if datos_del_maestro["clase_actual"] is not None:
-                datos_del_maestro["foros"] = datos_del_maestro["clase_actual"].foro_set.filter(eliminado=False).all(). \
-                    order_by('-fecha_de_creacion')
-                _colocar_cantidad_participaciones_de_foro(datos_del_maestro["foros"])
-                datos_del_maestro["cantidad_foros_abiertos"] = contar_foros_activos(datos_del_maestro["foros"])
-                datos_del_maestro["total_de_foros"] = len(datos_del_maestro["foros"])
-                return render(request, 'foros/consultar-foros-maestro/ConsultarForosMaestro.html', datos_del_maestro)
-            else:
-                return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
-    raise Http404
+class ListarForosMaestroView(MaestroMixin, ListView):
+    """ Vista para consultar los foros de un maestro"""
+    model = Foro
+    template_name = 'foros/consultar-foros-maestro/ConsultarForosMaestro.html'
+
+    def get_queryset(self):
+        return Foro.objects.filter(clase__codigo=self.kwargs['codigo_clase'],
+                                   clase__maestro_id=self.request.user.persona.maestro.pk).\
+            order_by('-fecha_de_creacion')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(ListarForosMaestroView, self).get_context_data(**kwargs)
+        query_clase = Clase.objects.filter(codigo=self.kwargs['codigo_clase'])
+        clase = get_object_or_404(query_clase, maestro_id=self.request.user.persona.maestro.pk)
+        clase.actualizar_estado_foros()
+        context['cantidad_foros_abiertos'] = clase.cantidad_de_foros_abiertos()
+        context['total_de_foros'] = clase.cantidad_de_foros()
+        return context
 
 
 @login_required
@@ -134,11 +132,11 @@ def registrar_foro(request, codigo_clase):
             formulario = ForoForm(request.POST)
             if formulario.is_valid():
                 foro = formulario.cleaned_data
-                if validar_fecha_cierre_mayor_a_fecha_apertura(foro["fecha_inicio"], foro["fecha_cierre"]):
-                    _registrar_foro(datos_del_maestro["clase_actual"].pk, foro["nombre"], foro["descripcion"],
-                                    foro["fecha_inicio"], foro["fecha_cierre"])
-                    return redirect('foros', codigo_clase=codigo_clase)
-                formulario.errors["fecha_inicio"] = "La fecha de inicio no puede ser antes que la fecha de cierre"
+                #if validar_fecha_cierre_mayor_a_fecha_apertura(foro["fecha_inicio"], foro["fecha_cierre"]):
+                _registrar_foro(datos_del_maestro["clase_actual"].pk, foro["nombre"], foro["descripcion"],
+                                foro["fecha_de_inicio"], foro["fecha_de_cierre"])
+                return redirect('foros', codigo_clase=codigo_clase)
+                #formulario.errors["fecha_inicio"] = "La fecha de inicio no puede ser antes que la fecha de cierre"
             datos_del_maestro["form"] = formulario
             return render(request, 'foros/registro-foro/RegistroForo.html', datos_del_maestro)
     raise Http404

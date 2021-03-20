@@ -25,6 +25,20 @@ class Foro(models.Model):
     participaciones = models.ManyToManyField(Persona, through='Participacion')
     eliminado = models.BooleanField(default=False)
 
+    def actualizar_estado(self):
+        """
+        Actualiza el estado del foro
+        :return: None
+        """
+        now = timezone.now()
+        if self.fecha_de_inicio > now:
+            self.estado = 'Por abrir'
+        elif self.fecha_de_cierre < now:
+            self.estado = 'Cerrada'
+        else:
+            self.estado = 'Abierta'
+        self.save()
+
 
 class Participacion(models.Model):
     """

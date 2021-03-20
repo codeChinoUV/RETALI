@@ -1,10 +1,10 @@
 from django.urls import path
 
-from apps.foros.views import consultar_foros_maestro, registrar_foro, consultar_foro, participar_en_foro, \
-    responder_participacion, consultar_foros_alumno, editar_foro
+from apps.foros.views import registrar_foro, consultar_foro, participar_en_foro, responder_participacion, \
+    consultar_foros_alumno, editar_foro, ListarForosMaestroView
 
 urlpatterns = [
-    path('<str:codigo_clase>/foros', consultar_foros_maestro, name='foros'),
+    path('<str:codigo_clase>/foros', ListarForosMaestroView.as_view(), name='foros'),
     path('<str:codigo_clase>/foros/alumno', consultar_foros_alumno, name='foros_alumno'),
     path('<str:codigo_clase>/foros/registrar_foro', registrar_foro, name='registro_foro'),
     path('<str:codigo_clase>/foros/<int:id_foro>/editar', editar_foro, name='editar_foro'),
