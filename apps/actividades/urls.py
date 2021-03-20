@@ -11,7 +11,6 @@ urlpatterns = [
     path('<str:codigo_clase>/actividades/<int:pk>/editar', EditarActividadView.as_view(), name='editar_actividad'),
     path('<str:codigo_clase>/actividades/<int:id_actividad>/', ConsultarActividadView.as_view(),
          name='consultar_actividad_mestro'),
-    # path('<str:codigo_clase>/actividades/<int:id_actividad>/alumno', consultar_actividad_alumno, name='consultar_actividad_alumno'),
     path('<str:codigo_clase>/actividades/<int:id_actividad>/entregas/<int:id_entrega>',
          RevisarEntregaActividadView.as_view(), name='revisar_entrega'),
     path('<str:codigo_clase>/actividades/<int:id_actividad>/entregar_actividad', EntregarActividadView.as_view(),

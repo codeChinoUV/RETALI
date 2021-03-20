@@ -12,7 +12,7 @@
             <div class="titulo">Inicio</div>
         </a>
     </li>
-    <li class="link-actual">
+    <li>
         <a href="{% url 'actividades_alumno' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
             <div class="titulo">Actividades</div>
@@ -24,8 +24,8 @@
             <div class="titulo">Foros</div>
         </a>
     </li>
-    <li>
-        <a href="{% url 'avisos' clase_actual.codigo %}">
+    <li class="link-actual">
+        <a href="{% url 'avisos_alumno' clase_actual.codigo %}">
             <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/alertas.svg' %}" alt="Icono de inicio"></div>
             <div class="titulo">Avisos</div>
         </a>
@@ -34,12 +34,12 @@
 {% block contenido %}
     <h1 class="titulo-seccion">Avisos</h1>
     <hr>
-    {% if avisos|length == 0 %}
+    {% if aviso_list|length == 0 %}
     <div id="informacion-sin-avisos">
         <p>No hay avisos que mostrar</p>
     </div>
     {% endif %}
-    {% for aviso in avisos %}
+    {% for aviso in aviso_list %}
         <div class="aviso">
             <div class="cabecera-aviso">
                 <img class="aviso-imagen" src="{% static 'generales/imagenes/altoparlante.png' %}" alt="imagen aviso">

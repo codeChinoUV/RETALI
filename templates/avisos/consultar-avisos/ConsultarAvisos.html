@@ -38,16 +38,25 @@
     </li>
 {% endblock %}
 {% block contenido %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                    <div class="alert alert-{{ message.level_tag }}" role="alert">
+                        {{ message.message }}
+                    </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <h1 class="titulo-seccion">Avisos</h1>
     <hr>
     <div id="informacion-avisos">
-        <p>Total de avisos: {{ avisos|length }}</p>
+        <p>Total de avisos: {{ aviso_list|length }}</p>
         <a href="{% url 'crear_aviso' clase_actual.codigo %}" >
             <div>Nuevo aviso</div>
             <img src="{% static 'avisos/consultar-avisos-maestro/imagenes/registrar-aviso.svg' %}" alt="icono crear">
         </a>
     </div>
-    {% for aviso in avisos %}
+    {% for aviso in aviso_list %}
         <div class="aviso">
             <div class="cabecera-aviso">
                 <img class="aviso-imagen" src="{% static 'generales/imagenes/altoparlante.png' %}" alt="imagen aviso">
