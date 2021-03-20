@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, UpdateView
 
 from apps.clases.models import Clase, Inscripcion, EstadoSolicitudUnirse
 from apps.foros.forms import ForoForm
@@ -70,6 +70,39 @@ class CrearForoView(MaestroMixin, CreateView):
             return self.render_to_response(self.get_context_data(form=formulario))
 
 
+class ModificarForo(MaestroMixin, UpdateView):
+    """Vista para modificar un foro"""
+    model = Foro
+    template_name = 'foros/editar-foro/EditarForo.html'
+    form_class = ForoForm
+
+    def get_context_data(self, **kwargs):
+        context = super(ModificarForo, self).get_context_data(**kwargs)
+        codigo_clase = self.kwargs['codigo_clase']
+        id_foro = self.kwargs['pk']
+        query_foro = Foro.objects.filter(clase__abierta=True, clase__codigo=codigo_clase,
+                                         clase__maestro_id=self.request.user.persona.maestro.pk)
+        foro = get_object_or_404(query_foro, pk=id_foro)
+        if 'form' not in context:
+            context['form'] = self.form_class(instance=foro)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object
+        codigo_clase = self.kwargs['codigo_clase']
+        id_foro = self.kwargs['pk']
+        query_foro = Foro.objects.filter(clase__abierta=True, clase__codigo=codigo_clase,
+                                         clase__maestro_id=self.request.user.persona.maestro.pk)
+        foro = get_object_or_404(query_foro, pk=id_foro)
+        formulario = self.form_class(request.POST, instance=foro)
+        if formulario.is_valid():
+            formulario.save()
+            messages.info(request, 'Se ha modificado correctamente la información del foro ')
+            return redirect('consultar_foro', codigo_clase=codigo_clase, id_foro=id_foro)
+        else:
+            return self.render_to_response(self.get_context_data(form=formulario))
+
+
 def _actualizar_estado_foro(foro):
     """
     Actualiza el estado de un foro
@@ -86,99 +119,6 @@ def _actualizar_estado_foro(foro):
     else:
         Foro.objects.filter(pk=foro.pk).update(estado='Abierta')
         foro.estado = 'Abierta'
-
-
-def _actualizar_estado_foros(foros):
-    """
-    Actualiza el estado de todos los foros
-    :param foros: Los foros a actualizar su estado
-    :return: None
-    """
-    for foro in foros:
-        _actualizar_estado_foro(foro)
-
-
-@login_required()
-def editar_foro(request, codigo_clase, id_foro):
-    """
-    Muestra la plantila para editar la informacion de un foro de una clase
-    :param request: La solcitud del usuario
-    :param codigo_clase: El codigo de la clase en donde se encuentra registrado el foro
-    :param id_foro: El id del foro a editar
-    :return: un render o un redirect
-    """
-    if request.user.es_maestro:
-        datos_del_maestro = {}
-        datos_del_maestro["clase_actual"] = request.user.persona.maestro.clase_set.filter(codigo=codigo_clase).first()
-        if request.method == "GET":
-            if datos_del_maestro["clase_actual"] is not None:
-                if _validar_existe_foro_maestro(request.user.persona.maestro, codigo_clase, id_foro):
-                    foro_actual = Foro.objects.filter(pk=id_foro).first()
-                    datos_del_maestro["form"] = _crear_formulario_con_informacion_de_foro(foro_actual)
-                    return render(request, 'foros/editar-foro/EditarForo.html', datos_del_maestro)
-            return render(request, 'generales/NoEncontrada.html', datos_del_maestro)
-        elif request.method == "POST":
-            if datos_del_maestro["clase_actual"] is not None:
-                if _validar_existe_foro_maestro(request.user.persona.maestro, codigo_clase, id_foro):
-                    formulario = ForoForm(request.POST)
-                    if formulario.is_valid():
-                        datos = formulario.cleaned_data
-                        #if validar_fecha_cierre_mayor_a_fecha_apertura(datos["fecha_inicio"], datos["fecha_cierre"]):
-                        _actualizar_informacion_foro(id_foro, datos["nombre"], datos["descripcion"],
-                                                          datos["fecha_inicio"], datos["fecha_cierre"])
-                        return redirect('consultar_foro', codigo_clase=codigo_clase,
-                                        id_foro=id_foro)
-                        #else:
-                        #    formulario.errors["fecha_inicio"] = "La fecha de inicio no puede ser antes que la fecha " \
-                        #                                        "de cierre"
-                    datos_del_maestro["form"] = formulario
-                    return render(request, 'foros/editar-foro/EditarForo.html', datos_del_maestro)
-        raise Http404
-    else:
-        return redirect('inicio')
-
-
-def _crear_formulario_con_informacion_de_foro(foro):
-    """
-    Crea un formulario y le coloca en los campos la información de un Foro
-    :param foro: El foro del cual se podra la información en sus campos
-    :return: Un ForoForm
-    """
-    formulario = ForoForm()
-    formulario.fields["nombre"].initial = foro.nombre
-    formulario.fields["descripcion"].initial = foro.descripcion
-    formulario.fields["fecha_inicio"].initial = foro.fecha_de_inicio
-    formulario.fields["fecha_cierre"].initial = foro.fecha_de_cierre
-    return formulario
-
-
-def _actualizar_informacion_foro(id_foro, nombre, descripcion, fecha_inicio, fecha_cierre):
-    """
-    Actualiza la información del foro con el id_foro
-    :param id_foro: El id del foro a actualizar la información
-    :param nombre: El nuevo nombre del foro
-    :param descripcion: La nueva descripción del foro
-    :param fecha_inicio: La nueva fecha de inicio del foro
-    :param fecha_cierre: La nueva fecha de cierre del foro
-    :return: None
-    """
-    Foro.objects.filter(pk=id_foro).update(nombre=nombre, descripcion=descripcion, fecha_de_inicio=fecha_inicio,
-                                           fecha_de_cierre=fecha_cierre)
-
-
-def _registrar_foro(id_clase, nombre, descripcion, fecha_inicio, fecha_cierre):
-    """
-    Rigistra un nuevo for en la clase con el id_clase
-    :param id_clase: El id de la clase en donde se registrara el foro
-    :param nombre: El nombre que tendra el foro
-    :param descripcion: La descripcion del foro
-    :param fecha_inicio: La fecha de inicio del foro
-    :param fecha_cierre: La fecha de cierre del foro
-    :return: None
-    """
-    foro = Foro(clase_id=id_clase, nombre=nombre, descripcion=descripcion, fecha_de_inicio=fecha_inicio,
-                fecha_de_cierre=fecha_cierre)
-    foro.save()
 
 
 @login_required()
