@@ -359,14 +359,11 @@ class DescargarArchivoView(LoginRequiredMixin, View):
                 query_actividad = Actividad.objects.filter(clase__codigo=codigo_clase, clase__abierta=True,
                                                            clase__maestro_id=request.user.persona.maestro.pk)
                 actividad = get_object_or_404(query_actividad, pk=id_actividad)
-                query_entrega = actividad.entrega_set
-                get_object_or_404(query_entrega, pk=id_entrega)
-                return self._obtener_archivo(file_path)
             else:
                 query_inscripcion = Inscripcion.objects.filter(aceptado='Aceptado', clase__codigo=codigo_clase)
                 inscripcion = get_object_or_404(query_inscripcion, alumno_id=request.user.persona.alumno.pk)
                 query_actividad = inscripcion.clase.actividad_set
                 actividad = get_object_or_404(query_actividad, pk=id_actividad)
-                query_entrega = actividad.entrega_set
-                get_object_or_404(query_entrega, pk=id_entrega)
-                return self._obtener_archivo(file_path)
+            query_entrega = actividad.entrega_set
+            get_object_or_404(query_entrega, pk=id_entrega)
+            return self._obtener_archivo(file_path)
