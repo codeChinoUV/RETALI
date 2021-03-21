@@ -28,13 +28,15 @@ class Actividad(models.Model):
     def actualizar_estado_actividad(self):
         """Actualiza el estado de la actividad dependiendo de las fechas de apertura y cierre"""
         now = timezone.now()
+        estado_previo = self.estado
         if self.fecha_de_inicio > now:
             self.estado = 'Por abrir'
         elif self.fecha_de_cierre < now:
             self.estado = 'Cerrada'
         else:
             self.estado = 'Abierta'
-        self.save()
+        if estado_previo != self.estado:
+            self.save()
 
     def esta_abierta(self):
         """Valida si la actividad se encuentra en estado Abierta"""

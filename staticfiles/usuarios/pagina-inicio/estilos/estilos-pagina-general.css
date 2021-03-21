@@ -304,6 +304,10 @@ header a .icono img{
     background-color: var(--hovercolor);
 }
 
+.clase-actual{
+    background-color: var(--hovercolor);
+}
+
 #menu-lateral #elementos-menu .elemento .icono{
     box-sizing: border-box;
     padding: var(--padding);

@@ -7,7 +7,7 @@ h2{
 }
 
 #mensaje-inicio-maestro{
-    background: #1e1e1e;
+    background: var(--bgcolor);
     margin: 4% 15%;
     border-radius: 2rem;
     padding: 2%;
@@ -26,7 +26,7 @@ h2{
     height: var(--height-tarjeta-clase);
     padding: 10px;
     margin: 5%;
-    background-color: #1e1e1e;
+    background-color: var(--bgcolor);
     border-radius: 2rem;
 }
 
