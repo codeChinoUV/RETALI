@@ -12,6 +12,7 @@ class ForoForm(forms.ModelForm):
     """
     Formulario que servira para registrar un foro, ademas de servir para validar los campos
     """
+
     class Meta:
         model = Foro
         fields = ['nombre', 'descripcion', 'fecha_de_inicio', 'fecha_de_cierre']

@@ -1,14 +1,12 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
 from django.shortcuts import redirect, get_object_or_404
 from django.views import View
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 
 from apps.clases.models import Clase, Inscripcion, EstadoSolicitudUnirse
 from apps.foros.forms import ForoForm
-from apps.foros.models import Foro, Participacion, Respuesta
+from apps.foros.models import Foro
 from apps.usuarios.mixins import MaestroMixin, AlumnoMixin
 
 
@@ -19,7 +17,7 @@ class ListarForosMaestroView(MaestroMixin, ListView):
 
     def get_queryset(self):
         return Foro.objects.filter(clase__codigo=self.kwargs['codigo_clase'],
-                                   clase__maestro_id=self.request.user.persona.maestro.pk).\
+                                   clase__maestro_id=self.request.user.persona.maestro.pk). \
             order_by('-fecha_de_creacion')
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -117,6 +115,7 @@ class ConsultarForoView(LoginRequiredMixin, DetailView):
 
 class ParticiparEnForoView(LoginRequiredMixin, View):
     """ Vista para guardar la participación de una persona en un foro"""
+
     @staticmethod
     def _validar_participacion(participacion):
         return participacion is not None and participacion != ''
@@ -143,6 +142,7 @@ class ParticiparEnForoView(LoginRequiredMixin, View):
 
 class ResponderParticipacionView(LoginRequiredMixin, View):
     """Vista para responder a una participación"""
+
     @staticmethod
     def _validar_respuesta(respuesta):
         return respuesta is not None and respuesta != ''
