@@ -74,7 +74,7 @@
             {% block listaDeClases %}
             <div id="clases">
                 {% for clase in clases %}
-                    <div class="elemento elemento-clase">
+                    <div class="elemento elemento-clase {% if clase.codigo == clase_actual.codigo %} clase-actual {% endif %}">
                         <a href="{% url 'ver_materia' clase.codigo %}">
                             <div class="icono">
                                 {% if clase.foto %}
