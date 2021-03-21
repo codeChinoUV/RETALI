@@ -139,6 +139,15 @@
     </div>
 {% endblock %}
 {% block contenido %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                    <div class="alert alert-{{ message.level_tag }}" role="alert">
+                        {{ message.message }}
+                    </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <h1 id="titulo-foro">Foro: {{ foro.nombre }} </h1>
     <hr>
     <div id="informacion-foro">
@@ -192,7 +201,7 @@
         </form>
     </div>
     {% endif %}
-    {% for participacion in participaciones %}
+    {% for participacion in foro.obtener_participaciones %}
         <div class="participacion">
             <div class="informacion-participacion">
                 {% if participacion.participante.foto_de_perfil %}
@@ -208,7 +217,7 @@
             <hr class="separacion-participacion">
             <p>{{ participacion.participacion }}</p>
             <hr class="separacion-respuestas">
-            {% for respuesta in participacion.respuestas %}
+            {% for respuesta in participacion.obtener_respuestas %}
                 <div class="respuesta">
                     <div class="informacion-respuesta">
                         {% if respuesta.autor.foto_de_perfil %}

@@ -25,6 +25,43 @@ class Foro(models.Model):
     participaciones = models.ManyToManyField(Persona, through='Participacion')
     eliminado = models.BooleanField(default=False)
 
+    def actualizar_estado(self):
+        """
+        Actualiza el estado del foro
+        :return: None
+        """
+        now = timezone.now()
+        if self.fecha_de_inicio > now:
+            self.estado = 'Por abrir'
+        elif self.fecha_de_cierre < now:
+            self.estado = 'Cerrada'
+        else:
+            self.estado = 'Abierta'
+        self.save()
+
+    def cantidad_de_participaciones(self):
+        """
+        Obtiene la cantidad de participaciones de un foro
+        :return: La cantidad de participaciones
+        """
+        return self.participacion_set.filter(eliminada=False).count()
+
+    def obtener_participaciones(self):
+        """
+        Obtiene las participaciones del foro que no esten eliminadas
+        :return: Una lista de participaciones
+        """
+        return self.participacion_set.filter(eliminada=False).all().order_by('-fecha')
+
+    def registrar_participacion(self, participacion, creador_id):
+        """
+        Registra una nueva participacion
+        :param participacion: El contenido de la participación
+        :param creador_id: El id del creador de la participación
+        """
+        participacion = Participacion(participacion=participacion, participante_id=creador_id, foro_id=self.pk)
+        participacion.save()
+
 
 class Participacion(models.Model):
     """
@@ -35,6 +72,24 @@ class Participacion(models.Model):
     fecha = models.DateTimeField(default=timezone.now)
     participacion = models.TextField(null=False)
     eliminada = models.BooleanField(default=False)
+
+    def obtener_respuestas(self):
+        """
+        Obtiene la lista de respuesta de la participación que no esten eliminadas
+        """
+        return self.respuesta_set.filter(eliminada=False).all().order_by('-fecha')
+
+    def registrar_respuesta(self, respuesta, creador_id):
+        """
+        Registra una nueva participacion
+        :param respuesta: El contenido de la respuesta
+        :param creador_id: El id del creador de la respuesta
+        """
+        respuesta_anteriores = self.respuesta_set.filter(eliminada=False).count()
+        respuesta_actual = respuesta_anteriores + 1
+        respuesta = Respuesta(respuesta=respuesta, autor_id=creador_id, participacion_id=self.pk,
+                              numero_respuesta=respuesta_actual)
+        respuesta.save()
 
 
 class Respuesta(models.Model):

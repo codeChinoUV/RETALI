@@ -38,6 +38,15 @@
     </li>
 {% endblock %}
 {% block contenido %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                    <div class="alert alert-{{ message.level_tag }}" role="alert">
+                        {{ message.message }}
+                    </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <h1 class="titulo-seccion">Foros</h1>
     <hr>
     <div id="informacion-foros">
@@ -48,15 +57,15 @@
             <img src="{% static 'foros/consultar-foros-maestro/imagenes/registro-foro.svg' %}" alt="icono crear">
         </a>
     </div>
-    {% for foro in foros %}
+    {% for foro in foro_list %}
         <div class="foro">
             <img class="foro-imagen" src="{% static 'generales/imagenes/charlando.png' %}" alt="imagen actividad">
             <div class="informacion-foro">
                 <h3><a href="{% url 'consultar_foro' clase_actual.codigo foro.pk %}">{{ foro.nombre }}</a></h3>
                 {% timezone 'America/Mexico_City' %}
-                <p>Del {{ foro.fecha_de_inicio }} hasta las {{ foro.fecha_de_cierre }}</p>
+                <p>Del: <b>{{ foro.fecha_de_inicio }}</b> hasta las: <b>{{ foro.fecha_de_cierre }}</b>
                 {% endtimezone %}
-                <p>{{ foro.cantidad_participaciones }} Alumnos han participado en el foro</p>
+                <p>{{ foro.cantidad_de_participaciones }} Alumnos han participado en el foro</p>
             </div>
             <div class="estado-foro">
                 {% if foro.estado == 'Abierta' %}

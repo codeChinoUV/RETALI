@@ -1,5 +1,3 @@
-import { validar_tamanio_campo } from "../../../scripts/validaciones.js";
-
 /**
  * Valida que el campo nombre no este vacio y no sobre pase el tamaño maximo
  */
@@ -71,7 +69,7 @@ function validarFechaCierreSeleccionada(){
     }
 }
 
-document.querySelector("input[type='submit']").addEventListener("click", (e) => {
+/*document.querySelector("input[type='submit']").addEventListener("click", (e) => {
     e.preventDefault();
     document.querySelectorAll(".invalid-feedback").forEach((e) => {
         e.remove();
@@ -93,4 +91,4 @@ document.querySelector("input[type='submit']").addEventListener("click", (e) => 
               }
             })
     }
-})
+})*/
