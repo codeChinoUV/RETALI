@@ -31,13 +31,15 @@ class Foro(models.Model):
         :return: None
         """
         now = timezone.now()
+        estado_inicial = self.estado
         if self.fecha_de_inicio > now:
             self.estado = 'Por abrir'
         elif self.fecha_de_cierre < now:
             self.estado = 'Cerrada'
         else:
             self.estado = 'Abierta'
-        self.save()
+        if self.estado != estado_inicial:
+            self.save()
 
     def cantidad_de_participaciones(self):
         """
