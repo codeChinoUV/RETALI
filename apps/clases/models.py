@@ -61,7 +61,7 @@ class Clase(models.Model):
         Obtiene la cantidad de alumnos aceptados a una clase
         :return: La cantidad de alumnos aceptados en la clase
         """
-        return self.inscripcion_set.filter(aceptado='Aceptado').count()
+        return self.inscripcion_set.filter(aceptado=EstadoSolicitudUnirse.ACEPTADO).count()
 
     def obtener_cantidad_de_alumnos_pendientes_de_aceptar(self):
         """
@@ -69,6 +69,13 @@ class Clase(models.Model):
         :return: La cantidad de alumnos pendientes de aceptar
         """
         return self.inscripcion_set.filter(aceptado=EstadoSolicitudUnirse.EN_ESPERA).count()
+
+    def obtener_cantidad_de_alumnos_rechazados(self):
+        """
+        Obtiene la cantidad de alumnos rechazados de aceptar en una clase
+        :return: La cantidad de alumnos rechazdos
+        """
+        return self.inscripcion_set.filter(aceptado=EstadoSolicitudUnirse.RECHAZADO).count()
 
     def registrar_inscripcion_alumno(self, id_alumno):
         """

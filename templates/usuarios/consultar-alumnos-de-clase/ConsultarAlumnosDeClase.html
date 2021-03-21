@@ -41,9 +41,9 @@
     <h1 class="titulo-seccion">Grupo</h1>
     <hr>
     <div id="informacion-alumnos">
-        <p>Alumnos aceptados: {{ cantidad_alumnos_aceptados }}</p>
-        <p>Alumnos rechazados: {{ cantidad_alumnos_rechazados }}</p>
-        <p>Alumnos en espera de aceptación: {{ cantidad_alumnos_en_espera }}</p>
+        <p>Alumnos aceptados: {{ clase_actual.obtener_cantidad_de_alumnos_aceptados }}</p>
+        <p>Alumnos rechazados: {{ clase_actual.obtener_cantidad_de_alumnos_rechazados }}</p>
+        <p>Alumnos en espera de aceptación: {{ clase_actual.obtener_cantidad_de_alumnos_pendientes_de_aceptar }}</p>
     </div>
     {% for inscripcion in inscripcion_list %}
         <div class="alumno">
