@@ -1,7 +1,7 @@
 from django.urls import path
 
-from apps.foros.views import responder_participacion, ListarForosMaestroView, ListarForosAlumnoView, CrearForoView, \
-    ModificarForo, ConsultarForoView, ParticiparEnForoView
+from apps.foros.views import ListarForosMaestroView, ListarForosAlumnoView, CrearForoView, \
+    ModificarForo, ConsultarForoView, ParticiparEnForoView, ResponderParticipacionView
 
 urlpatterns = [
     path('<str:codigo_clase>/foros', ListarForosMaestroView.as_view(), name='foros'),
@@ -12,5 +12,5 @@ urlpatterns = [
     path('<str:codigo_clase>/foros/<int:id_foro>/registrar_participacion', ParticiparEnForoView.as_view(),
          name='registrar_participacion'),
     path('<str:codigo_clase>/foros/<int:id_foro>/participaciones/<int:id_participacion>/responder',
-         responder_participacion, name='responder_participacion')
+         ResponderParticipacionView.as_view(), name='responder_participacion')
 ]

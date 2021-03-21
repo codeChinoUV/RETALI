@@ -79,6 +79,18 @@ class Participacion(models.Model):
         """
         return self.respuesta_set.filter(eliminada=False).all().order_by('-fecha')
 
+    def registrar_respuesta(self, respuesta, creador_id):
+        """
+        Registra una nueva participacion
+        :param respuesta: El contenido de la respuesta
+        :param creador_id: El id del creador de la respuesta
+        """
+        respuesta_anteriores = self.respuesta_set.filter(eliminada=False).count()
+        respuesta_actual = respuesta_anteriores + 1
+        respuesta = Respuesta(respuesta=respuesta, autor_id=creador_id, participacion_id=self.pk,
+                              numero_respuesta=respuesta_actual)
+        respuesta.save()
+
 
 class Respuesta(models.Model):
     """

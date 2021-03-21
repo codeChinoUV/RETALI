@@ -141,110 +141,29 @@ class ParticiparEnForoView(LoginRequiredMixin, View):
         return redirect('consultar_foro', codigo_clase=codigo_clase, pk=id_foro)
 
 
-def _validar_existe_foro_maestro(maestro, codigo_clase, id_foro):
-    """
-    Valida si existe un foro en una clase en donde del maestro
-    :param maestro: El maestro a validar si el foro pertence a alguna de sus clases
-    :param codigo_clase: El codigo de la clase del foro
-    :param id_foro: El id del foro a validar si existe
-    :return: True si existe o False si no
-    """
-    existe_foro = False
-    clase = Clase.objects.filter(codigo=codigo_clase).first()
-    if clase is not None:
-        clase = maestro.clase_set.filter(pk=clase.id).first()
-        if clase is not None:
-            if clase.foro_set.filter(eliminado=False, pk=id_foro).count() > 0:
-                existe_foro = True
-    return existe_foro
+class ResponderParticipacionView(LoginRequiredMixin, View):
+    """Vista para responder a una participación"""
+    @staticmethod
+    def _validar_respuesta(respuesta):
+        return respuesta is not None and respuesta != ''
 
-
-def _validar_existe_foro_alumno(alumno, codigo_clase, id_foro):
-    """
-    Valida si existe el foro en alguna clase en donde el alumno se encuentre inscrito
-    :param alumno: El alumno a valiadr si el foro se encuentra en algunas de sus clases inscritas
-    :param codigo_clase: El codigo de la clase del foro
-    :param id_foro: El id del foro a validar si existe
-    :return: True si el foro existe o False si no
-    """
-    existe_foro = False
-    clase = Clase.objects.filter(codigo=codigo_clase).first()
-    if clase is not None:
-        inscripcion = alumno.inscripcion_set.filter(aceptado='Aceptado', clase_id=clase.pk).first()
-        if inscripcion is not None:
-            foro = inscripcion.clase.foro_set.filter(pk=id_foro).first()
-            if foro is not None:
-                existe_foro = True
-    return existe_foro
-
-
-@login_required()
-def responder_participacion(request, codigo_clase, id_foro, id_participacion):
-    """
-    Registra una respuesta a una participacion
-    :param codigo_clase: El codigo de la clase en donde se encuentra el foro de la participacion a responder
-    :param id_foro: El id del foro de la participacion
-    :param id_participacion: El id de la participacion a responder
-    :return: un redirect
-    """
-    if request.method == "POST":
+    def post(self, request, codigo_clase, id_foro, id_participacion):
         if request.user.es_maestro:
-            if _validar_existe_participacion_foro_maestro(request.user.persona.maestro, codigo_clase, id_foro,
-                                                          id_participacion):
-                if request.POST['respuesta'] is not None and request.POST['respuesta'] != '':
-                    _registrar_respuesta(request.user.persona.pk, id_participacion, request.POST['respuesta'])
-                    return redirect('consultar_foro', codigo_clase=codigo_clase, pk=id_foro)
+            query_foro = Foro.objects.filter(clase__codigo=codigo_clase, clase__abierta=True,
+                                             clase__maestro_id=request.user.persona.maestro.pk)
+            foro = get_object_or_404(query_foro, pk=id_foro)
         else:
-            if _validar_existe_participacion_foro_alumno(request.user.persona.alumno, codigo_clase, id_foro,
-                                                         id_participacion):
-                if request.POST['respuesta'] is not None and request.POST['respuesta'] != '':
-                    _registrar_respuesta(request.user.persona.pk, id_participacion, request.POST['respuesta'])
-                    return redirect('consultar_foro', codigo_clase=codigo_clase, pk=id_foro)
-    raise Http404
-
-
-def _validar_existe_participacion_foro_alumno(alumno, codigo_clase, id_foro, id_participacion):
-    """
-    Valida si existe una participacion en un foro
-    :param alumno: El alumno que va responder a la participacion
-    :param codigo_clase: El codigo de la clase en donde se encuentra el foro
-    :param id_foro: El id del foro
-    :param id_participacion: El id de la participacion
-    :return: True si existe la participacion o False si no
-    """
-    existe_participacion = False
-    if _validar_existe_foro_alumno(alumno, codigo_clase, id_foro):
-        if Participacion.objects.filter(pk=id_participacion, eliminada=False).count() > 0:
-            existe_participacion = True
-    return existe_participacion
-
-
-def _validar_existe_participacion_foro_maestro(maestro, codigo_clase, id_foro, id_participacion):
-    """
-    Valida si existe una participacion en un foro
-    :param maestro: El maestro que va a responder a la participacion
-    :param codigo_clase: El codigo de la clase en donde se encuentra el foro
-    :param id_foro: El id del foro a validar si existe
-    :param id_participacion: El id de la participacion a validar si existe
-    :return: True si existe el comentario o False si no
-    """
-    existe_participacion = False
-    if _validar_existe_foro_maestro(maestro, codigo_clase, id_foro):
-        if Participacion.objects.filter(pk=id_participacion, eliminada=False).count() > 0:
-            existe_participacion = True
-    return existe_participacion
-
-
-def _registrar_respuesta(id_persona, id_participacion, respuesta):
-    """
-    Registra una respuesta a una participacion
-    :param id_persona: El id de la persona que realizo la participacion
-    :param id_participacion: El id de la participacion a responder
-    :param respuesta: La respuesta
-    :return: None
-    """
-    respuesta_anteriores = Respuesta.objects.filter(participacion_id=id_participacion).count()
-    respuesta_actual = respuesta_anteriores + 1
-    respuesta = Respuesta(autor_id=id_persona, participacion_id=id_participacion, respuesta=respuesta,
-                          numero_respuesta=respuesta_actual)
-    respuesta.save()
+            query_inscripcion = Inscripcion.objects.filter(clase__codigo=codigo_clase, clase__abierta=True,
+                                                           aceptado=EstadoSolicitudUnirse.ACEPTADO)
+            inscripcion = get_object_or_404(query_inscripcion, alumno_id=request.user.persona.alumno.pk)
+            query_foro = inscripcion.clase.foro_set
+            foro = get_object_or_404(query_foro, pk=id_foro)
+        query_participacion = foro.participacion_set.filter(eliminada=False)
+        participacion = get_object_or_404(query_participacion, pk=id_participacion)
+        foro.actualizar_estado()
+        if self._validar_respuesta(request.POST['respuesta']) and foro.estado == 'Abierta':
+            participacion.registrar_respuesta(request.POST['respuesta'], request.user.persona.pk)
+            messages.info(request, 'Su respuesta se ha registrado correctamente')
+        else:
+            messages.warning('Su respuesta no se ha guardado, verifique si el foro aun se encuentra abierto')
+        return redirect('consultar_foro', codigo_clase=codigo_clase, pk=id_foro)
