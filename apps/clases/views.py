@@ -40,6 +40,10 @@ class ConsultarClaseView(MaestroMixin, TemplateView):
         clase_actual = get_object_or_404(query_set, codigo=kwargs['codigo_clase'])
         context['alumnos_aceptados'] = clase_actual.obtener_cantidad_de_alumnos_aceptados()
         context['alumnos_en_espera'] = clase_actual.obtener_cantidad_de_alumnos_pendientes_de_aceptar()
+        context['total_de_foros'] = clase_actual.cantidad_de_foros()
+        context['foros_abiertos'] = clase_actual.cantidad_de_foros_abiertos()
+        context['total_de_actividades'] = clase_actual.cantidad_de_actividades()
+        context['actividades_abiertas'] = clase_actual.cantidad_de_actividades_abiertas()
         return context
 
 
