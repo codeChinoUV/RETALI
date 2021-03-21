@@ -22,7 +22,7 @@
 
 #inputs-registro-foro input,
 #inputs-registro-foro textarea{
-    background-color: #121212;
+    background-color: var(--primary-color);
     border-radius: 1rem;
     border: none;
     color: white;

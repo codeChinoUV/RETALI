@@ -21,7 +21,7 @@
 
 #inputs-registro-actvidad input,
 #inputs-registro-actvidad textarea{
-    background-color: #121212;
+    background-color: var(--primary-color);
     border-radius: 1rem;
     border: none;
     color: white;
