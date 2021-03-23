@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'apps.actividades',
     'apps.avisos',
     'apps.foros',
+    'apps.utils'
 ]
 
 MIDDLEWARE = [
@@ -126,6 +127,11 @@ MEDIA_URL = "/mediafiles/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
 
+IMAGES_DIR = os.path.join(MEDIA_ROOT, 'images')
+
+if not os.path.exists(MEDIA_ROOT) or not os.path.exists(IMAGES_DIR):
+    os.makedirs(IMAGES_DIR)
+
 STATIC_URL = "/staticfiles/"
 
 STATICFILES_DIRS = (
@@ -139,3 +145,10 @@ STATICFILES_DIRS = (
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
 LOGIN_URL = '/usuario/iniciar_sesion/'
+
+# Celery
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
