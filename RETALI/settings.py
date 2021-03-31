@@ -26,7 +26,8 @@ DEBUG = int(os.environ.get("DEBUG", default=True))
 
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ") if os.environ.get("DJANGO_ALLOWED_HOSTS") is not None else "*"
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ") if os.environ.get(
+    "DJANGO_ALLOWED_HOSTS") is not None else "*"
 
 INSTALLED_APPS = [
     'django_cleanup',
@@ -91,7 +92,6 @@ DATABASES = {  # Base de datos producción
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -152,3 +152,4 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
+CELERY_TASK_ALWAYS_EAGER = False  # True para ejecutar la tarea localmente de manera asincrona (Desarrollo o pruebas)
