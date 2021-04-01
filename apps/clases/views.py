@@ -8,6 +8,7 @@ from django.views.generic.base import View, TemplateView
 from .forms import ClaseForm
 from .models import Clase, Inscripcion, EstadoSolicitudUnirse
 from ..usuarios.mixins import MaestroMixin, AlumnoMixin
+from ..utils.imagenes.models import ImagenConCalidades
 
 
 class RegistroClaseView(MaestroMixin, CreateView):
@@ -24,6 +25,8 @@ class RegistroClaseView(MaestroMixin, CreateView):
             clase = formulario.save(commit=False)
             clase.maestro_id = request.user.persona.maestro.pk
             clase.codigo = Clase.obtener_codigo_unico()
+            imagen = ImagenConCalidades.guardar_imagen_original(formulario.cleaned_data['foto'])
+            clase.imagen_con_calidades_id = imagen.pk
             clase.save()
             return HttpResponseRedirect(self.success_url)
         else:

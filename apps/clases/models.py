@@ -4,6 +4,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from apps.usuarios.models import Persona
+from apps.utils.imagenes.models import ImagenConCalidades
 
 
 class Maestro(Persona):
@@ -23,7 +24,7 @@ class Clase(models.Model):
     escuela = models.CharField(max_length=50, null=False)
     nombre = models.CharField(max_length=70, null=False)
     abierta = models.BooleanField(default=True)
-    foto = models.ImageField(upload_to='clases')
+    imagen_con_calidades = models.OneToOneField(ImagenConCalidades, on_delete=models.CASCADE)
     maestro = models.ForeignKey(Maestro, on_delete=models.RESTRICT)
     creada_en = models.DateField(default=timezone.now)
 
@@ -99,7 +100,7 @@ class Clase(models.Model):
             'escuela': self.escuela,
             'foto': self.foto.url,
             'maestro': self.maestro.nombre + ' ' + self.maestro.apellidos,
-            'foto_maestro': url_foto_maeestro
+            #'foto_maestro': url_foto_maeestro
         }
         return datos_clase
 
