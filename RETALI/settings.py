@@ -29,6 +29,10 @@ DEBUG = int(os.environ.get("DEBUG", default=True))
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ") if os.environ.get(
     "DJANGO_ALLOWED_HOSTS") is not None else "*"
 
+ADMINS = (('Miguel', 'pumas.chino99@gmail.com'),)
+
+MANAGERS = ADMINS
+
 INSTALLED_APPS = [
     'django_cleanup',
     'django.contrib.admin',
@@ -152,4 +156,12 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_TASK_ALWAYS_EAGER = False  # True para ejecutar la tarea localmente de manera asincrona (Desarrollo o pruebas)
+CELERY_TASK_ALWAYS_EAGER = True  # True para ejecutar la tarea localmente de manera asincrona (Desarrollo o pruebas)
+
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'retali@outlook.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'pon_tu_contraseña_aqui')
+EMAIL_USE_SSL = True
