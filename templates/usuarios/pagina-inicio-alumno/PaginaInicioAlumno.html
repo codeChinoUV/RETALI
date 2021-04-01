@@ -47,10 +47,14 @@
                          title="{% if clase.nombre|length > 30%}{{ clase.nombre|slice:"0:25" }}...{% else %}{{ clase.nombre }}{% endif %}">
                         <a href="{% url 'ver_materia_alumno' clase.codigo %}">
                             <div class="icono">
-                                {% if clase.foto %}
-                                    <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
+                                {% if clase.imagen_con_calidades  %}
+                                    {% if clase.imagen_con_calidades.obtener_imagen_calidad_media %}
+                                        <img src="{{ clase.imagen_con_calidades.imagen_calidad_media.url }}" alt="Imagen de la clase">
+                                    {% else %}
+                                        <img src="{{ clase.imagen_con_calidades.imagen_original.url }}" alt="Imagen de la clase">
+                                    {% endif %}
                                 {% else %}
-                                    <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
+                                    <img src="{% static 'usuarios/pagina-inicio/imagenes/libro.png' %}" alt="Imagen de la clase">
                                 {% endif %}
                             </div>
                             {% if clase.nombre|length > 30 %}
@@ -128,8 +132,12 @@
                 {% for clase in clases %}
                     {% if clase.estado_inscipcion == 'Aceptado' %}
                     <div class="clase">
-                        {% if clase.foto  %}
-                            <img src="{{ clase.foto.url }}" alt="Imagen de la clase">
+                        {% if clase.imagen_con_calidades  %}
+                            {% if clase.imagen_con_calidades.obtener_imagen_calidad_media %}
+                                <img src="{{ clase.imagen_con_calidades.imagen_calidad_media.url }}" alt="Imagen de la clase">
+                            {% else %}
+                                <img src="{{ clase.imagen_con_calidades.imagen_original.url }}" alt="Imagen de la clase">
+                            {% endif %}
                         {% else %}
                             <img src="{% static 'usuarios/pagina-inicio/imagenes/libro.png' %}" alt="Imagen de la clase">
                         {% endif %}
@@ -148,8 +156,12 @@
                 {% for clase in clases %}
                     {% if clase.estado_inscipcion == 'En espera' %}
                     <div class="clase">
-                        {% if clase.foto  %}
-                            <img src="{{ clase.foto.url }}" alt="Imagen de la clase">
+                        {% if clase.imagen_con_calidades  %}
+                            {% if clase.imagen_con_calidades.obtener_imagen_calidad_media %}
+                                <img src="{{ clase.imagen_con_calidades.imagen_calidad_media.url }}" alt="Imagen de la clase">
+                            {% else %}
+                                <img src="{{ clase.imagen_con_calidades.imagen_original.url }}" alt="Imagen de la clase">
+                            {% endif %}
                         {% else %}
                             <img src="{% static 'usuarios/pagina-inicio/imagenes/libro.png' %}" alt="Imagen de la clase">
                         {% endif %}
@@ -168,8 +180,12 @@
                 {% for clase in clases %}
                     {% if clase.estado_inscipcion == 'Rechazado' %}
                     <div class="clase">
-                        {% if clase.foto  %}
-                            <img src="{{ clase.foto.url }}" alt="Imagen de la clase">
+                        {% if clase.imagen_con_calidades  %}
+                            {% if clase.imagen_con_calidades.obtener_imagen_calidad_media %}
+                                <img src="{{ clase.imagen_con_calidades.imagen_calidad_media.url }}" alt="Imagen de la clase">
+                            {% else %}
+                                <img src="{{ clase.imagen_con_calidades.imagen_original.url }}" alt="Imagen de la clase">
+                            {% endif %}
                         {% else %}
                             <img src="{% static 'usuarios/pagina-inicio/imagenes/libro.png' %}" alt="Imagen de la clase">
                         {% endif %}
