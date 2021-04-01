@@ -95,12 +95,16 @@ class Clase(models.Model):
         url_foto_maeestro = ''
         if self.maestro.foto_de_perfil:
             url_foto_maeestro = self.maestro.foto_de_perfil.url
+        if self.imagen_con_calidades.obtener_imagen_calidad_media():
+            url_foto_clase = self.imagen_con_calidades.obtener_imagen_calidad_media().url
+        else:
+            url_foto_clase = self.imagen_con_calidades.imagen_original.url
         datos_clase = {
             'nombre': self.nombre,
             'escuela': self.escuela,
-            'foto': self.foto.url,
+            'foto': url_foto_clase,
             'maestro': self.maestro.nombre + ' ' + self.maestro.apellidos,
-            #'foto_maestro': url_foto_maeestro
+            'foto_maestro': url_foto_maeestro
         }
         return datos_clase
 
