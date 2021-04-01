@@ -47,15 +47,7 @@
                          title="{% if clase.nombre|length > 30%}{{ clase.nombre|slice:"0:25" }}...{% else %}{{ clase.nombre }}{% endif %}">
                         <a href="{% url 'ver_materia_alumno' clase.codigo %}">
                             <div class="icono">
-                                {% if clase.imagen_con_calidades  %}
-                                    {% if clase.imagen_con_calidades.obtener_imagen_calidad_media %}
-                                        <img src="{{ clase.imagen_con_calidades.imagen_calidad_media.url }}" alt="Imagen de la clase">
-                                    {% else %}
-                                        <img src="{{ clase.imagen_con_calidades.imagen_original.url }}" alt="Imagen de la clase">
-                                    {% endif %}
-                                {% else %}
-                                    <img src="{% static 'usuarios/pagina-inicio/imagenes/libro.png' %}" alt="Imagen de la clase">
-                                {% endif %}
+                                <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
                             </div>
                             {% if clase.nombre|length > 30 %}
                             <div class="titulo"> {{ clase.nombre|slice:"0:25" }}...</div>
