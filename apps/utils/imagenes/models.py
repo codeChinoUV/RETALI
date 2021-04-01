@@ -1,11 +1,14 @@
 import io
 import os
 import sys
+
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.db import models
 from PIL import Image
 from django.core.files.uploadedfile import InMemoryUploadedFile
+
+from apps.utils.email import Email
 
 logger = get_task_logger(__name__)
 
@@ -37,22 +40,28 @@ class ImagenConCalidades(models.Model):
     imagen_calidad_alta = models.ImageField(upload_to=obtener_path_de_subida, null=True)
     imagen_calidad_media = models.ImageField(upload_to=obtener_path_de_subida, null=True)
     imagen_calidad_baja = models.ImageField(upload_to=obtener_path_de_subida, null=True)
-    estado_convercion = models.CharField(max_length=13, choices=EstadoConvercionImagenes.choices,
+    estado_conversion = models.CharField(max_length=13, choices=EstadoConvercionImagenes.choices,
                                          default=EstadoConvercionImagenes.SIN_CONVERTIR)
 
-    def guardar_imagen_original(self, imagen):
-        self.imagen_original = imagen
-        self.save()
-        ImagenConCalidades.crear_calidades.delay(self.pk)
+    @classmethod
+    def guardar_imagen_original(cls, imagen):
+        imagen_con_calidades = ImagenConCalidades(imagen_original=imagen)
+        imagen_con_calidades.save()
+        ImagenConCalidades.crear_calidades.delay(imagen_con_calidades.pk)
+        return imagen_con_calidades
 
     def __validar_calidades_de_imagen_disponibles(self):
         """
         Valida si las calidades de las imagenes se encuentran disponibles, de no ser así empieza a realizar la
         conversión
         """
-        if self.estado_convercion != EstadoConvercionImagenes.CONVERTIDA and self.estado_convercion \
+        if self.estado_conversion != EstadoConvercionImagenes.CONVERTIDA and self.estado_conversion \
                 != EstadoConvercionImagenes.EN_PROCESO:
-            ImagenConCalidades.crear_calidades.delay(self.pk)
+            try:
+                ImagenConCalidades.crear_calidades.delay(self.pk)
+            except Exception as e:
+                ImagenConCalidades.crear_calidades(self.pk)
+                Email.enviar_mensaje_de_error(f'Ocurrio un error al conectarse con el servidor de redis {str(e)}')
 
     def obtener_imagen_calidad_alta(self):
         """Recupera la imagen con calidad alta"""
@@ -78,7 +87,7 @@ class ImagenConCalidades(models.Model):
         """Crea imagenes de diferentes resoluciones de una Imagen"""
         imagen_con_calidades = ImagenConCalidades.objects.filter(pk=id_imagen_con_calidades).first()
         try:
-            imagen_con_calidades.estado_convercion = EstadoConvercionImagenes.EN_PROCESO
+            imagen_con_calidades.estado_conversion = EstadoConvercionImagenes.EN_PROCESO
             imagen_con_calidades.save()
             imagen = imagen_con_calidades.imagen_original
             path, file = os.path.split(imagen.path)
@@ -108,11 +117,11 @@ class ImagenConCalidades(models.Model):
                                                                    RESOLUCION_CALIDAD_BAJA[1],
                                                                    imagen_con_calidades.__class__.CALIDAD_IMAGENES)
             imagen_con_calidades.imagen_calidad_baja = imagen_calidad_baja
-            imagen_con_calidades.estado_convercion = EstadoConvercionImagenes.CONVERTIDA
+            imagen_con_calidades.estado_conversion = EstadoConvercionImagenes.CONVERTIDA
             imagen_con_calidades.save()
             logger.info(f'Se ha terminado de convertir las calidades de la imagen con id {id_imagen_con_calidades}')
         except Exception as e:
-            imagen_con_calidades.estado_convercion = EstadoConvercionImagenes.EN_ERROR
+            imagen_con_calidades.estado_conversion = EstadoConvercionImagenes.EN_ERROR
             imagen_con_calidades.save()
             logger.error(f'Ocrrio un error al convertir la imagen con id {id_imagen_con_calidades}: {e}')
 
