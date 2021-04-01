@@ -40,7 +40,15 @@
     <h1>{{ clase_actual.nombre }}</h1>
     <hr>
     <div id="tarjeta-informacion-clase">
-        <img src="{{ clase_actual.foto.url }}" alt="Foto de clase">
+        {% if clase_actual.imagen_con_calidades  %}
+            {% if clase_actual.imagen_con_calidades.obtener_imagen_calidad_media %}
+                <img src="{{ clase_actual.imagen_con_calidades.imagen_calidad_media.url }}" alt="Imagen de la clase">
+            {% else %}
+                <img src="{{ clase_actual.imagen_con_calidades.imagen_original.url }}" alt="Imagen de la clase">
+            {% endif %}
+        {% else %}
+            <img src="{% static 'usuarios/pagina-inicio/imagenes/libro.png' %}" alt="Imagen de la clase">
+        {% endif %}
         <div>
             <p>{{ clase_actual.escuela }}</p>
             <p>Codigo de la clase: {{ clase_actual.codigo }}</p>
