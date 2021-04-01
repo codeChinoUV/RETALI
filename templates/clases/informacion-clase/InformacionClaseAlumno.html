@@ -36,19 +36,27 @@
     <div id="tarjeta-informacion-clase">
         {% if user.persona.alumno.foto_de_perfil %}
             <img src="{{ user.persona.alumno.foto_de_perfil.url }}" alt="foto de perfil">
-            {% else %}
-                <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
+        {% else %}
+            <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
         {% endif %}
         <div>
-            <p> Datos del docente</p>
+            <h4> Datos del docente</h4>
             <p>Docente: {{ clase_actual.maestro.nombre }}  {{ clase_actual.maestro.apellidos }}</p>
             <p>Teléfono: {{ clase_actual.maestro.numero_telefonico }}</p>
         </div>
     </div>
     <div id="tarjeta-informacion-clase">
-        <img src="{{ clase_actual.foto.url }}" alt="Foto de clase">
+        {% if clase_actual.imagen_con_calidades  %}
+            {% if clase_actual.imagen_con_calidades.obtener_imagen_calidad_media %}
+                <img src="{{ clase_actual.imagen_con_calidades.imagen_calidad_media.url }}" alt="Imagen de la clase">
+            {% else %}
+                <img src="{{ clase_actual.imagen_con_calidades.imagen_original.url }}" alt="Imagen de la clase">
+            {% endif %}
+        {% else %}
+            <img src="{% static 'usuarios/pagina-inicio/imagenes/libro.png' %}" alt="Imagen de la clase">
+        {% endif %}
         <div>
-             <p> Otros datos</p>
+            <h4>Información de la clase</h4>
             <p>{{ clase_actual.escuela }}</p>
             <p>Codigo de la clase: {{ clase_actual.codigo }}</p>
         </div>
