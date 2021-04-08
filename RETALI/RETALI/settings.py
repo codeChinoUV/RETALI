@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY") if os.environ.get("SECRET_KEY") is not None else "asdfgsds"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.environ.get("DEBUG", default=True))
+DEBUG = int(os.environ.get("DEBUG", default=1))
 
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'RETALI.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {  # Base de datos producción
-    'default': {
+    "default": {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
         "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
         "USER": os.environ.get("SQL_USER", "user"),
@@ -137,14 +137,7 @@ if not os.path.exists(MEDIA_ROOT) or not os.path.exists(IMAGES_DIR):
     os.makedirs(IMAGES_DIR)
 
 STATIC_URL = "/staticfiles/"
-
-STATICFILES_DIRS = (
-
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    BASE_DIR / 'staticfiles/',
-)
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
@@ -156,7 +149,7 @@ CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localho
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_TASK_ALWAYS_EAGER = False  # True para ejecutar la tarea localmente de manera asincrona (Desarrollo o pruebas)
+CELERY_TASK_ALWAYS_EAGER = os.environ.get('CELERY_TASK_ALWAYS_EAGER', 1) # True para ejecutar la tarea localmente de manera asincrona (Desarrollo o pruebas)
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
