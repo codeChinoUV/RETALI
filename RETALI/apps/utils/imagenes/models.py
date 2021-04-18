@@ -10,6 +10,8 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from apps.utils.email import Email
 
+from RETALI.settings import MEDIA_ROOT, DEBUG
+
 logger = get_task_logger(__name__)
 
 
@@ -94,7 +96,11 @@ class ImagenConCalidades(models.Model):
             file_name, ext = os.path.splitext(file)
             ext = ext.replace('.', '')
             logger.info(f'Se ha empezado a convertir la imagen con id {id_imagen_con_calidades}')
-            stream = imagen.open()
+            path_subida = obtener_path_de_subida(imagen_con_calidades, file)
+            if DEBUG:
+                stream = imagen.open()
+            else:
+                stream = open(f'{MEDIA_ROOT}/{path_subida}', 'rb')
             imagen_bytes = Image.open(stream)
             imagen_calidad_alta = ImagenConCalidades._crear_imagen(imagen_bytes, file_name, ext,
                                                                    imagen_con_calidades.__class__.

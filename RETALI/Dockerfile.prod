@@ -12,17 +12,14 @@ WORKDIR /usr/src/app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# install psycopg2 dependencies
 RUN apk update && apk add postgresql-dev gcc python3-dev jpeg-dev zlib-dev musl-dev
-
 # lint
-#RUN pip3 install --upgrade pip
-#RUN pip3 install flake8
+RUN pip install --upgrade pip
 COPY . .
 
 # install dependencies
-COPY requerimientos.txt .
-RUN pip3 wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requerimientos.txt
+COPY ./requerimientos.txt .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requerimientos.txt
 
 
 #########
@@ -44,17 +41,13 @@ ENV APP_HOME=/home/app/web
 RUN mkdir $APP_HOME
 RUN mkdir $APP_HOME/staticfiles
 RUN mkdir $APP_HOME/mediafiles
-RUN mkdir $APP_HOME/mediafiles/clases
-RUN mkdir $APP_HOME/mediafiles/entregas
 WORKDIR $APP_HOME
 
 # install dependencies
 RUN apk update && apk add postgresql-dev gcc python3-dev jpeg-dev zlib-dev musl-dev libpq
-RUN apk update && apk add libpq
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requerimientos.txt .
-RUN pip3 install --no-cache /wheels/*
-#RUN pip3 install -r requerimientos.txt
+RUN pip install --no-cache /wheels/*
 
 # copy entrypoint-prod.sh
 COPY ./entrypoint.prod.sh $APP_HOME
@@ -64,8 +57,6 @@ COPY . $APP_HOME
 
 # chown all the files to the app user
 RUN chown -R app:app $APP_HOME
-
-RUN pip install pillow
 
 # change to the app user
 USER app
