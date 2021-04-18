@@ -1,0 +1,80 @@
+{% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
+{% load static %}
+{% block nombre_pagina %} Clase {{ clase_actual.nombre}} {% endblock %}
+{% block estilos-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static 'clases/informacion-clase/estilos/informacion-clase.css' %}">
+{% endblock %}
+{% block links %}
+    <li class="link-actual">
+        <a href="{% url 'ver_materia' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'actividades' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'foros' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'avisos' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/alertas.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Avisos</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'grupo' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Grupo</div>
+        </a>
+    </li>
+{% endblock %}
+{% block contenido %}
+    <h1>{{ clase_actual.nombre }}</h1>
+    <hr>
+    <div id="tarjeta-informacion-clase">
+        {% if clase_actual.imagen_con_calidades  %}
+            {% if clase_actual.imagen_con_calidades.obtener_imagen_calidad_media %}
+                <img src="{{ clase_actual.imagen_con_calidades.imagen_calidad_media.url }}" alt="Imagen de la clase">
+            {% else %}
+                <img src="{{ clase_actual.imagen_con_calidades.imagen_original.url }}" alt="Imagen de la clase">
+            {% endif %}
+        {% else %}
+            <img src="{% static 'usuarios/pagina-inicio/imagenes/libro.png' %}" alt="Imagen de la clase">
+        {% endif %}
+        <div>
+            <p>{{ clase_actual.escuela }}</p>
+            <p>Codigo de la clase: {{ clase_actual.codigo }}</p>
+        </div>
+    </div>
+    <div id="tarjeta-estadistica-clase">
+        <div class="tarjeta-estadistica">
+            <img src="{% static 'generales/imagenes/portapapeles.png' %}" alt="imagen actividades">
+            <div class="estadistica">
+                <p>Total de actividades: {{ total_de_actividades }}</p>
+                <p>Actividades abiertas: {{ actividades_abiertas }}</p>
+            </div>
+        </div>
+        <div class="tarjeta-estadistica">
+            <img src="{% static 'generales/imagenes/charlando.png' %}" alt="imagen foros">
+            <div class="estadistica">
+                <p>Total de foros: {{ total_de_foros }}</p>
+                <p>Foros activos: {{ foros_abiertos }}</p>
+            </div>
+        </div>
+        <div class="tarjeta-estadistica">
+            <img src="{% static 'generales/imagenes/graduado.png' %}" alt="imagen alumno">
+            <div class="estadistica">
+                <p>Alumnos aceptados: {{ alumnos_aceptados }}</p>
+                <p>Alumnos pendientes de aceptar: {{ alumnos_en_espera }} </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
