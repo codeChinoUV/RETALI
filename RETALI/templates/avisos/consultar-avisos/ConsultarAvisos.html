@@ -1,0 +1,75 @@
+{% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
+{% load static %}
+{% load tz %}
+{% block nombre_pagina %} Avisos {% endblock %}
+{% block estilos-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static 'avisos/consultar-avisos-maestro/estilos/consultar-avisos.css' %}">
+{% endblock %}
+{% block links %}
+    <li>
+        <a href="{% url 'ver_materia' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'actividades' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'foros' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    </li>
+    <li class="link-actual">
+        <a href="{% url 'avisos' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/alertas.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Avisos</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'grupo' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Grupo</div>
+        </a>
+    </li>
+{% endblock %}
+{% block contenido %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                    <div class="alert alert-{{ message.level_tag }}" role="alert">
+                        {{ message.message }}
+                    </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <h1 class="titulo-seccion">Avisos</h1>
+    <hr>
+    <div id="informacion-avisos">
+        <p>Total de avisos: {{ aviso_list|length }}</p>
+        <a href="{% url 'crear_aviso' clase_actual.codigo %}" >
+            <div>Nuevo aviso</div>
+            <img src="{% static 'avisos/consultar-avisos-maestro/imagenes/registrar-aviso.svg' %}" alt="icono crear">
+        </a>
+    </div>
+    {% for aviso in aviso_list %}
+        <div class="aviso">
+            <div class="cabecera-aviso">
+                <img class="aviso-imagen" src="{% static 'generales/imagenes/altoparlante.png' %}" alt="imagen aviso">
+                <div class="informacion-aviso">
+                    <h3>{{ aviso.nombre }}</h3>
+                </div>
+                {% timezone 'America/Mexico_City' %}
+                <p>{{ aviso.fecha_publicado }}</p>
+                {% endtimezone %}
+            </div>
+            <div class="aviso-contenido">
+                <p>{{ aviso.descripcion }}</p>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

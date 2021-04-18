@@ -1,0 +1,64 @@
+{% extends 'usuarios/pagina-inicio-alumno/PaginaInicioAlumno.html' %}
+{% load static %}
+{% load tz %}
+{% block estilos-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static 'foros/consultar-foros-maestro/estilos/consultar-foros-maestro.css' %}">
+{% endblock %}
+{% block links %}
+    <li >
+        <a href="{% url 'ver_materia_alumno' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'actividades_alumno' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    </li>
+    <li class="link-actual">
+        <a href="#">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'avisos_alumno' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/alertas.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Avisos</div>
+        </a>
+    </li>
+{% endblock %}
+{% block contenido %}
+    <h1 class="titulo-seccion">Foros</h1>
+    <hr>
+    <div id="informacion-foros">
+        <p>Foros abiertos: {{ cantidad_foros_abiertos }}</p>
+        <p>Total de foros: {{ total_de_foros }}</p>
+    </div>
+    {% for foro in foro_list %}
+        <div class="foro">
+            <img class="foro-imagen" src="{% static 'generales/imagenes/charlando.png' %}" alt="imagen actividad">
+            <div class="informacion-foro">
+                <h3><a href="{% url 'consultar_foro' clase_actual.codigo foro.pk %}">{{ foro.nombre }}</a></h3>
+                {% timezone 'America/Mexico_City' %}
+                    <p>Del: <b>{{ foro.fecha_de_inicio }}</b> hasta las: <b>{{ foro.fecha_de_cierre }}</b></p>
+                {% endtimezone %}
+                <p>{{ foro.cantidad_de_participaciones }} Persona(s) han participado en el foro</p>
+            </div>
+            <div class="estado-foro">
+                {% if foro.estado == 'Abierta' %}
+                    <div class="color-foro abierta"></div>
+                    <p>Abierto</p>
+                {% elif foro.estado == 'Cerrada'%}
+                    <div class="color-foro cerrada"></div>
+                    <p>Cerrado</p>
+                {% else %}
+                    <div class="color-actividad por-abrir"></div>
+                    <p>Por abrir</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

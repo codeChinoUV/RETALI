@@ -1,0 +1,5 @@
+# Iniciar worker
+celery -A RETALI worker --loglevel=info
+
+#Iniciar server redis
+redis-server

@@ -1,0 +1,63 @@
+#formulario-registro-foro{
+    background-color: var(--bgcolor);
+    color: white;
+    margin: 2% 10%;
+    padding: 1%;
+    display: flow-root;
+    border-radius: 2rem;
+}
+
+#formulario-registro-foro img{
+    width: 88px;
+    display: block;
+    float: left;
+    margin-top: 20px;
+}
+
+#inputs-registro-foro{
+    width: calc(100% - 88px);
+    float: right;
+    padding: 1%;
+}
+
+#inputs-registro-foro input,
+#inputs-registro-foro textarea{
+    background-color: var(--primary-color);
+    border-radius: 1rem;
+    border: none;
+    color: white;
+}
+
+#inputs-registro-foro div label{
+    margin-left: 1rem;
+}
+
+.input-fechas-foro{
+    width: auto;
+    display: block;
+    float: left;
+    margin-right: 1%;
+}
+
+#id_fecha_de_inicio,
+#id_fecha_de_cierre{
+    background: url('../../../actividades/registro-actividad/imagenes/fecha.svg') no-repeat scroll 5px 5px;
+    background-size: 25px 25px;
+    padding-left: 35px;
+}
+
+#inputs-registro-foro input[type="submit"]{
+    background-color: var(--hovercolor);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 1rem;
+    vertical-align: center;
+    margin: 2.5% 0;
+    float: right;
+}
+
+.invalid-feedback{
+    display: block;
+    margin-left: 1rem;
+}

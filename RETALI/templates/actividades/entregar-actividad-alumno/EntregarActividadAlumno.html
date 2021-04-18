@@ -1,0 +1,166 @@
+{%  extends 'usuarios/pagina-inicio-alumno/PaginaInicioAlumno.html' %}
+{% load static %}
+{% load tz %}
+{% load file_extras  %}
+{% block nombre_pagina%}Entregar activdad{% endblock %}
+{% block estilos-extra %}
+    <link rel="stylesheet" href="{% static 'actividades/entregar-actividad-alumno/estilos/entregar-actividad-alumno.css' %}">
+{% endblock %}
+{% block links %}
+    <li>
+         <a href="{% url 'ver_materia_alumno' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    </li>
+    <li class="link-actual">
+        <a id="link-redireccion" href="{% url 'actividades_alumno' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'foros_alumno' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    </li>
+    <li>
+         <a href="{% url 'avisos_alumno' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/alertas.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Avisos</div>
+        </a>
+    </li>
+{% endblock %}
+{% block datosPerfil %}
+    <div id="perfil">
+        <div id="foto">
+            {% if user.persona.alumno.foto_de_perfil %}
+                <img src="{{ user.persona.alumno.foto_de_perfil.url }}" alt="foto de perfil">
+            {% else %}
+                <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
+            {% endif %}
+        </div>
+        <div id="nombre">{{ user.persona.alumno.nombre }} {{ user.persona.maestro.apellidos }}</div>
+    </div>
+{% endblock %}
+{% block listaDeClases %}
+     <div id="clases">
+        {% for clase in clases %}
+            {% if clase.estado_inscipcion == 'Aceptado' %}
+            <div class="elemento elemento-clase">
+                <a href="{% url 'ver_materia_alumno' clase.codigo %}">
+                    <div class="icono">
+                        {% if clase.foto %}
+                            <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
+                        {% else %}
+                            <img src="{% static 'usuarios/pagina-inicio/imagenes/clase.png' %}" alt="Foto de la clase">
+                        {% endif %}
+                    </div>
+                    <div class="titulo">{{ clase.nombre }}</div>
+                </a>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+ {% endblock %}
+{% block contenido %}
+    <h1 class="titulo-seccion">Entregar actividad</h1>
+    <hr>
+    <div id="entrega">
+        <div id="cabecera-actividad">
+            <img src="{% static 'generales/imagenes/portapapeles.png' %}" alt="imagen activdad">
+            <div id="informacion-actividad">
+                <h2>{{ actividad.nombre }}</h2>
+                {% timezone 'America/Mexico_City' %}
+                <p>Del: {{ actividad.fecha_de_inicio }} hasta: {{ actividad.fecha_de_cierre }} </p>
+                {% endtimezone %}
+            </div>
+            <div id="calificacion-actividad">
+                <div id="calificacion-circulo">
+                    {% if entrega.revision %}
+                        {{ entrega.revision.calificacion }}
+                    {% else %}
+                        SC
+                    {% endif %}
+                </div>
+                <p>Calificación</p>
+            </div>
+        </div>
+        <div id="cuerpo-entrega">
+            <div class="form-group">
+                <label for="descripcion_actividad">Descripción de la actividad: </label>
+                <textarea id="descripcion_actividad" class="form-control" disabled cols="40" rows="10">{{ actividad.descripcion }}</textarea>
+            </div>
+            <form method="post" id="entregaForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="comentarios_entrega">Comentarios de la entrega: </label>
+                    <textarea id="comentarios_entrega" name="comentarios" class="form-control"
+                            {% if actividad.estado == 'Cerrada' %} disabled {% endif %} cols="40" rows="5">{{ entrega.comentarios }}</textarea>
+                </div>
+                {% if entrega %}
+                    {% if archivos|length > 0 %}
+                        <p>Archivos previamente adjuntos:</p>
+                    {% endif %}
+                    <div id="archivos-de-entrega-anteriores">
+                    {% for archivo in archivos %}
+                        <div class="archivo-previo">
+                            {% if archivo.extension == 'otro' %}
+                                <img class="img-tipo-archivo" src="{% static 'actividades/revisar-entrega-actividad/imagenes/archivo.svg' %}" alt="archivo">
+                            {% elif archivo.extension == 'pdf' %}
+                                <img class="img-tipo-archivo" src="{% static 'actividades/revisar-entrega-actividad/imagenes/pdf.svg' %}" alt="archivo">
+                            {% elif archivo.extension == 'imagen' %}
+                                <img class="img-tipo-archivo" src="{{ archivo.archivo.url }}" alt="archivo">
+                            {% elif archivo.extension == 'video' %}
+                                <img class="img-tipo-archivo" src="{% static 'actividades/revisar-entrega-actividad/imagenes/video.svg' %}" alt="archivo">
+                            {% endif %}
+                            <div class="informacion-archivo">
+                                <p class="nombre-archivo">{{ archivo.nombre }}</p>
+                                <p class="tamano-archivo">{{ archivo.archivo.size|sizify }}</p>
+                            </div>
+                            <div class="descargar">
+                                <a href="{% url 'descargar_archivo_entrega' clase_actual.codigo actividad.pk entrega.pk archivo.pk %}">
+                                    <img src="{% static 'generales/imagenes/descargar.svg' %}" alt="Descargar">
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% endif %}
+                {% if actividad.estado == 'Abierta' %}
+                <p class="titulo-completo">Archivos adjuntos: </p>
+                    <div class="form-group" id="archivos-adjuntos">
+                        <div class="drop-zone">
+                            <input id="drop-zone-input" name="archivos" type="file" multiple />
+                            <span class="drop-zone__prompt">Suelta los archivos o da click aquí</span>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if actividad.estado == 'Abierta' %}
+                <hr id="linea-entrega">
+                <div id="enviar-formulario">
+                    <div id="progeso-subida">
+                        <label id="archivo-subiendo">Subiendo archivos: </label>
+                        <div class="progressbar" id="progressBar">
+                            <div class="progressbar-fill">
+                                <span class="progressbar-text">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button entrega-previa="{% if entrega %}si{% else %}no{% endif %}" type="submit">Entregar actividad</button>
+                </div>
+                {% endif %}
+            </form>
+            {% if entrega.revision %}
+            <div class="form-group">
+                <label class="titulo-completo" for="comentarios_revision">Comentarios de la revisión: </label>
+                <textarea id="comentarios_revision" name="comentarios" class="form-control" cols="40" rows="5" disabled>{{ entrega.revision.retroalimentacion }}</textarea>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+{% block scripts-adicionales %}
+    <script src="{% static 'actividades/entregar-actividad-alumno/scripts/entregar-actividad-alumno.js' %}"></script>
+{% endblock %}

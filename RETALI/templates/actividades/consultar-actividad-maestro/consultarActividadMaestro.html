@@ -1,0 +1,112 @@
+{% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
+{% load static %}
+{% load tz %}
+{% block nombre_pagina %} Ver actividad {% endblock %}
+{% block estilos-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static 'actividades/registro-actividad/estilos/registro-actividades.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'actividades/consultar-actividad-maestro/estilos/consultar-actividad-maestro.css' %}">
+{% endblock %}
+{% block links %}
+    <li>
+        <a href="{% url 'ver_materia' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    </li>
+    <li class="link-actual">
+        <a href="{% url 'actividades' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'foros' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'avisos' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/alertas.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Avisos</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'grupo' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Grupo</div>
+        </a>
+    </li>
+{% endblock %}
+{% block contenido %}
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                    <div class="alert alert-{{ message.level_tag }}" role="alert">
+                        {{ message.message }}
+                    </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <h1 class="titulo-seccion">Ver actvidad</h1>
+    <hr>
+    <div id="formulario-registro-actividad">
+        <form>
+            <img src="{% static 'generales/imagenes/portapapeles.png' %}">
+            <div id="inputs-registro-actvidad">
+                <div class="form-group" >
+                    <label for="id_nombre">{{ form.nombre.label }}</label>
+                    {{ form.nombre }}
+                </div>
+                <div class="form-group">
+                    <label for="id_descripcion">{{ form.descripcion.label }}</label>
+                    {{ form.descripcion }}
+                </div>
+                <div class="form-group input-fechas-actividades">
+                    <label for="id_fecha_de_inicio">{{ form.fecha_de_inicio.label }}</label>
+                    {% timezone 'America/Mexico_City' %}
+                    {{ form.fecha_de_inicio }}
+                    {% endtimezone %}
+                </div>
+                <div class="form-group input-fechas-actividades">
+                    <label for="id_fecha_de_cierre">{{ form.fecha_de_cierre.label }}</label>
+                    {% timezone 'America/Mexico_City' %}
+                    {{ form.fecha_de_cierre }}
+                    {% endtimezone %}
+                </div>
+                <a id="boton-editar" href="{% url 'editar_actividad' clase_actual.codigo id_actividad %}">
+                    <div>Editar actividad</div>
+                    <img id="imagen-boton-editar" src="{% static 'actividades/consultar-actividad-maestro/imagenes/editar.svg' %}" alt="icono editar">
+                </a>
+            </div>
+        </form>
+    </div>
+    <div id="lista-entregas">
+        <h2>Entregas: </h2>
+        {% for entrega in entregas %}
+            <div class="tarjeta-entrega">
+                {% if entrega.alumno.foto_de_perfil %}
+                    <img src="{{ entrega.alumno.foto_de_perfil.url }}" alt="foto del alumno">
+                {% else %}
+                    <img src="{% static 'usuarios/pagina-inicio/imagenes/usuario.png' %}" alt="foto de perfil">
+                {% endif %}
+                <div class="informacion-tarjeta-entrega">
+                    <h3><a class="link-revision" href="{% url 'revisar_entrega' clase_actual.codigo id_actividad entrega.pk %}">{{ entrega.alumno.nombre }} {{ entrega.alumno.apellidos }}</a></h3>
+                    {% timezone 'America/Mexico_City' %}
+                        <p><b>Fecha de entrega:</b> {{ entrega.fecha_de_entrega }}</p>
+                    {% endtimezone %}
+                </div>
+                <div class="calificacion-entrega">
+                    {% if entrega.revision %}
+                        <div class="calificacion-actividad calificada">{{ entrega.revision.calificacion }}</div>
+                    {% else %}
+                        <div class="calificacion-actividad sin-calificar">SC</div>
+                    {% endif %}
+                    <p>Calificacion</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+{% block scripts-adicionales %}
+{% endblock %}

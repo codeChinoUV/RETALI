@@ -1,0 +1,87 @@
+{% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
+{% load static %}
+{% block nombre_pagina %} Registro de Foro {% endblock %}
+{% block estilos-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static 'foros/registro-foro/estilos/registro-foro.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+{% block links %}
+    <li>
+        <a href="{% url 'ver_materia' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'actividades' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    </li>
+    <li class="link-actual">
+        <a href="{% url 'foros' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'avisos' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/alertas.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Avisos</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'grupo' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Grupo</div>
+        </a>
+    </li>
+{% endblock %}
+{% block contenido %}
+    <h1 class="titulo-seccion">Registrar foro</h1>
+    <hr>
+    <div id="formulario-registro-foro">
+        <form method="POST">
+            {% csrf_token %}
+            <img src="{% static 'generales/imagenes/charlando.png' %}">
+            <div id="inputs-registro-foro">
+                <div class="form-group" >
+                    <label for="nombre">{{ form.nombre.label }}</label>
+                    {{ form.nombre }}
+                    {% if form.errors.nombre %}
+                        <div class="invalid-feedback">{{ form.errors.nombre }} </div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">{{ form.descripcion.label }}</label>
+                    {{ form.descripcion }}
+                    {% if form.errors.descripcion %}
+                        <div class="invalid-feedback">{{ form.errors.descripcion }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group input-fechas-foro">
+                    <label for="fecha_inicio">{{ form.fecha_de_inicio.label }}</label>
+                    {{ form.fecha_de_inicio }}
+                    {% if form.errors.fecha_de_inicio %}
+                        <div class="invalid-feedback">{{ form.errors.fecha_de_inicio }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group input-fechas-foro">
+                    <label for="fecha_cierre">{{ form.fecha_de_cierre.label }}</label>
+                    {{ form.fecha_de_cierre }}
+                    {% if form.errors.fecha_de_cierre %}
+                        <div class="invalid-feedback">{{ form.errors.fecha_de_cierre }}</div>
+                    {% endif %}
+                </div>
+                <input type="submit" value="Registrar foro">
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+{% block scripts-adicionales %}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="{% static 'scripts/validaciones.js' %}"></script>
+    <script src="{% static 'actividades/registro-actividad/scripts/agregar-evento-a-fechas.js' %}"></script>
+    <script src="{% static 'foros/registro-foro/scripts/registro-foro.js' %}"></script>
+{% endblock %}

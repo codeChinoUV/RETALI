@@ -1,0 +1,62 @@
+#formulario-registro-actividad{
+    background-color: var(--bgcolor);
+    color: white;
+    margin: 2% 10%;
+    padding: 1%;
+    display: flow-root;
+    border-radius: 2rem;
+}
+
+#formulario-registro-actividad img{
+    width: 88px;
+    display: block;
+    float: left;
+}
+
+#inputs-registro-actvidad{
+    width: calc(100% - 88px);
+    float: right;
+    padding: 1%;
+}
+
+#inputs-registro-actvidad input,
+#inputs-registro-actvidad textarea{
+    background-color: var(--primary-color);
+    border-radius: 1rem;
+    border: none;
+    color: white;
+}
+
+#inputs-registro-actvidad div label{
+    margin-left: 1rem;
+}
+
+.input-fechas-actividades{
+    width: auto;
+    display: block;
+    float: left;
+    margin-right: 1%;
+}
+
+#id_fecha_de_inicio,
+#id_fecha_de_cierre{
+    background: url('../imagenes/fecha.svg') no-repeat scroll 5px 5px;
+    background-size: 25px 25px;
+    padding-left: 35px;
+}
+
+#inputs-registro-actvidad input[type="submit"]{
+    background-color: var(--hovercolor);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 1rem;
+    vertical-align: center;
+    margin: 2.5% 0;
+    float: right;
+}
+
+.invalid-feedback{
+    display: block;
+    margin-left: 1rem;
+}

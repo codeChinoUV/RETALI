@@ -1,0 +1,61 @@
+{%  extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
+{% load static %}
+{% block titulo %}Registro de Clase{% endblock %}
+{% block estilos-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static 'clases/registro-clase/estilos/registro-clase.css' %}">
+{% endblock %}
+{% block links %}{% endblock %}
+{% block contenido %}
+    <div id="formulario_registro_clase" class="formulario_registro">
+        <img id="imagen-seleccionada" src="{% static 'clases/registro-clase/imagenes/AgregarImagen.png' %}">
+        <div id="campos-formulario">
+            <h2>Registrar clase</h2>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="nombre">{{ form.nombre.label }}</label>
+                    {{ form.nombre }}
+                    {% if form.errors %}
+                        {% for key, value in form.errors.items %}
+                            {% if key == 'nombre' %}
+                                <div class="invalid-feedback">El nombre no puede estar vacio y debe de tener menos de
+                                    120 letras</div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="escuela">{{ form.escuela.label }}</label>
+                    {{ form.escuela }}
+                    {% if form.errors %}
+                        {% for key, value in form.errors.items %}
+                            {% if key == 'escuela' %}
+                                <div class="invalid-feedback">El nombre de la escuela no puede estar vacio y debe de
+                                    tener menos de 100 letras</div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="foto">{{ form.foto.label }}</label>
+                    <div class="input-group mb-3">
+                        <div class="custom-file">
+                            {{ form.foto }}
+                            <label class="custom-file-label btn-" for="foto">Escoge un archivo</label>
+                        </div>
+                    </div>
+                    {% if form.errors %}
+                        {% for key, value in form.errors.items %}
+                            {% if key == 'foto' %}
+                                <div class="invalid-feedback">Debe de seleccionar una foto para su clase</div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <a href="{% url 'inicio' %}" class="btn btn-danger">Regresar</a>
+                <input type="button" id="btn-registrar" class="btn btn-primary" value="Registrar">
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript" src="{% static 'clases/registro-clase/scripts/registro-clase.js' %}"></script>
+{% endblock %}

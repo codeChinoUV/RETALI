@@ -1,0 +1,99 @@
+{% extends 'usuarios/paginaInicio/PaginaInicioMaestro.html' %}
+{% load static %}
+{% load tz %}
+{% block nombre_pagina %} Editar actividad {% endblock %}
+{% block estilos-extra %}
+    <link rel="stylesheet" type="text/css" href="{% static 'actividades/registro-actividad/estilos/registro-actividades.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+{% block links %}
+    <li>
+        <a href="{% url 'ver_materia' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/inicio.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Inicio</div>
+        </a>
+    </li>
+    <li class="link-actual">
+        <a href="{% url 'actividades' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/actividades.svg' %}" alt="Icono de actividades"></div>
+            <div class="titulo">Actividades</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'foros' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/foros.svg' %}" alt="Icono de foros"></div>
+            <div class="titulo">Foros</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'avisos' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/alertas.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Avisos</div>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'grupo' clase_actual.codigo %}">
+            <div class="icono"><img src="{% static 'clases/informacion-clase/imagenes/grupo.svg' %}" alt="Icono de inicio"></div>
+            <div class="titulo">Grupo</div>
+        </a>
+    </li>
+{% endblock %}
+{% block contenido %}
+    <h1 class="titulo-seccion">Editar actvidad</h1>
+    <hr>
+    <div id="formulario-registro-actividad">
+        <form method="POST">
+            {% csrf_token %}
+            <img src="{% static 'generales/imagenes/portapapeles.png' %}">
+            <div id="inputs-registro-actvidad">
+                <div class="form-group" >
+                    <label for="nombre">{{ form.nombre.label }}</label>
+                    {{ form.nombre }}
+                    {% if form.errors %}
+                        {% for key, value in form.errors.items %}
+                            {% if key == 'nombre' %}
+                                <div class="invalid-feedback">El nombre de la actividad no puede estar vacio y debe de
+                                    tener menos de 120 caracteres </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">{{ form.descripcion.label }}</label>
+                    {{ form.descripcion }}
+                    {% if form.errors %}
+                        {% for key, value in form.errors.items %}
+                            {% if key == 'descripcion' %}
+                                <div class="invalid-feedback">La descripción de la actividad no puede estar vacia</div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-group input-fechas-actividades">
+                    <label for="fecha_de_inicio">{{ form.fecha_de_inicio.label }}</label>
+                    {% timezone 'America/Mexico_City' %}
+                    {{ form.fecha_de_inicio }}
+                    {% endtimezone %}
+                    {% if form.errors.fecha_de_inicio %}
+                        <div class="invalid-feedback">{{ form.errors.fecha_de_inicio }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group input-fechas-actividades">
+                    <label for="fecha_de_cierre">{{ form.fecha_de_cierre.label }}</label>
+                    {% timezone 'America/Mexico_City' %}
+                    {{ form.fecha_de_cierre }}
+                    {% endtimezone %}
+                    {% if form.errors.fecha_de_cierre %}
+                        <div class="invalid-feedback">{{ form.errors.fecha_de_cierre }}</div>
+                    {% endif %}
+                </div>
+                <input type="submit" value="Guardar cambios">
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+{% block scripts-adicionales %}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="{% static 'actividades/editar-actividad/scripts/editar-actividad.js' %}"></script>
+{% endblock %}
