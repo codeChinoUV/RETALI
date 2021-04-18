@@ -15,6 +15,8 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+MEDIA_PATH = os.environ.get('APP_HOME', BASE_DIR)
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -129,7 +131,7 @@ USE_TZ = True
 
 MEDIA_URL = "/mediafiles/"
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
+MEDIA_ROOT = os.path.join(MEDIA_PATH, "mediafiles")
 
 IMAGES_DIR = os.path.join(MEDIA_ROOT, 'images')
 
@@ -137,19 +139,29 @@ if not os.path.exists(MEDIA_ROOT) or not os.path.exists(IMAGES_DIR):
     os.makedirs(IMAGES_DIR)
 
 STATIC_URL = "/staticfiles/"
+# Solo prodcuccion
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+#STATICFILES_DIRS = (
+
+    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+#    BASE_DIR / 'staticfiles/',
+#)
 
 AUTH_USER_MODEL = 'usuarios.Usuario'
 
 LOGIN_URL = '/usuario/iniciar_sesion/'
 
 # Celery
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379')
-CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379')
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER', 'redis://localhost:6379')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT', 'redis://localhost:6379')
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
-CELERY_TASK_ALWAYS_EAGER = os.environ.get('CELERY_TASK_ALWAYS_EAGER', 1) # True para ejecutar la tarea localmente de manera asincrona (Desarrollo o pruebas)
+# True para ejecutar la tarea localmente de manera asincrona (Desarrollo o pruebas)
+CELERY_TASK_ALWAYS_EAGER = False
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

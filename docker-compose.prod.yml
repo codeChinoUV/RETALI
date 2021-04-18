@@ -30,6 +30,22 @@ services:
       - 1337:80
     depends_on:
       - web
+  redis:
+    image: redis:alpine
+  celery:
+    restart: on-failure
+    build:
+      context: ./RETALI
+    command: celery -A RETALI worker --loglevel=info
+    volumes:
+      - ./RETALI:/usr/src/app
+      - media_volume:/home/app/web/mediafiles
+    env_file:
+      - .env.prod
+    depends_on:
+      - db
+      - redis
+      - web
 
 volumes:
   postgres_data:
